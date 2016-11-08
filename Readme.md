@@ -1,6 +1,10 @@
 # Yuck
 ### Learning to implement an imperative language in the twenty-first century.
 
+#### Imperative languages? What is this, 1996?
+
+#### Why are you using Java for the Frontend? Are you a masochist?
+
 #### Roadmap
 
 1. Specification of the `yuck` language.
