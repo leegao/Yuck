@@ -8,6 +8,7 @@ public class Grammar {
   private final Multimap<Variable, List<Atom>> mRules;
   private final HashMultimap<List<Atom>, Atom> mFirstCache = HashMultimap.create();
   private final Map<List<Atom>, Boolean> mNullableCache = new HashMap<>();
+  private final HashMultimap<Variable, Atom> mFollowCache = HashMultimap.create();
 
   public Grammar(Multimap<Variable, List<Atom>> rules) {
     mRules = rules;
@@ -16,6 +17,7 @@ public class Grammar {
   public Set<Atom> first(List<Atom> sentence) {
     // first(atom :: tl) = prefix(atom) + delta(atom) * first(tl)
     // changing tl -> changing (atom :: tl)
+    if (sentence.isEmpty()) return Sets.newHashSet(E());
     if (mFirstCache.containsKey(sentence)) {
       return mFirstCache.get(sentence);
     }
@@ -34,7 +36,7 @@ public class Grammar {
         int oldRule = mFirstCache.get(rule).size();
         Atom atom = rule.get(0);
         Set<Atom> prefix = new HashSet<>();
-        if (atom instanceof Terminal || atom instanceof Epsilon) {
+        if (atom instanceof Terminal | atom instanceof Epsilon) {
           prefix.add(atom);
         } else if (atom instanceof Variable) {
           for (List<Atom> subRule : mRules.get((Variable) atom)) {
@@ -44,8 +46,11 @@ public class Grammar {
         }
         if (prefix.contains(E())) {
           List<Atom> tail = rule.subList(1, rule.size());
-          original.add(tail);
-          prefix.addAll(mFirstCache.get(tail));
+          if (!tail.isEmpty()) {
+            prefix.remove(E());
+            original.add(tail);
+            prefix.addAll(mFirstCache.get(tail));
+          }
         }
         if (prefix.size() != oldRule || original.size() != oldRules) {
           mFirstCache.putAll(rule, prefix);
@@ -63,29 +68,52 @@ public class Grammar {
     if (mNullableCache.containsKey(sentence)) {
       return mNullableCache.get(sentence);
     }
-    boolean result = first(sentence).contains(E()) && nullable(sentence.subList(1, sentence.size()));
+    boolean result = first(sentence).contains(E());
     mNullableCache.put(sentence, result);
     return result;
   }
 
   public Set<Atom> follow(Variable variable) {
     // follow(V) = \cup_{X -> aVb} first(b) + nullable(b) * follow(V)
-    return null;
-  }
-
-  private Set<Atom> prefix(Atom atom) {
-    if (atom instanceof Epsilon) {
-      return Sets.newHashSet(atom);
-    } else if (atom instanceof Terminal) {
-      return Sets.newHashSet(atom);
-    } else if (atom instanceof Variable) {
-      Set<Atom> result = new HashSet<>();
-      for (List<Atom> rule : mRules.get((Variable) atom)) {
-        result.addAll(first(rule));
-      }
-      return result;
+    if (mFollowCache.containsKey(variable)) {
+      return mFollowCache.get(variable);
     }
-    throw new IllegalStateException("Cannot prefix EOF.");
+    Set<Variable> original = new HashSet<>();
+    original.add(variable);
+    Set<Variable> worklist;
+    boolean changed = true;
+    while (changed) {
+      changed = false;
+      worklist = Sets.newHashSet(original);
+      int oldOriginal = original.size();
+      for (Variable nonterminal : worklist) {
+        // look for all rules of the form X -> a V b
+        Set<Atom> result = new HashSet<>();
+        int oldResult = mFollowCache.get(nonterminal).size();
+        for (Map.Entry<Variable, List<Atom>> entry : mRules.entries()) {
+          for (int i = 0; i < entry.getValue().size(); i++) {
+            if (entry.getValue().get(i).equals(variable)) {
+              List<Atom> b = entry.getValue().subList(i + 1, entry.getValue().size());
+              Set<Atom> sub = first(b);
+              if (sub.contains(E())) {
+                sub.addAll(mFollowCache.get(entry.getKey()));
+                original.add(entry.getKey());
+              }
+              sub.remove(E());
+              result.addAll(sub);
+            }
+          }
+        }
+        if (oldResult != result.size()) {
+          mFollowCache.putAll(nonterminal, result);
+          changed = true;
+        }
+      }
+      if (oldOriginal != original.size()) {
+        changed = true;
+      }
+    }
+    return mFollowCache.get(variable);
   }
 
   public static void main(String[] args) {
@@ -99,9 +127,10 @@ public class Grammar {
         .build();
     Grammar grammar = new Grammar(rules);
     for (Map.Entry<Variable, List<Atom>> entry : rules.entries()) {
-      System.err.println(entry.getValue() + "  ->  " + grammar.first(entry.getValue()));
+      System.err.println(entry.getValue() + "  1->  " + grammar.first(entry.getValue()));
+      System.err.println(entry.getKey() + "  2->  " + grammar.follow(entry.getKey()));
     }
-    System.err.println(rules);
+    System.err.println(grammar.first(Lists.newArrayList(V("e'"))));
   }
 
   private static Terminal T(String t) {
