@@ -15,7 +15,7 @@ public class Yuckc {
     new Yuckc().driver(args);
   }
 
-  public void driver(String[] args) {
+  private void driver(String[] args) {
     CmdLineParser parser = new CmdLineParser(this);
     try {
       parser.parseArgument(args);
