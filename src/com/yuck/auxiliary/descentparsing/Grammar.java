@@ -7,6 +7,7 @@ import java.util.*;
 public class Grammar {
   private final Multimap<Variable, List<Atom>> mRules;
   private final HashMultimap<List<Atom>, Atom> mFirstCache = HashMultimap.create();
+  private final Map<List<Atom>, Boolean> mNullableCache = new HashMap<>();
 
   public Grammar(Multimap<Variable, List<Atom>> rules) {
     mRules = rules;
@@ -57,8 +58,14 @@ public class Grammar {
   }
 
   public boolean nullable(List<Atom> sentence) {
-    // nullable(hd :: tl) = first(hd) has null  and nullable(tl)
-    return false;
+    // nullable(hd :: tl) = eps in first(hd) and nullable(tl)
+    if (sentence.isEmpty()) return true;
+    if (mNullableCache.containsKey(sentence)) {
+      return mNullableCache.get(sentence);
+    }
+    boolean result = first(sentence).contains(E()) && nullable(sentence.subList(1, sentence.size()));
+    mNullableCache.put(sentence, result);
+    return result;
   }
 
   public Set<Atom> follow(Variable variable) {
