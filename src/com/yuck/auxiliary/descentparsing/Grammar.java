@@ -6,12 +6,14 @@ import java.util.*;
 
 public class Grammar {
   private final Multimap<Variable, List<Atom>> mRules;
+  private final Variable mStart;
   private final HashMultimap<List<Atom>, Atom> mFirstCache = HashMultimap.create();
   private final Map<List<Atom>, Boolean> mNullableCache = new HashMap<>();
   private final HashMultimap<Variable, Atom> mFollowCache = HashMultimap.create();
 
-  public Grammar(Multimap<Variable, List<Atom>> rules) {
+  public Grammar(Multimap<Variable, List<Atom>> rules, Variable start) {
     mRules = rules;
+    mStart = start;
   }
 
   public Set<Atom> first(List<Atom> sentence) {
@@ -125,7 +127,7 @@ public class Grammar {
         .put(V("op"), Lists.newArrayList(T("-")))
         .put(V("op"), Lists.newArrayList(T("*")))
         .build();
-    Grammar grammar = new Grammar(rules);
+    Grammar grammar = new Grammar(rules, V("e"));
     for (Map.Entry<Variable, List<Atom>> entry : rules.entries()) {
       System.err.println(entry.getValue() + "  1->  " + grammar.first(entry.getValue()));
       System.err.println(entry.getKey() + "  2->  " + grammar.follow(entry.getKey()));

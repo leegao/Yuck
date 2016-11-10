@@ -8,7 +8,6 @@ import com.yuck.auxiliary.descentparsing.annotations.Start;
 import javafx.util.Pair;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +48,8 @@ public abstract class GrammarBase<T> {
         rules.put(key, variableListPair.getValue());
         mMethodMap.put(variableListPair, method);
         if (method.getDeclaredAnnotation(Start.class) != null) {
+          if (mStart != null && !mStart.equals(key))
+            throw new IllegalStateException("Cannot have multiple start states");
           mStart = key;
         }
         Class<?> returnType = method.getReturnType();
@@ -68,7 +69,7 @@ public abstract class GrammarBase<T> {
         }
       }
     }
-    mGrammar =  new Grammar(rules.build());
+    mGrammar =  new Grammar(rules.build(), mStart);
     return mGrammar;
   }
 }
