@@ -8,6 +8,7 @@ import com.yuck.auxiliary.descentparsing.annotations.Start;
 import javafx.util.Pair;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ public abstract class GrammarBase<T> {
   private Variable mStart;
   private Grammar mGrammar;
   private Map<Pair<Variable, List<Atom>>, Method> mMethodMap = new HashMap<>();
+  private Map<Variable, Class<?>> mTypeMap = new HashMap<>();
 
   protected static Pair<Variable, List<Atom>> parseRule(String rule) {
     // id -> ($id | %eps | \S+)+
@@ -43,10 +45,26 @@ public abstract class GrammarBase<T> {
       Rule rule = method.getDeclaredAnnotation(Rule.class);
       if (rule != null) {
         Pair<Variable, List<Atom>> variableListPair = parseRule(rule.rule());
-        rules.put(variableListPair.getKey(), variableListPair.getValue());
+        Variable key = variableListPair.getKey();
+        rules.put(key, variableListPair.getValue());
         mMethodMap.put(variableListPair, method);
         if (method.getDeclaredAnnotation(Start.class) != null) {
-          mStart = variableListPair.getKey();
+          mStart = key;
+        }
+        Class<?> returnType = method.getReturnType();
+        if (!mTypeMap.containsKey(key)) {
+          mTypeMap.put(key, returnType);
+        } else {
+          // check compatibility
+          Class<?> old = mTypeMap.get(key);
+          if (!old.isAssignableFrom(returnType)) {
+            if (returnType.isAssignableFrom(old)) {
+              mTypeMap.put(key, returnType);
+            } else {
+              throw new IllegalStateException(
+                  "Cannot join types " + old.getTypeName() + " and " + returnType.getTypeName());
+            }
+          }
         }
       }
     }
