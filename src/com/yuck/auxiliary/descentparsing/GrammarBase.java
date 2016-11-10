@@ -7,11 +7,13 @@ import com.google.common.collect.Lists;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
 import javafx.util.Pair;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class GrammarBase<T> {
   // Gives the token label
@@ -77,6 +79,14 @@ public abstract class GrammarBase<T> {
     }
     mGrammar =  new Grammar(rules.build(), start);
     HashMultimap<Pair<Variable, Terminal>, List<Atom>> actionTable = mGrammar.actions();
+
+    for (Pair<Variable, Terminal> key : actionTable.keySet()) {
+      Set<List<Atom>> conflicts = actionTable.get(key);
+      if (conflicts.size() > 1) {
+        // check for conflict
+        throw new NotImplementedException();
+      }
+    }
 
     mPreprocessed = true;
     return mGrammar;
