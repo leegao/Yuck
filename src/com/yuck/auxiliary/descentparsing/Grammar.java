@@ -1,6 +1,7 @@
 package com.yuck.auxiliary.descentparsing;
 
 import com.google.common.collect.*;
+import javafx.util.Pair;
 
 import java.util.*;
 
@@ -10,6 +11,8 @@ public class Grammar {
   private final HashMultimap<List<Atom>, Atom> mFirstCache = HashMultimap.create();
   private final Map<List<Atom>, Boolean> mNullableCache = new HashMap<>();
   private final HashMultimap<Variable, Atom> mFollowCache = HashMultimap.create();
+  private boolean mPreprocessed = false;
+  private HashMultimap<Pair<Variable, Terminal>, List<Atom>> mActions = HashMultimap.create();
 
   public Grammar(Multimap<Variable, List<Atom>> rules, Variable start) {
     mRules = rules;
@@ -116,6 +119,32 @@ public class Grammar {
       }
     }
     return mFollowCache.get(variable);
+  }
+
+  public HashMultimap<Pair<Variable, Terminal>, List<Atom>> actions() {
+    if (mPreprocessed) return mActions;
+    // Computes the action table for var on term.
+
+    for (Variable variable : mRules.keySet()) {
+      Set<Atom> followSet = follow(variable);
+      for (List<Atom> sentence : mRules.get(variable)) {
+        Set<Atom> firstSet = first(sentence);
+        for (Atom atom : firstSet) {
+          if (atom instanceof Terminal) {
+            mActions.put(new Pair<>(variable, (Terminal) atom), sentence);
+          }
+        }
+        if (firstSet.contains(E())) {
+          for (Atom atom : followSet) {
+            if (atom instanceof Terminal) {
+              mActions.put(new Pair<>(variable, (Terminal) atom), sentence);
+            }
+          }
+        }
+      }
+    }
+    mPreprocessed = true;
+    return mActions;
   }
 
   public static void main(String[] args) {

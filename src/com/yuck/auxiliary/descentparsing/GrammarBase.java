@@ -1,6 +1,7 @@
 package com.yuck.auxiliary.descentparsing;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
@@ -17,7 +18,6 @@ public abstract class GrammarBase<T> {
   public abstract String label(T token);
 
   private boolean mPreprocessed = false;
-  private Variable mStart;
   private Grammar mGrammar;
   private Map<Pair<Variable, List<Atom>>, Method> mMethodMap = new HashMap<>();
   private Map<Variable, Class<?>> mTypeMap = new HashMap<>();
@@ -40,7 +40,7 @@ public abstract class GrammarBase<T> {
   protected Grammar preprocess() {
     if (mPreprocessed) return mGrammar;
 
-    mStart = null;
+    Variable start = null;
     mGrammar = null;
     mMethodMap.clear();
     mTypeMap.clear();
@@ -54,9 +54,9 @@ public abstract class GrammarBase<T> {
         rules.put(key, variableListPair.getValue());
         mMethodMap.put(variableListPair, method);
         if (method.getDeclaredAnnotation(Start.class) != null) {
-          if (mStart != null && !mStart.equals(key))
+          if (start != null && !start.equals(key))
             throw new IllegalStateException("Cannot have multiple start states");
-          mStart = key;
+          start = key;
         }
         Class<?> returnType = method.getReturnType();
         if (!mTypeMap.containsKey(key)) {
@@ -75,7 +75,8 @@ public abstract class GrammarBase<T> {
         }
       }
     }
-    mGrammar =  new Grammar(rules.build(), mStart);
+    mGrammar =  new Grammar(rules.build(), start);
+    HashMultimap<Pair<Variable, Terminal>, List<Atom>> actionTable = mGrammar.actions();
 
     mPreprocessed = true;
     return mGrammar;

@@ -1,5 +1,6 @@
 package com.yuck.auxiliary.descentparsing.javatest;
 
+import com.yuck.auxiliary.descentparsing.Grammar;
 import com.yuck.auxiliary.descentparsing.GrammarBase;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
@@ -57,6 +58,7 @@ public class Calculator extends GrammarBase<String> {
   public static void main(String[] args) {
     Calculator calculator = new Calculator();
     System.err.println(calculator.parseRule("E -> n $E'"));
-    calculator.preprocess();
+    Grammar grammar = calculator.preprocess();
+    System.err.println(grammar.actions());
   }
 }
