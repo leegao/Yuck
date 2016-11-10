@@ -7,12 +7,12 @@ import java.util.*;
 
 public class Grammar {
   private final Multimap<Variable, List<Atom>> mRules;
-  private final Variable mStart;
+  protected final Variable mStart;
   private final HashMultimap<List<Atom>, Atom> mFirstCache = HashMultimap.create();
   private final Map<List<Atom>, Boolean> mNullableCache = new HashMap<>();
   private final HashMultimap<Variable, Atom> mFollowCache = HashMultimap.create();
   private boolean mPreprocessed = false;
-  private HashMultimap<Pair<Variable, Terminal>, List<Atom>> mActions = HashMultimap.create();
+  private HashMultimap<Pair<Variable, Atom>, List<Atom>> mActions = HashMultimap.create();
 
   public Grammar(Multimap<Variable, List<Atom>> rules, Variable start) {
     mRules = rules;
@@ -94,6 +94,9 @@ public class Grammar {
       for (Variable nonterminal : worklist) {
         // look for all rules of the form X -> a V b
         Set<Atom> result = new HashSet<>();
+        if (nonterminal.equals(mStart)) {
+          result.add(new EOF());
+        }
         int oldResult = mFollowCache.get(nonterminal).size();
         for (Map.Entry<Variable, List<Atom>> entry : mRules.entries()) {
           for (int i = 0; i < entry.getValue().size(); i++) {
@@ -121,7 +124,7 @@ public class Grammar {
     return mFollowCache.get(variable);
   }
 
-  public HashMultimap<Pair<Variable, Terminal>, List<Atom>> actions() {
+  public HashMultimap<Pair<Variable, Atom>, List<Atom>> actions() {
     if (mPreprocessed) return mActions;
     // Computes the action table for var on term.
 
@@ -131,13 +134,13 @@ public class Grammar {
         Set<Atom> firstSet = first(sentence);
         for (Atom atom : firstSet) {
           if (atom instanceof Terminal) {
-            mActions.put(new Pair<>(variable, (Terminal) atom), sentence);
+            mActions.put(new Pair<>(variable, atom), sentence);
           }
         }
         if (firstSet.contains(E())) {
           for (Atom atom : followSet) {
-            if (atom instanceof Terminal) {
-              mActions.put(new Pair<>(variable, (Terminal) atom), sentence);
+            if (atom instanceof Terminal || atom instanceof EOF) {
+              mActions.put(new Pair<>(variable, atom), sentence);
             }
           }
         }
