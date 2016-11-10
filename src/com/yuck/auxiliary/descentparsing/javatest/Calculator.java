@@ -8,18 +8,18 @@ import com.yuck.auxiliary.descentparsing.annotations.Start;
 import java.util.function.Function;
 
 public class Calculator extends GrammarBase<String> {
-  @Rule(rule = "E -> n $E'")
+  @Rule("E -> n $E'")
   @Start
   public int E(String n, Function<Integer, Integer> op) {
     return op.apply(Integer.valueOf(n));
   }
 
-  @Rule(rule = "E' -> %eps")
+  @Rule("E' -> %eps")
   public Function<Integer, Integer> E_() {
     return n -> n;
   }
 
-  @Rule(rule = "E' -> op $E")
+  @Rule("E' -> op $E")
   public Function<Integer, Integer> E_(String op, int right) {
     return getOperation(op, right);
   }
@@ -58,8 +58,8 @@ public class Calculator extends GrammarBase<String> {
   public static void main(String[] args) {
     Calculator calculator = new Calculator();
 
-    // Note that our grammar is right-associative, so this is (1 + (3 - 4))
-    int result = calculator.parse(Splitter.on(" ").splitToList("1 + 3 - 4"));
+    // Note that our grammar is right-associative, so this is (1 + (3 * 4))
+    int result = calculator.parse(Splitter.on(" ").splitToList("1 + 3 * 4"));
     System.out.println(result);
   }
 }

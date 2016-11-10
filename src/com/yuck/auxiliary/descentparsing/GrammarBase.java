@@ -112,7 +112,7 @@ public abstract class GrammarBase<T> {
     for (Method method : this.getClass().getMethods()) {
       Rule rule = method.getDeclaredAnnotation(Rule.class);
       if (rule != null) {
-        Pair<Variable, List<Atom>> variableListPair = parseRule(rule.rule());
+        Pair<Variable, List<Atom>> variableListPair = parseRule(rule.value());
         Variable key = variableListPair.getKey();
         rules.put(key, variableListPair.getValue());
         mMethodMap.put(variableListPair, method);
