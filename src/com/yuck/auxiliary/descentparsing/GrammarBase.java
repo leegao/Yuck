@@ -38,7 +38,13 @@ public abstract class GrammarBase<T> {
   }
 
   protected Grammar preprocess() {
-    mPreprocessed = true;
+    if (mPreprocessed) return mGrammar;
+
+    mStart = null;
+    mGrammar = null;
+    mMethodMap.clear();
+    mTypeMap.clear();
+
     ImmutableMultimap.Builder<Variable, List<Atom>> rules = ImmutableMultimap.builder();
     for (Method method : this.getClass().getMethods()) {
       Rule rule = method.getDeclaredAnnotation(Rule.class);
@@ -70,6 +76,8 @@ public abstract class GrammarBase<T> {
       }
     }
     mGrammar =  new Grammar(rules.build(), mStart);
+
+    mPreprocessed = true;
     return mGrammar;
   }
 }
