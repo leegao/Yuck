@@ -130,9 +130,6 @@ public class Grammar {
 
     for (Variable variable : mRules.keySet()) {
       Set<Atom> followSet = follow(variable);
-      if (variable.equals(V("Group'"))) {
-        System.err.println(followSet);
-      }
       for (List<Atom> sentence : mRules.get(variable)) {
         Set<Atom> firstSet = first(sentence);
         for (Atom atom : firstSet) {

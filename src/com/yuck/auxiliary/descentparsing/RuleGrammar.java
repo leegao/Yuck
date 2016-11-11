@@ -21,6 +21,20 @@ import static com.yuck.auxiliary.descentparsing.Grammar.E;
 import static com.yuck.auxiliary.descentparsing.Grammar.T;
 import static com.yuck.auxiliary.descentparsing.Grammar.V;
 
+
+
+/**
+ * E -> eps | $E_group2 $E'
+ * E' -> $E | %eps
+ * E_group1 -> term | var | %( $Group %)
+ * E_group2 -> $E_group1 $E_group2'
+ * E_group2' -> %eps | $post
+ * Group -> $E $Group'
+ * Group' -> %eps | '|' $Group
+ * Post -> + | * | ?
+ *
+ * Tokens: $var, term, +, *, ?, (, ), |, %eps, [%+, %*, %?, %(, %), %|] <- terms
+ */
 public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
   private static final Set<String> SIMPLE_TOKENS = Sets.newHashSet("+", "*", "?", "(", ")", "|");
   private static final Set<String> ESCAPES = Sets.newHashSet("%+", "%*", "%?", "%(", "%)", "%|");
@@ -36,19 +50,6 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
       }
     }
 
-    /**
-     * // E -> %eps | ((term | var | %( $Group %)) $post?)+
-     * E -> eps | $E_group2 $E'
-     * E' -> $E | %eps
-     * E_group1 -> term | var | %( $Group %)
-     * E_group2 -> $E_group1 $E_group2'
-     * E_group2' -> %eps | $post
-     * Group -> $E $Group'
-     * Group' -> %eps | '|' $Group
-     * Post -> + | * | ?
-     *
-     * Tokens: $var, term, +, *, ?, (, ), |, %eps, [%+, %*, %?, %(, %), %|] <- terms
-     */
     HashMultimap<Variable, List<Atom>> rules = HashMultimap.create();
     rules.put(V("E"), newArrayList(T("eps")));
     rules.put(V("E"), newArrayList(V("E_group2"), V("E'")));
@@ -122,7 +123,7 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
   }
 
   @Register("E#1") // E -> eps
-  public Bundle E1() {
+  public Bundle E1(RuleToken epsToken) {
     return Bundle.of(HashMultimap.create(), newArrayList(E()));
   }
 
@@ -174,7 +175,7 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
   }
 
   @Register("E_group1#group") // -> %( $Group %)
-  public Bundle E_group1(RuleToken _, List<Bundle> group, RuleToken __) {
+  public Bundle E_group1(RuleToken lparen, List<Bundle> group, RuleToken rparen) {
     // generates a new variable that gets pointed to e and others; it then gets added to the remaining bundles
     List<List<Atom>> alternates = new ArrayList<>();
     HashMultimap<Variable, List<Atom>> intermediates = HashMultimap.create();
@@ -260,8 +261,8 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
   }
 
   static class Bundle {
-    private final HashMultimap<Variable, List<Atom>> intermediates;
-    private final List<Atom> head;
+    public final HashMultimap<Variable, List<Atom>> intermediates;
+    public final List<Atom> head;
 
     Bundle(HashMultimap<Variable, List<Atom>> intermediates, List<Atom> head) {
       this.intermediates = intermediates;
@@ -285,23 +286,10 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
 
     @Override
     public String toString() {
-      return intermediates + "\n\t" + head + "\n";
+      return head + " :\t" + intermediates;
     }
   }
 
-  /**
-   * // E -> %eps | ((term | var | %( $Group %)) $post?)+
-   * E -> eps | $E_group2 $E'
-   * E' -> $E | %eps
-   * E_group1 -> term | var | %( $Group %)
-   * E_group2 -> $E_group1 $E_group2'
-   * E_group2' -> %eps | $post
-   * Group -> $E $Group'
-   * Group' -> %eps | '|' $Group
-   * Post -> + | * | ?
-   *
-   * Tokens: $var, term, +, *, ?, (, ), |, %eps, [%+, %*, %?, %(, %), %|] <- terms
-   */
   class RuleToken {
     final String type;
     final String data;

@@ -25,19 +25,16 @@ public abstract class GrammarBase<U> {
   protected Map<Variable, Class<?>> mTypeMap = new HashMap<>();
   protected HashMultimap<Pair<Variable, Atom>, List<Atom>> mActionTable;
 
-  protected static Pair<Variable, List<Atom>> parseRule(String rule) {
+  protected static Pair<Variable, RuleGrammar.Bundle> parseRule(String rule) {
     // id -> ($id | %eps | \S+)+
     List<String> strings = Splitter.on("->").limit(2).trimResults().splitToList(rule);
     if (strings.size() != 2) throw new IllegalStateException();
     Variable left = new Variable(strings.get(0));
     String right = strings.get(1);
-    List<Atom> productions = newArrayList(Splitter.onPattern("\\s+").splitToList(right).stream().map(
-        str -> {
-          if (str.startsWith("$")) return new Variable(str.substring(1));
-          else if (str.equals("%eps")) return new Epsilon();
-          else return new Terminal(str);
-        }).iterator());
-    return new Pair<>(left, productions);
+    RuleGrammar ruleGrammar = new RuleGrammar(left);
+    List<RuleGrammar.RuleToken> ruleTokens = ruleGrammar.tokenize(right);
+    RuleGrammar.Bundle bundle = ruleGrammar.parse(ruleTokens);
+    return new Pair<>(left, bundle);
   }
 
   private Pair<Atom, U> peek(List<U> stream) {
@@ -113,10 +110,12 @@ public abstract class GrammarBase<U> {
     for (Method method : this.getClass().getMethods()) {
       Rule rule = method.getDeclaredAnnotation(Rule.class);
       if (rule != null) {
-        Pair<Variable, List<Atom>> variableListPair = parseRule(rule.value());
+        Pair<Variable, RuleGrammar.Bundle> variableListPair = parseRule(rule.value());
         Variable key = variableListPair.getKey();
-        rules.put(key, variableListPair.getValue());
-        mMethodMap.put(variableListPair, method);
+        RuleGrammar.Bundle bundle = variableListPair.getValue();
+        rules.putAll(bundle.intermediates);
+        rules.put(key, bundle.head);
+        mMethodMap.put(new Pair<>(key, bundle.head), method);
         if (method.getDeclaredAnnotation(Start.class) != null) {
           if (start != null && !start.equals(key))
             throw new IllegalStateException("Cannot have multiple start states");
