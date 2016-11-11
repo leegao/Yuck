@@ -1,10 +1,12 @@
 package com.yuck.auxiliary.descentparsing;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
 import javafx.util.Pair;
@@ -13,6 +15,8 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class GrammarBase<T> {
   // Gives the token label
@@ -152,5 +156,56 @@ public abstract class GrammarBase<T> {
     mActionTable = actionTable;
     mPreprocessed = true;
     return mGrammar;
+  }
+
+  public static class RuleGrammar {
+    private static final Set<String> SIMPLE_TOKENS = Sets.newHashSet("+", "*", "?", "(", ")", "|", "%eps");
+    private static final Set<String> ESCAPES = Sets.newHashSet("%+", "%*", "%?", "%(", "%)", "%|");
+    private static final Pattern SIMPLE_PATTERN = Pattern.compile("\\(|\\)|\\*|\\+|\\||\\?");
+
+    /**
+     * // E -> %eps | ((term | var | %( $Group %)) post?)+
+     * E -> %%eps | $E_group2 $E'
+     * E' -> $E | %eps
+     * E_group1 -> term | var | %( $Group %)
+     * E_group2 -> $E_group1 $E_group2'
+     * E_group2' -> %eps | post
+     * Group -> $E $Group'
+     * Group' -> %eps | $Group
+     *
+     * Tokens: $var, term, +, *, ?, (, ), |, %eps, [%+, %*, %?, %(, %), %|] <- terms
+     */
+    class RuleToken {
+      final String type;
+      final String data;
+
+      RuleToken(String type, String data) {
+        this.type = type;
+        this.data = data;
+      }
+    }
+
+    public List<RuleToken> tokenize(String rule) {
+      List<String> terms = Splitter.onPattern("\\s+").trimResults().splitToList(rule);
+      List<RuleToken> tokens = new ArrayList<>();
+      List<String> subterms = new ArrayList<>();
+      for (String term : terms) {
+        Matcher matcher = SIMPLE_PATTERN.matcher(term);
+        int end = 0;
+        while (matcher.find(end)) {
+          // split
+          int start = matcher.start();
+          end = matcher.end();
+          String prefix = term.substring(0, start);
+          if (!prefix.isEmpty()) subterms.add(prefix);
+          String middle = term.substring(start, end);
+          if (!middle.isEmpty()) subterms.add(middle);
+        }
+        String postfix = term.substring(end);
+        if (!postfix.isEmpty()) subterms.add(postfix);
+      }
+      System.err.println(subterms);
+      return tokens;
+    }
   }
 }
