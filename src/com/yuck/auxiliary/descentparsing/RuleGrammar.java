@@ -91,7 +91,6 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
   }
 
   private final Variable mParent;
-  private static int sId = 0;
   protected final Map<Variable, String> mGroupHandlers = new HashMap<>();
 
   public RuleGrammar(Variable parent) {
@@ -271,9 +270,8 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
   }
 
   public Variable fresh(List<List<Atom>> rule, String type) {
-    sId += 1;
     String mid = Joiner.on("|").join(rule.stream().map(x -> Joiner.on(".").join(x)).collect(Collectors.toList()));
-    return V(mParent.mLabel.substring(1) + "@(" + mid + ")@" + type + "#" + sId);
+    return V(mParent.mLabel.substring(1) + "@(" + mid + ")@" + type);
   }
 
   enum Postfix {

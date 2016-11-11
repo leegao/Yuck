@@ -185,11 +185,10 @@ public abstract class GrammarBase<U> {
     String name = variable.mLabel.substring(1);
     int first = name.indexOf('@');
     int last = name.lastIndexOf('@');
-    int hash = name.lastIndexOf('#');
     Preconditions.checkArgument(first != last);
     String parent = name.substring(0, first);
     String expr = name.substring(first + 1, last);
-    String type = name.substring(last + 1, hash);
+    String type = name.substring(last + 1);
     // Right now, just switch on the type
     switch (type) {
       case "group": {
