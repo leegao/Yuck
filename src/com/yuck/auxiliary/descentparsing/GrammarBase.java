@@ -1,29 +1,19 @@
 package com.yuck.auxiliary.descentparsing;
 
-import com.google.common.base.*;
+import com.google.common.base.Splitter;
+import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
 import javafx.util.Pair;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.yuck.auxiliary.descentparsing.Grammar.E;
-import static com.yuck.auxiliary.descentparsing.Grammar.V;
-import static com.yuck.auxiliary.descentparsing.Grammar.T;
 
 public abstract class GrammarBase<U> {
   // Gives the token label
