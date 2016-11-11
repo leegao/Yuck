@@ -312,6 +312,10 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
     List<RuleToken> tokens = new ArrayList<>();
     List<String> subterms = new ArrayList<>();
     for (String term : terms) {
+      if (ESCAPES.contains(term)) {
+        subterms.add(term);
+        continue;
+      }
       Matcher matcher = SIMPLE_PATTERN.matcher(term);
       int last = 0;
       while (matcher.find(last)) {

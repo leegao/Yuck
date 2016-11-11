@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.function.Function;
 
 public class Calculator extends GrammarBase<String> {
-  @Rule("E -> (n | lp $E rp) (op (n | lp $E rp))*")
+  @Rule("E -> (n | %( $E %) ) (op (n | %( $E %) ))*")
   @Start
   public int E(List<?> head, List<List<?>> rest) {
     Function<Integer, Integer> tail = x -> x;
@@ -66,9 +66,9 @@ public class Calculator extends GrammarBase<String> {
         case "/":
           return "op";
         case "(":
-          return "lp";
+          return "%(";
         case ")":
-          return "rp";
+          return "%)";
       }
       throw new IllegalStateException("'" + token + "'");
     }
