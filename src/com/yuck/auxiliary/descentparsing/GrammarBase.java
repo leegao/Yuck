@@ -93,7 +93,13 @@ public abstract class GrammarBase<U> {
     }
     Method method = mMethodMap.get(new Pair<>(state, sentence));
     try {
-      return method.invoke(this, arguments.stream().map(Pair::getValue).toArray());
+      // Differentiate between variadic methods and normal methods
+      Object[] args = arguments.stream().map(Pair::getValue).toArray();
+      if (method.isVarArgs() && method.getParameterCount() == 1) {
+        return method.invoke(this, new Object[] {args});
+      } else {
+        return method.invoke(this, args);
+      }
     } catch (IllegalAccessException | InvocationTargetException e) {
       throw Throwables.propagate(e);
     }
@@ -175,7 +181,8 @@ public abstract class GrammarBase<U> {
     String type = name.substring(last + 1, hash);
     // Right now, just switch on the type
     switch (type) {
-      case "group": throw new NotImplementedException();
+      case "group":
+        return GrammarBase.class.getDeclaredMethod("group", Object[].class);
       case "maybe": {
         if (production.get(0) instanceof Epsilon) {
           return GrammarBase.class.getDeclaredMethod("maybeEmpty");
@@ -194,6 +201,10 @@ public abstract class GrammarBase<U> {
         return GrammarBase.class.getDeclaredMethod("starFull", Object.class, List.class);
     }
     throw new IllegalStateException();
+  }
+
+  public <R> List<R> group(R... args) {
+    return newArrayList(args);
   }
 
   public <R> List<R> starEmpty() {
