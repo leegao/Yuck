@@ -16,6 +16,7 @@ import java.util.*;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+@SuppressWarnings({"unused", "unchecked"})
 public abstract class GrammarBase<U> {
   private final Map<String, Method> mGroupHandlerRegistry = new HashMap<>();
 
@@ -227,11 +228,11 @@ public abstract class GrammarBase<U> {
   }
 
   public <R> List<R> starEmpty() {
-    return new ArrayList<R>();
+    return new ArrayList<>();
   }
 
   public <R> List<R> starFull(R r, List<R> rest) {
-    List<R> result = new ArrayList<R>();
+    List<R> result = new ArrayList<>();
     result.add(r);
     result.addAll(rest);
     return result;
