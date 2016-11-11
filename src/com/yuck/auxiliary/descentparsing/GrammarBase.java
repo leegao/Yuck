@@ -10,6 +10,7 @@ import com.yuck.auxiliary.descentparsing.annotations.Start;
 import javafx.util.Pair;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.InvocationTargetException;
@@ -168,8 +169,17 @@ public abstract class GrammarBase<U> {
     private static final Set<String> SIMPLE_TOKENS = Sets.newHashSet("+", "*", "?", "(", ")", "|");
     private static final Set<String> ESCAPES = Sets.newHashSet("%+", "%*", "%?", "%(", "%)", "%|");
     private static final Pattern SIMPLE_PATTERN = Pattern.compile("\\(|\\)|\\*|\\+|\\||\\?");
+    private static final Map<String, Method> mRegistrar = new HashMap<>();
     private static final Grammar mRuleGrammar;
+    private static final Map<Pair<Variable, List<Atom>>, Method> mRuleRegistry = new HashMap<>();
     static {
+      for (Method method : RuleGrammar.class.getDeclaredMethods()) {
+        Register registration = method.getDeclaredAnnotation(Register.class);
+        if (registration != null) {
+          mRegistrar.put(registration.value(), method);
+        }
+      }
+
       HashMultimap<Variable, List<Atom>> rules = HashMultimap.create();
       rules.put(V("E"), newArrayList(T("eps")));
       rules.put(V("E"), newArrayList(V("E_group2"), V("E'")));
@@ -189,6 +199,22 @@ public abstract class GrammarBase<U> {
       rules.put(V("Post"), newArrayList(T("?")));
       mRuleGrammar = new Grammar(rules, V("E"));
 
+      register(V("E"), newArrayList(T("eps")), "E#1");
+      register(V("E"), newArrayList(V("E_group2"), V("E'")), "E#2");
+      register(V("E'"), newArrayList(V("E")), "E'#1");
+      register(V("E'"), newArrayList(E()), "E'#2");
+      register(V("E_group1"), newArrayList(T("term")), "E_group1#term");
+      register(V("E_group1"), newArrayList(T("var")), "E_group1#term");
+      register(V("E_group1"), newArrayList(T("("), V("Group"), T(")")), "E_group1#group");
+      register(V("E_group2"), newArrayList(V("E_group1"), V("E_group2'")), "E_group2");
+      register(V("E_group2'"), newArrayList(E()), "E_group2'#1");
+      register(V("E_group2'"), newArrayList(V("$Post")), "E_group2'#2");
+      register(V("Group"), newArrayList(V("E"), V("Group'")), "Group");
+      register(V("Group'"), newArrayList(E()), "Group'#1");
+      register(V("Group'"), newArrayList(T("|"), V("Group")), "Group'#2");
+      register(V("Post"), newArrayList(T("*")), "Post");
+      register(V("Post"), newArrayList(T("+")), "Post");
+      register(V("Post"), newArrayList(T("?")), "Post");
     }
 
     private final Variable mParent;
@@ -197,6 +223,11 @@ public abstract class GrammarBase<U> {
 
     public RuleGrammar(Variable parent) {
       mParent = parent;
+    }
+
+    static void register(Variable variable, List<Atom> sentence, String target) {
+      Method method = Preconditions.checkNotNull(mRegistrar.get(target));
+      mRuleRegistry.put(new Pair<>(variable, sentence), method);
     }
 
     static void preprocess() {
