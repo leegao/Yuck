@@ -116,8 +116,13 @@ public abstract class GrammarBase<U> {
         RuleGrammar.Bundle bundle = variableListPair.getValue();
         rules.putAll(bundle.intermediates);
         rules.put(key, bundle.head);
-        for (Variable intermediateVariable : bundle.intermediates.keySet()) {
-          Method intermediateMethod = handleIntermediateVariable(intermediateVariable);
+        for (Map.Entry<Variable, List<Atom>> intermediate : bundle.intermediates.entries()) {
+          try {
+            Method intermediateMethod = handleIntermediateVariable(intermediate.getKey(), intermediate.getValue());
+            mMethodMap.put(new Pair<>(intermediate.getKey(), intermediate.getValue()), intermediateMethod);
+          } catch (NoSuchMethodException e) {
+            throw Throwables.propagate(e);
+          }
         }
         mMethodMap.put(new Pair<>(key, bundle.head), method);
         if (method.getDeclaredAnnotation(Start.class) != null) {
@@ -158,7 +163,7 @@ public abstract class GrammarBase<U> {
     return mGrammar;
   }
 
-  public Method handleIntermediateVariable(Variable variable) {
+  public Method handleIntermediateVariable(Variable variable, List<Atom> production) throws NoSuchMethodException {
     // $X@...@type#n
     String name = variable.mLabel.substring(1);
     int first = name.indexOf('@');
@@ -171,10 +176,24 @@ public abstract class GrammarBase<U> {
     // Right now, just switch on the type
     switch (type) {
       case "group": throw new NotImplementedException();
-      case "maybe": throw new NotImplementedException();
+      case "maybe": {
+        if (production.get(0) instanceof Epsilon) {
+          return GrammarBase.class.getDeclaredMethod("maybeEmpty");
+        } else {
+          return GrammarBase.class.getDeclaredMethod("maybeFull", Object.class);
+        }
+      }
       case "star": throw new NotImplementedException();
       case "plus": throw new NotImplementedException();
     }
     throw new IllegalStateException();
+  }
+
+  public <R> Optional<R> maybeEmpty() {
+    return Optional.empty();
+  }
+
+  public <R> Optional<R> maybeFull(R r) {
+    return Optional.of(r);
   }
 }
