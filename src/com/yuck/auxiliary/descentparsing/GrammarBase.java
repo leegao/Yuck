@@ -1,5 +1,6 @@
 package com.yuck.auxiliary.descentparsing;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
@@ -115,6 +116,9 @@ public abstract class GrammarBase<U> {
         RuleGrammar.Bundle bundle = variableListPair.getValue();
         rules.putAll(bundle.intermediates);
         rules.put(key, bundle.head);
+        for (Variable intermediateVariable : bundle.intermediates.keySet()) {
+          Method intermediateMethod = handleIntermediateVariable(intermediateVariable);
+        }
         mMethodMap.put(new Pair<>(key, bundle.head), method);
         if (method.getDeclaredAnnotation(Start.class) != null) {
           if (start != null && !start.equals(key))
@@ -152,5 +156,25 @@ public abstract class GrammarBase<U> {
     mActionTable = actionTable;
     mPreprocessed = true;
     return mGrammar;
+  }
+
+  public Method handleIntermediateVariable(Variable variable) {
+    // $X@...@type#n
+    String name = variable.mLabel.substring(1);
+    int first = name.indexOf('@');
+    int last = name.lastIndexOf('@');
+    int hash = name.lastIndexOf('#');
+    Preconditions.checkArgument(first != last);
+    String parent = name.substring(0, first);
+    String expr = name.substring(first + 1, last);
+    String type = name.substring(last + 1, hash);
+    // Right now, just switch on the type
+    switch (type) {
+      case "group": throw new NotImplementedException();
+      case "maybe": throw new NotImplementedException();
+      case "star": throw new NotImplementedException();
+      case "plus": throw new NotImplementedException();
+    }
+    throw new IllegalStateException();
   }
 }

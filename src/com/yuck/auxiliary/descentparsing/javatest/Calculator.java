@@ -10,21 +10,21 @@ import com.yuck.auxiliary.descentparsing.annotations.Start;
 import java.util.function.Function;
 
 public class Calculator extends GrammarBase<String> {
-  @Rule("E -> n $E'")
+  @Rule("E -> n (op n*)")
   @Start
   public int E(String n, Function<Integer, Integer> op) {
     return op.apply(Integer.valueOf(n));
   }
 
-  @Rule("E' -> %eps")
-  public Function<Integer, Integer> E_() {
-    return n -> n;
-  }
-
-  @Rule("E' -> op $E")
-  public Function<Integer, Integer> E_(String op, int right) {
-    return getOperation(op, right);
-  }
+//  @Rule("E' -> %eps")
+//  public Function<Integer, Integer> E_() {
+//    return n -> n;
+//  }
+//
+//  @Rule("E' -> op $E")
+//  public Function<Integer, Integer> E_(String op, int right) {
+//    return getOperation(op, right);
+//  }
 
   Function<Integer, Integer> getOperation(String op, int right) {
     switch (op) {
