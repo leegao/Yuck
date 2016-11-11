@@ -19,13 +19,13 @@ import static com.yuck.auxiliary.descentparsing.Grammar.E;
 import static com.yuck.auxiliary.descentparsing.Grammar.T;
 import static com.yuck.auxiliary.descentparsing.Grammar.V;
 
-public class RuleGrammar {
+public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
   private static final Set<String> SIMPLE_TOKENS = Sets.newHashSet("+", "*", "?", "(", ")", "|");
   private static final Set<String> ESCAPES = Sets.newHashSet("%+", "%*", "%?", "%(", "%)", "%|");
   private static final Pattern SIMPLE_PATTERN = Pattern.compile("\\(|\\)|\\*|\\+|\\||\\?");
   private static final Map<String, Method> mRegistrar = new HashMap<>();
-  private static final Grammar mRuleGrammar;
-  private static final Map<Pair<Variable, List<Atom>>, Method> mRuleRegistry = new HashMap<>();
+  private static final Grammar sRuleGrammar;
+  private static final Map<Pair<Variable, List<Atom>>, Method> sRuleRegistry = new HashMap<>();
   static {
     for (Method method : RuleGrammar.class.getDeclaredMethods()) {
       Register registration = method.getDeclaredAnnotation(Register.class);
@@ -51,12 +51,12 @@ public class RuleGrammar {
     rules.put(V("Post"), newArrayList(T("*")));
     rules.put(V("Post"), newArrayList(T("+")));
     rules.put(V("Post"), newArrayList(T("?")));
-    mRuleGrammar = new Grammar(rules, V("E"));
+    sRuleGrammar = new Grammar(rules, V("E"));
 
     register(V("E"), newArrayList(T("eps")), "E#1");
     register(V("E"), newArrayList(V("E_group2"), V("E'")), "E#2");
-    register(V("E'"), newArrayList(V("E")), "E'#1");
-    register(V("E'"), newArrayList(E()), "E'#2");
+    register(V("E'"), newArrayList(V("E")), "E'#2");
+    register(V("E'"), newArrayList(E()), "E'#1");
     register(V("E_group1"), newArrayList(T("term")), "E_group1#term");
     register(V("E_group1"), newArrayList(T("var")), "E_group1#term");
     register(V("E_group1"), newArrayList(T("("), V("Group"), T(")")), "E_group1#group");
@@ -72,7 +72,6 @@ public class RuleGrammar {
   }
 
   private final Variable mParent;
-  private final List<String> mScopes = new ArrayList<>();
   private static int sId = 0;
 
   public RuleGrammar(Variable parent) {
@@ -81,12 +80,25 @@ public class RuleGrammar {
 
   static void register(Variable variable, List<Atom> sentence, String target) {
     Method method = Preconditions.checkNotNull(mRegistrar.get(target));
-    mRuleRegistry.put(new Pair<>(variable, sentence), method);
+    sRuleRegistry.put(new Pair<>(variable, sentence), method);
   }
 
-  static void preprocess() {
-    HashMultimap<Pair<Variable, Atom>, List<Atom>> actions = mRuleGrammar.actions();
+  @Override
+  public String label(RuleToken token) {
+    return token.type;
+  }
 
+  @Override
+  protected Grammar preprocess() {
+    if (mPreprocessed) {
+      return mGrammar;
+    }
+
+    mGrammar = sRuleGrammar;
+    mMethodMap = sRuleRegistry;
+    mActionTable = mGrammar.actions();
+    mPreprocessed = true;
+    return mGrammar;
   }
 
   @Retention(RetentionPolicy.RUNTIME)
@@ -95,7 +107,7 @@ public class RuleGrammar {
   }
 
   @Register("E#1") // E -> eps
-  public Bundle E1(RuleToken eps) {
+  public Bundle E1() {
     return Bundle.of(HashMultimap.create(), newArrayList(E()));
   }
 
@@ -107,12 +119,12 @@ public class RuleGrammar {
     return group;
   }
 
-  @Register("E'#1")
-  public Optional<Bundle> E_(RuleToken eps) {
+  @Register("E'#1") // -> %eps
+  public Optional<Bundle> E_() {
     return Optional.empty();
   }
 
-  @Register("E'#2")
+  @Register("E'#2") // -> $E
   public Optional<Bundle> E_(Bundle e) {
     return Optional.of(e);
   }
@@ -127,7 +139,7 @@ public class RuleGrammar {
     return Optional.of(operator);
   }
 
-  @Register("Post")
+  @Register("Post") // -> + | * | ?
   public Postfix Post(RuleToken token) {
     switch (token.type) {
       case "+": return Postfix.PLUS;
@@ -213,7 +225,7 @@ public class RuleGrammar {
   }
 
   @Register("Group'#1") // -> %eps
-  public List<Bundle> group_(RuleToken eps) {
+  public List<Bundle> group_() {
     return new ArrayList<>();
   }
 
@@ -276,6 +288,11 @@ public class RuleGrammar {
     RuleToken(String type, String data) {
       this.type = type;
       this.data = data;
+    }
+
+    @Override
+    public String toString() {
+      return data;
     }
   }
 

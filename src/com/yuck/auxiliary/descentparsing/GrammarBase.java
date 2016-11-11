@@ -19,11 +19,11 @@ public abstract class GrammarBase<U> {
   // Gives the token label
   public abstract String label(U token);
 
-  private boolean mPreprocessed = false;
-  private Grammar mGrammar;
-  private Map<Pair<Variable, List<Atom>>, Method> mMethodMap = new HashMap<>();
-  private Map<Variable, Class<?>> mTypeMap = new HashMap<>();
-  HashMultimap<Pair<Variable, Atom>, List<Atom>> mActionTable;
+  protected boolean mPreprocessed = false;
+  protected Grammar mGrammar;
+  protected Map<Pair<Variable, List<Atom>>, Method> mMethodMap = new HashMap<>();
+  protected Map<Variable, Class<?>> mTypeMap = new HashMap<>();
+  protected HashMultimap<Pair<Variable, Atom>, List<Atom>> mActionTable;
 
   protected static Pair<Variable, List<Atom>> parseRule(String rule) {
     // id -> ($id | %eps | \S+)+
