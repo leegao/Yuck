@@ -3,8 +3,6 @@ package com.yuck.auxiliary.descentparsing.javatest;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.yuck.auxiliary.descentparsing.GrammarBase;
-import com.yuck.auxiliary.descentparsing.RuleGrammar;
-import com.yuck.auxiliary.descentparsing.Variable;
 import com.yuck.auxiliary.descentparsing.annotations.For;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
@@ -13,8 +11,8 @@ import java.util.List;
 import java.util.function.Function;
 
 public class Calculator extends GrammarBase<String> {
-  @Rule("E -> (n | %( $E %) : X) (op (n | %( $E %) : X))*")
   @Start
+  @Rule("E -> (n | %( $E %) : X) (op (n | %( $E %) : X))*")
   public int E(int head, List<List<?>> rest) {
     Function<Integer, Integer> tail = x -> x;
     for (List<?> opn : rest) {
@@ -32,16 +30,6 @@ public class Calculator extends GrammarBase<String> {
     }
     return Integer.valueOf((String) group.get(0));
   }
-
-//  @Rule("E' -> %eps")
-//  public Function<Integer, Integer> E_() {
-//    return n -> n;
-//  }
-//
-//  @Rule("E' -> op $E")
-//  public Function<Integer, Integer> E_(String op, int right) {
-//    return getOperation(op, right);
-//  }
 
   Function<Integer, Integer> getOperation(String op, int right) {
     switch (op) {
@@ -80,13 +68,11 @@ public class Calculator extends GrammarBase<String> {
 
   public static void main(String[] args) {
     Calculator calculator = new Calculator();
-
-    // Note that our grammar is right-associative, so this is (1 + (3 * 4))
-    int result = calculator.parse(Splitter.on(" ").trimResults().omitEmptyStrings().splitToList("1 +  ( 3 * 2 )  - 3"));
+    List<String> tokenStream = Splitter.on(" ")
+        .trimResults()
+        .omitEmptyStrings()
+        .splitToList("1 +  ( 3 * 2 )  - 3");
+    int result = calculator.parse(tokenStream);
     System.out.println(result);
-
-    RuleGrammar ruleGrammar = new RuleGrammar(new Variable("E"));
-    System.err.println(ruleGrammar.tokenize("(a | b)? $E"));
-    System.err.println(ruleGrammar.parse(ruleGrammar.tokenize("(a | b)? $E")).toString());
   }
 }
