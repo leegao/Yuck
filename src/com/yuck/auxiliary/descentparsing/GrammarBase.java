@@ -159,8 +159,8 @@ public abstract class GrammarBase<U> {
     for (Pair<Variable, Atom> key : actionTable.keySet()) {
       Set<List<Atom>> conflicts = actionTable.get(key);
       if (conflicts.size() > 1) {
-        // check for conflict
-        throw new NotImplementedException();
+        // TODO: check for conflict resolution
+        throw new IllegalStateException("Conflict at " + key + " over " + conflicts);
       }
     }
 
