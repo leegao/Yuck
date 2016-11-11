@@ -190,7 +190,8 @@ public abstract class GrammarBase<U> {
           return GrammarBase.class.getDeclaredMethod("starFull", Object.class, List.class);
         }
       }
-      case "plus": throw new NotImplementedException();
+      case "plus":
+        return GrammarBase.class.getDeclaredMethod("starFull", Object.class, List.class);
     }
     throw new IllegalStateException();
   }

@@ -13,10 +13,10 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 
 public class Calculator extends GrammarBase<String> {
-  @Rule("E -> n n*")
+  @Rule("E -> n+")
   @Start
-  public int E(String n, List<String> op) {
-    return Integer.valueOf(n) + op.stream().map(Integer::valueOf).reduce(0, (a, b) -> a + b);
+  public int E(List<String> op) {
+    return op.stream().map(Integer::valueOf).reduce(0, (a, b) -> a + b);
   }
 
 //  @Rule("E' -> %eps")

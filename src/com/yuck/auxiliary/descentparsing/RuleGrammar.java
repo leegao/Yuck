@@ -218,12 +218,14 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
         }
         case PLUS: {
           Variable fvs = fresh(sentence, "plus");
+          Variable star = fresh(sentence, "star");
           List<Atom> newSentence = new ArrayList<>();
           newSentence.addAll(group.head);
-          newSentence.add(fvs);
-          intermediates.put(fvs, newArrayList(E()));
+          newSentence.add(star);
+          intermediates.put(star, newArrayList(E()));
+          intermediates.put(star, newSentence);
           intermediates.put(fvs, newSentence);
-          return Bundle.of(intermediates, newArrayList(newSentence));
+          return Bundle.of(intermediates, newArrayList(fvs));
         }
       }
       throw new NotImplementedException();
