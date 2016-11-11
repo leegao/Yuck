@@ -1,7 +1,7 @@
 package com.yuck.auxiliary.descentparsing;
 
 public class Variable extends Atom {
-  protected Variable(String label) {
+  public Variable(String label) {
     super("$" + label);
   }
 }

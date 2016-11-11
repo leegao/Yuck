@@ -100,7 +100,7 @@ public class Grammar {
         int oldResult = mFollowCache.get(nonterminal).size();
         for (Map.Entry<Variable, List<Atom>> entry : mRules.entries()) {
           for (int i = 0; i < entry.getValue().size(); i++) {
-            if (entry.getValue().get(i).equals(variable)) {
+            if (entry.getValue().get(i).equals(nonterminal)) {
               List<Atom> b = entry.getValue().subList(i + 1, entry.getValue().size());
               Set<Atom> sub = first(b);
               if (sub.contains(E())) {
@@ -130,6 +130,9 @@ public class Grammar {
 
     for (Variable variable : mRules.keySet()) {
       Set<Atom> followSet = follow(variable);
+      if (variable.equals(V("Group'"))) {
+        System.err.println(followSet);
+      }
       for (List<Atom> sentence : mRules.get(variable)) {
         Set<Atom> firstSet = first(sentence);
         for (Atom atom : firstSet) {
@@ -167,15 +170,15 @@ public class Grammar {
     System.err.println(grammar.first(Lists.newArrayList(V("e'"))));
   }
 
-  private static Terminal T(String t) {
+  static Terminal T(String t) {
     return new Terminal(t);
   }
 
-  private static Variable V(String v) {
+  static Variable V(String v) {
     return new Variable(v);
   }
 
-  private static Epsilon E() {
+  static Epsilon E() {
     return new Epsilon();
   }
 }

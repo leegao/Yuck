@@ -10,7 +10,7 @@ abstract class Atom {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof Atom)) return false;
+    if (!getClass().equals(o.getClass())) return false;
 
     Atom atom = (Atom) o;
 
