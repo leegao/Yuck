@@ -21,24 +21,23 @@ import static com.yuck.auxiliary.descentparsing.Grammar.E;
 import static com.yuck.auxiliary.descentparsing.Grammar.T;
 import static com.yuck.auxiliary.descentparsing.Grammar.V;
 
-
-
 /**
  * E -> eps | $E_group2 $E'
  * E' -> $E | %eps
- * E_group1 -> term | var | %( $Group %)
+ * E_group1 -> term | var | %( $Group $Handler %)
  * E_group2 -> $E_group1 $E_group2'
  * E_group2' -> %eps | $post
  * Group -> $E $Group'
  * Group' -> %eps | '|' $Group
  * Post -> + | * | ?
+ * Handler -> %eps | ':' term
  *
- * Tokens: $var, term, +, *, ?, (, ), |, %eps, [%+, %*, %?, %(, %), %|] <- terms
+ * Tokens: $var, term, +, *, ?, (, ), |, %eps, :, [%+, %*, %?, %(, %), %|] <- terms
  */
 public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
-  private static final Set<String> SIMPLE_TOKENS = Sets.newHashSet("+", "*", "?", "(", ")", "|");
-  private static final Set<String> ESCAPES = Sets.newHashSet("%+", "%*", "%?", "%(", "%)", "%|");
-  private static final Pattern SIMPLE_PATTERN = Pattern.compile("\\(|\\)|\\*|\\+|\\||\\?");
+  private static final Set<String> SIMPLE_TOKENS = Sets.newHashSet("+", "*", "?", "(", ")", "|", ":");
+  private static final Set<String> ESCAPES = Sets.newHashSet("%+", "%*", "%?", "%(", "%)", "%|", "%:");
+  private static final Pattern SIMPLE_PATTERN = Pattern.compile("\\(|\\)|\\*|\\+|\\||\\?|:");
   private static final Map<String, Method> mRegistrar = new HashMap<>();
   private static final Grammar sRuleGrammar;
   private static final Map<Pair<Variable, List<Atom>>, Method> sRuleRegistry = new HashMap<>();
@@ -57,7 +56,7 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
     rules.put(V("E'"), newArrayList(E()));
     rules.put(V("E_group1"), newArrayList(T("term")));
     rules.put(V("E_group1"), newArrayList(T("var")));
-    rules.put(V("E_group1"), newArrayList(T("("), V("Group"), T(")")));
+    rules.put(V("E_group1"), newArrayList(T("("), V("Group"), V("Handler"), T(")")));
     rules.put(V("E_group2"), newArrayList(V("E_group1"), V("E_group2'")));
     rules.put(V("E_group2'"), newArrayList(E()));
     rules.put(V("E_group2'"), newArrayList(V("Post")));
@@ -67,6 +66,8 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
     rules.put(V("Post"), newArrayList(T("*")));
     rules.put(V("Post"), newArrayList(T("+")));
     rules.put(V("Post"), newArrayList(T("?")));
+    rules.put(V("Handler"), newArrayList(E()));
+    rules.put(V("Handler"), newArrayList(T(":"), T("term")));
     sRuleGrammar = new Grammar(rules, V("E"));
 
     register(V("E"), newArrayList(T("eps")), "E#1");
@@ -75,7 +76,7 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
     register(V("E'"), newArrayList(E()), "E'#1");
     register(V("E_group1"), newArrayList(T("term")), "E_group1#term");
     register(V("E_group1"), newArrayList(T("var")), "E_group1#term");
-    register(V("E_group1"), newArrayList(T("("), V("Group"), T(")")), "E_group1#group");
+    register(V("E_group1"), newArrayList(T("("), V("Group"), V("Handler"), T(")")), "E_group1#group");
     register(V("E_group2"), newArrayList(V("E_group1"), V("E_group2'")), "E_group2");
     register(V("E_group2'"), newArrayList(E()), "E_group2'#1");
     register(V("E_group2'"), newArrayList(V("Post")), "E_group2'#2");
@@ -85,6 +86,8 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
     register(V("Post"), newArrayList(T("*")), "Post");
     register(V("Post"), newArrayList(T("+")), "Post");
     register(V("Post"), newArrayList(T("?")), "Post");
+    register(V("Handler"), newArrayList(E()), "Handler#1");
+    register(V("Handler"), newArrayList(T(":"), T("term")), "Handler#2");
   }
 
   private final Variable mParent;
@@ -174,8 +177,8 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
     throw new IllegalStateException();
   }
 
-  @Register("E_group1#group") // -> %( $Group %)
-  public Bundle E_group1(RuleToken lparen, List<Bundle> group, RuleToken rparen) {
+  @Register("E_group1#group") // -> %( $Group $Handler %)
+  public Bundle E_group1(RuleToken lparen, List<Bundle> group, Optional<?> handler, RuleToken rparen) {
     // generates a new variable that gets pointed to e and others; it then gets added to the remaining bundles
     List<List<Atom>> alternates = new ArrayList<>();
     HashMultimap<Variable, List<Atom>> intermediates = HashMultimap.create();
@@ -187,7 +190,21 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
     for (List<Atom> sentence : alternates) {
       intermediates.put(fvs, sentence);
     }
+
+    if (handler.isPresent()) {
+      throw new NotImplementedException();
+    }
     return Bundle.of(intermediates, newArrayList(fvs));
+  }
+
+  @Register("Handler#1") // -> %eps
+  public Optional<String> Handler() {
+    return Optional.empty();
+  }
+
+  @Register("Handler#2") // -> ':' term
+  public Optional<String> Handler(RuleToken colon, RuleToken term) {
+    return Optional.of(term.data);
   }
 
   @Register("E_group2") // -> $E_group1 $E_group2'
