@@ -1,5 +1,6 @@
 package com.yuck.auxiliary.descentparsing;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultimap;
@@ -13,6 +14,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.yuck.auxiliary.descentparsing.Grammar.E;
@@ -34,6 +36,19 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
       }
     }
 
+    /**
+     * // E -> %eps | ((term | var | %( $Group %)) $post?)+
+     * E -> eps | $E_group2 $E'
+     * E' -> $E | %eps
+     * E_group1 -> term | var | %( $Group %)
+     * E_group2 -> $E_group1 $E_group2'
+     * E_group2' -> %eps | $post
+     * Group -> $E $Group'
+     * Group' -> %eps | '|' $Group
+     * Post -> + | * | ?
+     *
+     * Tokens: $var, term, +, *, ?, (, ), |, %eps, [%+, %*, %?, %(, %), %|] <- terms
+     */
     HashMultimap<Variable, List<Atom>> rules = HashMultimap.create();
     rules.put(V("E"), newArrayList(T("eps")));
     rules.put(V("E"), newArrayList(V("E_group2"), V("E'")));
@@ -44,7 +59,7 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
     rules.put(V("E_group1"), newArrayList(T("("), V("Group"), T(")")));
     rules.put(V("E_group2"), newArrayList(V("E_group1"), V("E_group2'")));
     rules.put(V("E_group2'"), newArrayList(E()));
-    rules.put(V("E_group2'"), newArrayList(V("$Post")));
+    rules.put(V("E_group2'"), newArrayList(V("Post")));
     rules.put(V("Group"), newArrayList(V("E"), V("Group'")));
     rules.put(V("Group'"), newArrayList(E()));
     rules.put(V("Group'"), newArrayList(T("|"), V("Group")));
@@ -62,7 +77,7 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
     register(V("E_group1"), newArrayList(T("("), V("Group"), T(")")), "E_group1#group");
     register(V("E_group2"), newArrayList(V("E_group1"), V("E_group2'")), "E_group2");
     register(V("E_group2'"), newArrayList(E()), "E_group2'#1");
-    register(V("E_group2'"), newArrayList(V("$Post")), "E_group2'#2");
+    register(V("E_group2'"), newArrayList(V("Post")), "E_group2'#2");
     register(V("Group"), newArrayList(V("E"), V("Group'")), "Group");
     register(V("Group'"), newArrayList(E()), "Group'#1");
     register(V("Group'"), newArrayList(T("|"), V("Group")), "Group'#2");
@@ -153,7 +168,7 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
   public Bundle E_group1(RuleToken term) {
     switch (term.type) {
       case "term": return Bundle.of(HashMultimap.create(), newArrayList(T(term.data)));
-      case "var": return Bundle.of(HashMultimap.create(), newArrayList(V(term.data)));
+      case "var": return Bundle.of(HashMultimap.create(), newArrayList(V(term.data.substring(1))));
     }
     throw new IllegalStateException();
   }
@@ -236,7 +251,8 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
 
   public Variable fresh(List<List<Atom>> rule, String type) {
     sId += 1;
-    return V(mParent.mLabel.substring(1) + "@" + rule + "#" + type + sId);
+    String mid = Joiner.on("|").join(rule.stream().map(x -> Joiner.on(".").join(x)).collect(Collectors.toList()));
+    return V(mParent.mLabel.substring(1) + "@(" + mid + ")@" + type + "#" + sId);
   }
 
   enum Postfix {
@@ -265,6 +281,11 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
       resultList.addAll(left.head);
       resultList.addAll(right.head);
       return Bundle.of(resultMap, resultList);
+    }
+
+    @Override
+    public String toString() {
+      return intermediates + "\n\t" + head + "\n";
     }
   }
 
@@ -302,17 +323,18 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
     List<String> subterms = new ArrayList<>();
     for (String term : terms) {
       Matcher matcher = SIMPLE_PATTERN.matcher(term);
-      int end = 0;
-      while (matcher.find(end)) {
+      int last = 0;
+      while (matcher.find(last)) {
         // split
         int start = matcher.start();
-        end = matcher.end();
-        String prefix = term.substring(0, start);
+        int end = matcher.end();
+        String prefix = term.substring(last, start);
         if (!prefix.isEmpty()) subterms.add(prefix);
         String middle = term.substring(start, end);
         if (!middle.isEmpty()) subterms.add(middle);
+        last = end;
       }
-      String postfix = term.substring(end);
+      String postfix = term.substring(last);
       if (!postfix.isEmpty()) subterms.add(postfix);
     }
 

@@ -64,7 +64,7 @@ public class Calculator extends GrammarBase<String> {
 //    System.out.println(result);
 
     RuleGrammar ruleGrammar = new RuleGrammar(new Variable("E"));
-    System.err.println(ruleGrammar.tokenize("(a | b) $E"));
-    ruleGrammar.parse(ruleGrammar.tokenize("(a | b) $E"));
+    System.err.println(ruleGrammar.tokenize("(a | b)? $E"));
+    System.err.println(ruleGrammar.parse(ruleGrammar.tokenize("(a | b)? $E")).toString());
   }
 }

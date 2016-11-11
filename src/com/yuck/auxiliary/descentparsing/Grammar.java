@@ -102,7 +102,7 @@ public class Grammar {
           for (int i = 0; i < entry.getValue().size(); i++) {
             if (entry.getValue().get(i).equals(nonterminal)) {
               List<Atom> b = entry.getValue().subList(i + 1, entry.getValue().size());
-              Set<Atom> sub = first(b);
+              Set<Atom> sub = Sets.newHashSet(first(b));
               if (sub.contains(E())) {
                 sub.addAll(mFollowCache.get(entry.getKey()));
                 original.add(entry.getKey());
