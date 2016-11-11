@@ -5,6 +5,7 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
+import com.yuck.auxiliary.descentparsing.annotations.For;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
 import javafx.util.Pair;
@@ -16,6 +17,8 @@ import java.util.*;
 import static com.google.common.collect.Lists.newArrayList;
 
 public abstract class GrammarBase<U> {
+  private final Map<String, Method> mGroupHandlerRegistry = new HashMap<>();
+
   // Gives the token label
   public abstract String label(U token);
 
@@ -24,8 +27,9 @@ public abstract class GrammarBase<U> {
   protected Map<Pair<Variable, List<Atom>>, Method> mMethodMap = new HashMap<>();
   protected Map<Variable, Class<?>> mTypeMap = new HashMap<>();
   protected HashMultimap<Pair<Variable, Atom>, List<Atom>> mActionTable;
+  protected final Map<Variable, String> mGroupHandlers = new HashMap<>();
 
-  protected static Pair<Variable, RuleGrammar.Bundle> parseRule(String rule) {
+  protected Pair<Variable, RuleGrammar.Bundle> parseRule(String rule) {
     // id -> ($id | %eps | \S+)+
     List<String> strings = Splitter.on("->").limit(2).trimResults().splitToList(rule);
     if (strings.size() != 2) throw new IllegalStateException();
@@ -34,6 +38,7 @@ public abstract class GrammarBase<U> {
     RuleGrammar ruleGrammar = new RuleGrammar(left);
     List<RuleGrammar.RuleToken> ruleTokens = ruleGrammar.tokenize(right);
     RuleGrammar.Bundle bundle = ruleGrammar.parse(ruleTokens);
+    mGroupHandlers.putAll(ruleGrammar.mGroupHandlers);
     return new Pair<>(left, bundle);
   }
 
@@ -112,6 +117,13 @@ public abstract class GrammarBase<U> {
     mMethodMap.clear();
     mTypeMap.clear();
 
+    for (Method method : this.getClass().getMethods()) {
+      For handler = method.getDeclaredAnnotation(For.class);
+      if (handler != null) {
+        mGroupHandlerRegistry.put(handler.value(), method);
+      }
+    }
+
     ImmutableMultimap.Builder<Variable, List<Atom>> rules = ImmutableMultimap.builder();
     for (Method method : this.getClass().getMethods()) {
       Rule rule = method.getDeclaredAnnotation(Rule.class);
@@ -180,8 +192,17 @@ public abstract class GrammarBase<U> {
     String type = name.substring(last + 1, hash);
     // Right now, just switch on the type
     switch (type) {
-      case "group":
+      case "group": {
+        if (mGroupHandlers.containsKey(variable)) {
+          Method handler = mGroupHandlerRegistry.get(mGroupHandlers.get(variable));
+          if (handler != null) {
+            return handler;
+          } else {
+            return getClass().getDeclaredMethod(mGroupHandlers.get(variable), Object[].class);
+          }
+        }
         return GrammarBase.class.getDeclaredMethod("group", Object[].class);
+      }
       case "maybe": {
         if (production.get(0) instanceof Epsilon) {
           return GrammarBase.class.getDeclaredMethod("maybeEmpty");

@@ -1,9 +1,11 @@
 package com.yuck.auxiliary.descentparsing.javatest;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.yuck.auxiliary.descentparsing.GrammarBase;
 import com.yuck.auxiliary.descentparsing.RuleGrammar;
 import com.yuck.auxiliary.descentparsing.Variable;
+import com.yuck.auxiliary.descentparsing.annotations.For;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
 
@@ -11,18 +13,20 @@ import java.util.List;
 import java.util.function.Function;
 
 public class Calculator extends GrammarBase<String> {
-  @Rule("E -> (n | %( $E %) ) (op (n | %( $E %) ))*")
+  @Rule("E -> (n | %( $E %) : X) (op (n | %( $E %) : X))*")
   @Start
-  public int E(List<?> head, List<List<?>> rest) {
+  public int E(int head, List<List<?>> rest) {
     Function<Integer, Integer> tail = x -> x;
     for (List<?> opn : rest) {
       Function<Integer, Integer> oldTail = tail;
-      tail = x -> getOperation((String) opn.get(0), determine((List<?>) opn.get(1))).apply(oldTail.apply(x));
+      tail = x -> getOperation((String) opn.get(0), (Integer) opn.get(1)).apply(oldTail.apply(x));
     }
-    return tail.apply(determine(head));
+    return tail.apply(head);
   }
 
-  private int determine(List<?> group) {
+  @For("X")
+  public int determine(Object... args) {
+    List<?> group = Lists.newArrayList(args);
     if (group.size() > 1) {
       return (Integer) group.get(1);
     }

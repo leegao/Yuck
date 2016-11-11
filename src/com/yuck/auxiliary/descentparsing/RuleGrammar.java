@@ -92,6 +92,7 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
 
   private final Variable mParent;
   private static int sId = 0;
+  protected final Map<Variable, String> mGroupHandlers = new HashMap<>();
 
   public RuleGrammar(Variable parent) {
     mParent = parent;
@@ -178,7 +179,7 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
   }
 
   @Register("E_group1#group") // -> %( $Group $Handler %)
-  public Bundle E_group1(RuleToken lparen, List<Bundle> group, Optional<?> handler, RuleToken rparen) {
+  public Bundle E_group1(RuleToken lparen, List<Bundle> group, Optional<String> handler, RuleToken rparen) {
     // generates a new variable that gets pointed to e and others; it then gets added to the remaining bundles
     List<List<Atom>> alternates = new ArrayList<>();
     HashMultimap<Variable, List<Atom>> intermediates = HashMultimap.create();
@@ -192,7 +193,7 @@ public class RuleGrammar extends GrammarBase<RuleGrammar.RuleToken> {
     }
 
     if (handler.isPresent()) {
-      throw new NotImplementedException();
+      mGroupHandlers.put(fvs, handler.get());
     }
     return Bundle.of(intermediates, newArrayList(fvs));
   }
