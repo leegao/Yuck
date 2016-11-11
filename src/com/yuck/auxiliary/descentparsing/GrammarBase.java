@@ -183,10 +183,27 @@ public abstract class GrammarBase<U> {
           return GrammarBase.class.getDeclaredMethod("maybeFull", Object.class);
         }
       }
-      case "star": throw new NotImplementedException();
+      case "star": {
+        if (production.get(0) instanceof Epsilon) {
+          return GrammarBase.class.getDeclaredMethod("starEmpty");
+        } else {
+          return GrammarBase.class.getDeclaredMethod("starFull", Object.class, List.class);
+        }
+      }
       case "plus": throw new NotImplementedException();
     }
     throw new IllegalStateException();
+  }
+
+  public <R> List<R> starEmpty() {
+    return new ArrayList<R>();
+  }
+
+  public <R> List<R> starFull(R r, List<R> rest) {
+    List<R> result = new ArrayList<R>();
+    result.add(r);
+    result.addAll(rest);
+    return result;
   }
 
   public <R> Optional<R> maybeEmpty() {
