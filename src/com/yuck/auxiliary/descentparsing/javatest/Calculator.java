@@ -1,7 +1,7 @@
 package com.yuck.auxiliary.descentparsing.javatest;
 
-import com.google.common.base.Splitter;
 import com.yuck.auxiliary.descentparsing.GrammarBase;
+import com.yuck.auxiliary.descentparsing.RuleGrammar;
 import com.yuck.auxiliary.descentparsing.Variable;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
