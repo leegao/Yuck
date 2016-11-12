@@ -10,7 +10,6 @@ import com.yuck.auxiliary.descentparsing.annotations.Resolve;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
 import javafx.util.Pair;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -71,13 +70,17 @@ public abstract class GrammarBase<U> {
     return (R) parse(current, mGrammar.mStart);
   }
 
+  protected Throwable handleError(Variable variable, Atom on, List<U> stream) {
+    Pair<Atom, U> peek = peek(stream);
+    return new IllegalStateException("Error: No action at state " + variable + " on " + peek);
+  }
+
   private Object parse(List<U> stream, Variable state) {
     Pair<Atom, U> peek = peek(stream);
     Pair<Variable, Atom> key = new Pair<>(state, peek.getKey());
     Set<List<Atom>> sentences = mActionTable.get(key);
-    // TODO: Add error handling here.
     if (sentences.isEmpty()) {
-      throw new IllegalStateException("Error: No action at state " + state + " on " + peek);
+      throw Throwables.propagate(handleError(state, peek.getKey(), stream));
     }
 
     if (sentences.size() > 1) {
@@ -113,14 +116,10 @@ public abstract class GrammarBase<U> {
         }
         return reduce(stream, state, sentence);
       }
-      throw new IllegalStateException(); // Impossible, for now
+      throw new IllegalStateException();
     } else {
-      for (List<Atom> sentence : sentences) {
-        return reduce(stream, state, sentence);
-      }
+      return reduce(stream, state, sentences.iterator().next());
     }
-
-    throw new IllegalStateException();
   }
 
   private Object reduce(List<U> stream, Variable state, List<Atom> sentence) {
@@ -216,7 +215,6 @@ public abstract class GrammarBase<U> {
     for (Pair<Variable, Atom> key : actionTable.keySet()) {
       Set<List<Atom>> conflicts = actionTable.get(key);
       if (conflicts.size() > 1) {
-        // TODO: check for conflict resolution
         if (mConflictHandlerRegistry.containsKey(key)) {
           // either handle(stream, Set) or handle(stream, @For...)
           Method method = mConflictHandlerRegistry.get(key);
@@ -248,7 +246,9 @@ public abstract class GrammarBase<U> {
           }
           continue;
         }
-        throw new IllegalStateException("Conflict at " + key + " over " + conflicts);
+        throw new IllegalStateException(
+            "Conflict at " + key + " over " + conflicts +
+                "; you should either refactor or add in a conflict resolver.");
       }
     }
 

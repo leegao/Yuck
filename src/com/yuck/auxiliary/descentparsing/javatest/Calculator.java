@@ -4,6 +4,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.yuck.auxiliary.descentparsing.Atom;
 import com.yuck.auxiliary.descentparsing.GrammarBase;
+import com.yuck.auxiliary.descentparsing.Variable;
 import com.yuck.auxiliary.descentparsing.annotations.For;
 import com.yuck.auxiliary.descentparsing.annotations.Resolve;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
@@ -57,6 +58,11 @@ public class Calculator extends GrammarBase<String> {
       return (Integer) group.get(1);
     }
     return Integer.valueOf((String) group.get(0));
+  }
+
+  @Override
+  protected Throwable handleError(Variable variable, Atom on, List<String> stream) {
+    return super.handleError(variable, on, stream);
   }
 
   Function<Integer, Integer> getOperation(String op, int right) {
