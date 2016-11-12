@@ -90,7 +90,21 @@ public abstract class GrammarBase<U> {
         try {
           if (parameterAnnotations.length > 2) {
             // figure out the right annotations
-            throw new NotImplementedException();
+            List<Object> arguments = new ArrayList<>();
+            arguments.add(stream);
+            for (int i = 1; i < parameterAnnotations.length; i++) {
+              Optional<Annotation> any = newArrayList(parameterAnnotations[i])
+                  .stream()
+                  .filter(p -> p instanceof For)
+                  .findAny();
+              // Check that the conflicts are covered
+              String production = any.map(x -> (For) x).get().value();
+              RuleGrammar ruleGrammar = new RuleGrammar(key.getKey());
+              List<RuleGrammar.RuleToken> ruleTokens = ruleGrammar.tokenize(production);
+              RuleGrammar.Bundle bundle = ruleGrammar.parse(ruleTokens);
+              arguments.add(bundle.head);
+            }
+            sentence = (List<Atom>) handler.invoke(this, arguments.toArray());
           } else {
             sentence = (List<Atom>) handler.invoke(this, stream, sentences);
           }

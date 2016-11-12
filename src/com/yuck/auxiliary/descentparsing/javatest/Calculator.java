@@ -24,6 +24,11 @@ public class Calculator extends GrammarBase<String> {
     return tail.apply(head);
   }
 
+  @Rule("E -> ! $Meh")
+  public int E(String bang, String meh) {
+    return meh.length();
+  }
+
   @Rule("Meh -> n")
   public String meh(String n) {
     return n;
@@ -84,6 +89,8 @@ public class Calculator extends GrammarBase<String> {
           return "%(";
         case ")":
           return "%)";
+        case "!":
+          return "!";
       }
       throw new IllegalStateException("'" + token + "'");
     }
@@ -94,7 +101,7 @@ public class Calculator extends GrammarBase<String> {
     List<String> tokenStream = Splitter.on(" ")
         .trimResults()
         .omitEmptyStrings()
-        .splitToList("1 +  ( 3 * 2 )  - 3");
+        .splitToList("1 +  ( 3 * 2 )  - ( ! 111 22 )");
     int result = calculator.parse(tokenStream);
     System.out.println(result);
   }
