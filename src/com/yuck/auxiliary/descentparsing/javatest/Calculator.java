@@ -34,8 +34,11 @@ public class Calculator extends GrammarBase<String> {
     return n + m;
   }
 
-  @Resolve(variable = "Meh", term = "n", conflicts = {"n", "n n"})
-  public List<Atom> resolveMeh(List<String> rest, List<Atom> n, List<Atom> nn) {
+  @Resolve(variable = "Meh", term = "n")
+  public List<Atom> resolveMeh(
+      List<String> rest,
+      @For("n") List<Atom> n,
+      @For("n n") List<Atom> nn) {
     if (rest.size() > 1 && label(rest.get(1)).equals("n")) {
       return nn;
     }

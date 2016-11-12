@@ -6,19 +6,24 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.yuck.auxiliary.descentparsing.annotations.For;
+import com.yuck.auxiliary.descentparsing.annotations.Resolve;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
 import javafx.util.Pair;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.yuck.auxiliary.descentparsing.Grammar.V;
 
 @SuppressWarnings({"unused", "unchecked"})
 public abstract class GrammarBase<U> {
   private final Map<String, Method> mGroupHandlerRegistry = new HashMap<>();
+  private final Map<Pair<Variable, Atom>, Method> mConflictHandlerRegistry = new HashMap<>();
 
   // Gives the token label
   public abstract String label(U token);
@@ -68,13 +73,32 @@ public abstract class GrammarBase<U> {
 
   private Object parse(List<U> stream, Variable state) {
     Pair<Atom, U> peek = peek(stream);
-    Set<List<Atom>> sentences = mActionTable.get(new Pair<>(state, peek.getKey()));
+    Pair<Variable, Atom> key = new Pair<>(state, peek.getKey());
+    Set<List<Atom>> sentences = mActionTable.get(key);
     // TODO: Add error handling here.
     if (sentences.isEmpty()) {
       throw new IllegalStateException("Error: No action at state " + state + " on " + peek);
     }
 
     if (sentences.size() > 1) {
+      if (mConflictHandlerRegistry.containsKey(key)) {
+        Method handler = mConflictHandlerRegistry.get(key);
+        Resolve resolver = handler.getDeclaredAnnotation(Resolve.class);
+        Annotation[][] parameterAnnotations = handler.getParameterAnnotations();
+
+        List<Atom> sentence;
+        try {
+          if (parameterAnnotations.length > 2) {
+            // figure out the right annotations
+            throw new NotImplementedException();
+          } else {
+            sentence = (List<Atom>) handler.invoke(this, stream, sentences);
+          }
+        } catch (IllegalAccessException | InvocationTargetException e) {
+          throw Throwables.propagate(e);
+        }
+        return reduce(stream, state, sentence);
+      }
       throw new IllegalStateException(); // Impossible, for now
     } else {
       for (List<Atom> sentence : sentences) {
@@ -122,6 +146,13 @@ public abstract class GrammarBase<U> {
       For handler = method.getDeclaredAnnotation(For.class);
       if (handler != null) {
         mGroupHandlerRegistry.put(handler.value(), method);
+      }
+
+      Resolve resolver = method.getDeclaredAnnotation(Resolve.class);
+      if (resolver != null) {
+        Variable variable = V(resolver.variable());
+        Atom term = resolver.term().equals("%eof") ? new EOF() : new Terminal(resolver.term());
+        mConflictHandlerRegistry.put(new Pair<>(variable, term), method);
       }
     }
 
@@ -172,6 +203,37 @@ public abstract class GrammarBase<U> {
       Set<List<Atom>> conflicts = actionTable.get(key);
       if (conflicts.size() > 1) {
         // TODO: check for conflict resolution
+        if (mConflictHandlerRegistry.containsKey(key)) {
+          // either handle(stream, Set) or handle(stream, @For...)
+          Method method = mConflictHandlerRegistry.get(key);
+          Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+          Class<?>[] parameterTypes = method.getParameterTypes();
+          if (parameterAnnotations.length == 2) {
+            Preconditions.checkArgument(parameterTypes[0].equals(List.class));
+            Preconditions.checkArgument(parameterTypes[1].equals(Set.class));
+          } else if (parameterAnnotations.length >= 2) {
+            Preconditions.checkArgument(parameterTypes[0].equals(List.class));
+            Set<List<Atom>> current = new HashSet<>();
+            for (int i = 1; i < parameterAnnotations.length; i++) {
+              Preconditions.checkArgument(parameterTypes[i].equals(List.class));
+              Optional<Annotation> any = newArrayList(parameterAnnotations[i])
+                  .stream()
+                  .filter(p -> p instanceof For)
+                  .findAny();
+              Preconditions.checkArgument(any.isPresent());
+              // Check that the conflicts are covered
+              String production = any.map(x -> (For) x).get().value();
+              RuleGrammar ruleGrammar = new RuleGrammar(key.getKey());
+              List<RuleGrammar.RuleToken> ruleTokens = ruleGrammar.tokenize(production);
+              RuleGrammar.Bundle bundle = ruleGrammar.parse(ruleTokens);
+              current.add(bundle.head);
+            }
+            Preconditions.checkArgument(current.equals(conflicts));
+          } else {
+            throw new IllegalStateException("Conflict resolvers require at least two arguments.");
+          }
+          continue;
+        }
         throw new IllegalStateException("Conflict at " + key + " over " + conflicts);
       }
     }
