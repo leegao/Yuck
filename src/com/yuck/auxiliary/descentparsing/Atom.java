@@ -1,6 +1,6 @@
 package com.yuck.auxiliary.descentparsing;
 
-abstract class Atom {
+public abstract class Atom {
   protected final String mLabel;
 
   protected Atom(String label) {

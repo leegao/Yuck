@@ -2,8 +2,10 @@ package com.yuck.auxiliary.descentparsing.javatest;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.yuck.auxiliary.descentparsing.Atom;
 import com.yuck.auxiliary.descentparsing.GrammarBase;
 import com.yuck.auxiliary.descentparsing.annotations.For;
+import com.yuck.auxiliary.descentparsing.annotations.Resolve;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
 
@@ -20,6 +22,24 @@ public class Calculator extends GrammarBase<String> {
       tail = x -> getOperation((String) opn.get(0), (Integer) opn.get(1)).apply(oldTail.apply(x));
     }
     return tail.apply(head);
+  }
+
+  @Rule("Meh -> n")
+  public String meh(String n) {
+    return n;
+  }
+
+  @Rule("Meh -> n n")
+  public String meh(String n, String m) {
+    return n + m;
+  }
+
+  @Resolve(variable = "Meh", term = "n", conflicts = {"n", "n n"})
+  public List<Atom> resolveMeh(List<String> rest, List<Atom> n, List<Atom> nn) {
+    if (rest.size() > 1 && label(rest.get(1)).equals("n")) {
+      return nn;
+    }
+    return n;
   }
 
   @For("X")
