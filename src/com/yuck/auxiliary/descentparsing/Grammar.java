@@ -67,17 +67,6 @@ public class Grammar {
     return mFirstCache.get(sentence);
   }
 
-  public boolean nullable(List<Atom> sentence) {
-    // nullable(hd :: tl) = eps in first(hd) and nullable(tl)
-    if (sentence.isEmpty()) return true;
-    if (mNullableCache.containsKey(sentence)) {
-      return mNullableCache.get(sentence);
-    }
-    boolean result = first(sentence).contains(E());
-    mNullableCache.put(sentence, result);
-    return result;
-  }
-
   public Set<Atom> follow(Variable variable) {
     // follow(V) = \cup_{X -> aVb} first(b) + nullable(b) * follow(V)
     if (mFollowCache.containsKey(variable)) {
@@ -148,23 +137,6 @@ public class Grammar {
     }
     mPreprocessed = true;
     return mActions;
-  }
-
-  public static void main(String[] args) {
-    ImmutableMultimap<Variable, List<Atom>> rules = ImmutableMultimap.<Variable, List<Atom>>builder()
-        .put(V("e"), Lists.newArrayList(T("n"), V("e'")))
-        .put(V("e'"), Lists.newArrayList(V("op"), V("e")))
-        .put(V("e'"), Lists.newArrayList(E()))
-        .put(V("op"), Lists.newArrayList(T("+")))
-        .put(V("op"), Lists.newArrayList(T("-")))
-        .put(V("op"), Lists.newArrayList(T("*")))
-        .build();
-    Grammar grammar = new Grammar(rules, V("e"));
-    for (Map.Entry<Variable, List<Atom>> entry : rules.entries()) {
-      System.err.println(entry.getValue() + "  1->  " + grammar.first(entry.getValue()));
-      System.err.println(entry.getKey() + "  2->  " + grammar.follow(entry.getKey()));
-    }
-    System.err.println(grammar.first(Lists.newArrayList(V("e'"))));
   }
 
   static Terminal T(String t) {
