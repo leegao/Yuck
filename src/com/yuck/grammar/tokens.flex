@@ -51,8 +51,8 @@ FloatLiteral = DecIntegerLiteral [.] [0-9]+
   "<="                           { return symbol(yytext()); }
   ">"                            { return symbol(yytext()); }
   ">="                           { return symbol(yytext()); }
-  "("                            { return symbol(yytext()); }
-  ")"                       { return symbol(yytext()); }
+  "("                            { return symbol("%("); }
+  ")"                       { return symbol("%)"); }
   "["                       { return symbol(yytext()); }
   "]"                       { return symbol(yytext()); }
   "{"                       { return symbol(yytext()); }

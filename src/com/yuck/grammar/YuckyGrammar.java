@@ -29,6 +29,11 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return token;
   }
 
+  @Rule("E -> %( $E %)")
+  public Object expression(Token left, Object group, Token right) {
+    return group;
+  }
+
   @Rule("E -> [ $E (, $E : Second)* ]")
   public Object expression(Token lbracket, Object head, List<?> expressions, Token rbracket) {
     List<Object> list = new ArrayList<>();
@@ -98,7 +103,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
     YuckyGrammar grammar = new YuckyGrammar();
     grammar.preprocess();
 
-    YuckyLexer lexer = new YuckyLexer(new StringReader("{1 : \"1\", \"1\" : 2}"));
+    YuckyLexer lexer = new YuckyLexer(new StringReader("{(1) : \"1\", \"1\" : 2}"));
     List<Token> tokens = new ArrayList<>();
     Token token = lexer.yylex();
     while (token != null) {
