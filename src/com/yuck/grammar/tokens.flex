@@ -35,13 +35,62 @@ CommentContent       = ( [^*] | \*+ [^/*] )*
 Identifier = [:jletter:] [:jletterdigit:]*
 
 DecIntegerLiteral = 0 | [1-9][0-9]*
+FloatLiteral = DecIntegerLiteral [.] [0-9]+
 
 %state STRING
 
 %%
 
 /* keywords */
-<YYINITIAL> "break"              { return symbol(yytext()); }
+<YYINITIAL> {
+  "break"              { return symbol(yytext()); }
+  "="                            { return symbol(yytext()); }
+  "=="                           { return symbol(yytext()); }
+  "!="                           { return symbol(yytext()); }
+  "<"                            { return symbol(yytext()); }
+  "<="                           { return symbol(yytext()); }
+  ">"                            { return symbol(yytext()); }
+  ">="                           { return symbol(yytext()); }
+  "("                            { return symbol(yytext()); }
+  ")"                       { return symbol(yytext()); }
+  "["                       { return symbol(yytext()); }
+  "]"                       { return symbol(yytext()); }
+  "{"                       { return symbol(yytext()); }
+  "}"                       { return symbol(yytext()); }
+  "."                       { return symbol(yytext()); }
+  ".."                       { return symbol(yytext()); }
+  ","                       { return symbol(yytext()); }
+  "+"                       { return symbol(yytext()); }
+  "-"                       { return symbol(yytext()); }
+  "**"                       { return symbol(yytext()); }
+  "*"                       { return symbol(yytext()); }
+  "/"                       { return symbol(yytext()); }
+  "|"                       { return symbol(yytext()); }
+  "&"                       { return symbol(yytext()); }
+  "^"                       { return symbol(yytext()); }
+  "?"                       { return symbol(yytext()); }
+  ":"                       { return symbol(yytext()); }
+  "::"                       { return symbol(yytext()); }
+  "+="                       { return symbol(yytext()); }
+  "-="                       { return symbol(yytext()); }
+  "and"                             { return symbol(yytext()); }
+  "or"                             { return symbol(yytext()); }
+  "not"                             { return symbol(yytext()); }
+  "function"                     { return symbol(yytext()); }
+  "var"                             { return symbol(yytext()); }
+  "true"                         { return symbol(yytext()); }
+  "false"                         { return symbol(yytext()); }
+  "if"                             { return symbol(yytext()); }
+  "for"                             { return symbol(yytext()); }
+  "elseif"                         { return symbol(yytext()); }
+  "else"                         { return symbol(yytext()); }
+  "while"                         { return symbol(yytext()); }
+  "return"                         { return symbol(yytext()); }
+  "in"                             { return symbol(yytext()); }
+  "nil"                             { return symbol(yytext()); }
+  "match"                         { return symbol(yytext()); }
+  "with"                         { return symbol(yytext()); }
+}
 
 <YYINITIAL> {
   /* identifiers */
@@ -50,11 +99,6 @@ DecIntegerLiteral = 0 | [1-9][0-9]*
   /* literals */
   {DecIntegerLiteral}            { return symbol("num"); }
   \"                             { string.setLength(0); yybegin(STRING); }
-
-  /* operators */
-  "="                            { return symbol(yytext()); }
-  "=="                           { return symbol(yytext()); }
-  "+"                            { return symbol(yytext()); }
 
   /* comments */
   {Comment}                      { /* ignore */ }
