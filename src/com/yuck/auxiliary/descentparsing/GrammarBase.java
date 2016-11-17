@@ -55,12 +55,22 @@ public abstract class GrammarBase<U> {
     return new Pair<>(new Terminal(label(top)), top);
   }
 
-  private U consume(List<U> stream, Atom what) {
+  private U consume(Variable state, List<Atom> sentence, List<U> stream, Atom what) {
     Pair<Atom, U> peek = peek(stream);
     if (!peek.getKey().equals(what)) {
-      throw new IllegalStateException("Cannot consume " + what + " at " + stream);
+      // throw new IllegalStateException("Cannot consume " + what + " at " + stream);
+      return handleConsumptionError(state, peek.getKey(), stream, sentence, what);
     }
     return stream.remove(0);
+  }
+
+  protected U handleConsumptionError(
+      Variable state,
+      Atom next,
+      List<U> stream,
+      List<Atom> currentSentence,
+      Atom expected) {
+    throw new IllegalStateException("Cannot consume " + expected + " at " + stream);
   }
 
   public <R> R parse(List<U> stream) {
@@ -70,9 +80,9 @@ public abstract class GrammarBase<U> {
     return (R) parse(current, mGrammar.mStart);
   }
 
-  protected Throwable handleError(Variable variable, Atom on, List<U> stream) {
+  protected Set<List<Atom>> handleError(Variable variable, Atom on, List<U> stream) {
     Pair<Atom, U> peek = peek(stream);
-    return new IllegalStateException("Error: No action at state " + variable + " on " + peek);
+    throw  new IllegalStateException("Error: No action at state " + variable + " on " + peek);
   }
 
   private Object parse(List<U> stream, Variable state) {
@@ -80,7 +90,7 @@ public abstract class GrammarBase<U> {
     Pair<Variable, Atom> key = new Pair<>(state, peek.getKey());
     Set<List<Atom>> sentences = mActionTable.get(key);
     if (sentences.isEmpty()) {
-      throw Throwables.propagate(handleError(state, peek.getKey(), stream));
+      sentences = handleError(state, peek.getKey(), stream);
     }
 
     if (sentences.size() > 1) {
@@ -127,7 +137,7 @@ public abstract class GrammarBase<U> {
     for (Atom term : sentence) {
       if (term instanceof Terminal) {
         arguments.add(peek(stream));
-        consume(stream, term);
+        consume(state, sentence, stream, term);
       } else if (term instanceof Variable) {
         Object result = parse(stream, (Variable) term);
         arguments.add(new Pair<>(term, result));

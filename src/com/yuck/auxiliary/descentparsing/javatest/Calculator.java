@@ -11,6 +11,7 @@ import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 public class Calculator extends GrammarBase<String> {
@@ -61,7 +62,7 @@ public class Calculator extends GrammarBase<String> {
   }
 
   @Override
-  protected Throwable handleError(Variable variable, Atom on, List<String> stream) {
+  protected Set<List<Atom>> handleError(Variable variable, Atom on, List<String> stream) {
     return super.handleError(variable, on, stream);
   }
 

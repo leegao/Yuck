@@ -2,9 +2,7 @@ package com.yuck.grammar;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.yuck.auxiliary.descentparsing.Atom;
-import com.yuck.auxiliary.descentparsing.GrammarBase;
-import com.yuck.auxiliary.descentparsing.RuleGrammar;
+import com.yuck.auxiliary.descentparsing.*;
 import com.yuck.auxiliary.descentparsing.annotations.For;
 import com.yuck.auxiliary.descentparsing.annotations.Resolve;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
@@ -307,13 +305,31 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return (T) terms[0];
   }
 
+  @Override
+  protected Set<List<Atom>> handleError(Variable variable, Atom on, List<Token> stream) {
+    return super.handleError(variable, on, stream);
+  }
+
+  @Override
+  protected Token handleConsumptionError(
+      Variable state,
+      Atom next,
+      List<Token> stream,
+      List<Atom> currentSentence,
+      Atom expected) {
+    // Try to handle missing semicolons whenever possible.
+    if (expected.toString().equals(";"))
+      return new Token(";", -1, -1, ";");
+    return super.handleConsumptionError(state, next, stream, currentSentence, expected);
+  }
+
   public static void main(String[] args) throws IOException {
     YuckyGrammar grammar = new YuckyGrammar();
     grammar.preprocess();
 
     String code1 = "{(1) : function(x){ foo(); bar(); var x = 3; }, \"1\" : new Baz().jar.poo()(132)} - -3 * 2**3**foo(5.baz, 3**3).lol()";
     String code2 = "function(){" +
-        "function foo() {print(\"Hello!\");};" +
+        "function foo() {print(\"Hello!\")};" +
         "function() {};" +
     "}";
 
