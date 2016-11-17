@@ -39,7 +39,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
   level7 := 'not' |  '-' // unary, pre
   level8 := '^' // right
   level9 := (. term)*
-  level10 := E(...) // unary, post
+  level10 := E(.term | (...))* // unary, post
   */
   @Start
   @Rule("E -> $level1")
@@ -221,6 +221,17 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return rest.get(1).type.equals("}") ? emptyList : filledList;
   }
 
+  @Rule("E.leaf -> new (id (. id)* : QualifiedName) %( $args %)")
+  public Object expLeaf(Token n, Object name, Token open, List<?> arguments, Token closes) {
+    return "new " + name + "(" + Joiner.on(", ").join(arguments) + ")";
+  }
+
+  @For("QualifiedName")
+  public Object buildQualifiedName(Token head, List<Token> tail) {
+    if (tail.isEmpty()) return head;
+    return head + "." + Joiner.on(".").join(tail);
+  }
+
   @For("SingleToken")
   public Token singleToken(Object... tokens) {
     Preconditions.checkArgument(tokens.length == 1);
@@ -243,7 +254,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
     YuckyGrammar grammar = new YuckyGrammar();
     grammar.preprocess();
 
-    YuckyLexer lexer = new YuckyLexer(new StringReader("{(1) : \"1\", \"1\" : 2} - -3 * 2**3**foo(5.baz, 3**3).lol()"));
+    YuckyLexer lexer = new YuckyLexer(new StringReader("{(1) : \"1\", \"1\" : new Baz()} - -3 * 2**3**foo(5.baz, 3**3).lol()"));
     List<Token> tokens = new ArrayList<>();
     Token token = lexer.yylex();
     while (token != null) {
