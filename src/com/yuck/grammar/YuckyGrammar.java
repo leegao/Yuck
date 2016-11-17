@@ -232,6 +232,27 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return head + "." + Joiner.on(".").join(tail);
   }
 
+  @Rule("E.leaf -> function %( $parameters %) { ($statement ; : First)* }")
+  public Object expLeaf(
+      Token function,
+      Token open, List<?> parameters, Token close,
+      Token left, List<?> statements, Token right) {
+    return "function(" + Joiner.on(", ").join(parameters) + ") {" + Joiner.on("; ").join(statements) + "}";
+  }
+
+  @Rule("parameters -> %eps")
+  public List<?> parameters() {
+    return new ArrayList<>();
+  }
+
+  @Rule("parameters -> id (, id : Second)*")
+  public List<?> parameters(Token id, List<?> rest) {
+    List<Object> parameters = new ArrayList<>();
+    parameters.add(id);
+    parameters.addAll(rest);
+    return parameters;
+  }
+
   @For("SingleToken")
   public Token singleToken(Object... tokens) {
     Preconditions.checkArgument(tokens.length == 1);
@@ -254,7 +275,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
     YuckyGrammar grammar = new YuckyGrammar();
     grammar.preprocess();
 
-    YuckyLexer lexer = new YuckyLexer(new StringReader("{(1) : \"1\", \"1\" : new Baz()} - -3 * 2**3**foo(5.baz, 3**3).lol()"));
+    YuckyLexer lexer = new YuckyLexer(new StringReader("{(1) : function(x){}, \"1\" : new Baz().jar.poo()(132)} - -3 * 2**3**foo(5.baz, 3**3).lol()"));
     List<Token> tokens = new ArrayList<>();
     Token token = lexer.yylex();
     while (token != null) {
