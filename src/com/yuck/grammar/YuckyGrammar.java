@@ -258,6 +258,37 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return expr;
   }
 
+  @Rule("statement -> var id (= $E)?")
+  public Object statement(Token var, Token id, Optional<List<?>> init) {
+    if (init.isPresent()) {
+      return "var " + id + " = " + init.get().get(1);
+    }
+    return "var " + id;
+  }
+
+  @Rule("statement -> function id %( $parameters %) { ($statement ; : First)* }")
+  public Object statement(
+      Token function,
+      Token id,
+      Token open, List<?> parameters, Token close,
+      Token left, List<?> statements, Token right) {
+    return "function " + id + "(" + Joiner.on(", ").join(parameters) + ") {\n" + Joiner.on(";\n  ").join(statements) + "\n}";
+  }
+
+  @Resolve(variable = "statement", term = "function")
+  public List<Atom> resolveFunction(List<Token> rest, Set<List<Atom>> candidates) {
+    Preconditions.checkArgument(rest.size() > 1);
+    boolean anonymous = rest.get(1).text.equals("(");
+    for (List<Atom> candidate : candidates) {
+      if (candidate.size() == 1 && anonymous) {
+        return candidate;
+      } else if (candidate.size() != 1 && !anonymous) {
+        return candidate;
+      }
+    }
+    throw new IllegalStateException();
+  }
+
   @For("SingleToken")
   public Token singleToken(Object... tokens) {
     Preconditions.checkArgument(tokens.length == 1);
@@ -280,7 +311,13 @@ public class YuckyGrammar extends GrammarBase<Token> {
     YuckyGrammar grammar = new YuckyGrammar();
     grammar.preprocess();
 
-    YuckyLexer lexer = new YuckyLexer(new StringReader("{(1) : function(x){ foo(); bar(); }, \"1\" : new Baz().jar.poo()(132)} - -3 * 2**3**foo(5.baz, 3**3).lol()"));
+    String code1 = "{(1) : function(x){ foo(); bar(); var x = 3; }, \"1\" : new Baz().jar.poo()(132)} - -3 * 2**3**foo(5.baz, 3**3).lol()";
+    String code2 = "function(){" +
+        "function foo() {print(\"Hello!\");};" +
+        "function() {};" +
+    "}";
+
+    YuckyLexer lexer = new YuckyLexer(new StringReader(code2));
     List<Token> tokens = new ArrayList<>();
     Token token = lexer.yylex();
     while (token != null) {
