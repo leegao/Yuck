@@ -1,5 +1,6 @@
 package com.yuck.grammar;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.yuck.auxiliary.descentparsing.Atom;
 import com.yuck.auxiliary.descentparsing.GrammarBase;
@@ -34,12 +35,18 @@ public class YuckyGrammar extends GrammarBase<Token> {
   level4 := 'to' // right
   level5 := '+'  |  '-' // left
   level6 := '*'  |  '/'  |  '%' // left
-  level7 := 'not' |  '-' // unary
+  level7 := 'not' |  '-' // unary, pre
   level8 := '^' // right
+  level9 := (...) // unary, post
   */
   @Start
-  @Rule("E -> $level2 ((or : bop) $level2 : FoldOp)*")
-  public Object expression(Object left, List<?> ors) {
+  @Rule("E -> $level1")
+  public Object expression(Object level1) {
+    return level1;
+  }
+
+  @Rule("level1 -> $level2 ((or : bop) $level2 : FoldOp)*")
+  public Object level1(Object left, List<?> ors) {
     return merge(left, ors);
   }
 
@@ -89,12 +96,44 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return level8;
   }
 
-  @Rule("level8 -> $E.leaf ((pow : bop) $level8)?")
+  @Rule("level8 -> $level9 ((pow : bop) $level8)?")
   public Object level8(Object leaf, Optional<List<?>> pow) {
     if (pow.isPresent()) {
       return "(" + leaf.toString() + foldOperation(pow.get().get(0), pow.get().get(1)) + ")";
     }
     return leaf;
+  }
+
+  @Rule("level9 -> $E.leaf ( %( $args %) : Arguments)*")
+  public Object level9(Object leaf, List<List<?>> arguments) {
+    if (arguments.isEmpty()) {
+      return leaf;
+    }
+    Joiner joiner = Joiner.on(", ");
+    String call = leaf.toString() + "(" + joiner.join(arguments.get(0)) + ")";
+    for (List<?> sub : arguments.subList(1, arguments.size())) {
+      call = "(" + call + ")" + "(" + joiner.join(sub) + ")";
+    }
+    return call;
+  }
+
+  @Rule("args -> %eps")
+  public List<?> arguments() {
+    return new ArrayList<>();
+  }
+
+  @Rule("args -> $E (, $E : Second)*")
+  public List<?> arguments(Object arg, List<?> rest) {
+    List<Object> list = new ArrayList<>();
+    list.add(arg);
+    list.addAll(rest);
+    return list;
+  }
+
+  @For("Arguments")
+  public List<?> forArguments(Object... terms) {
+    Preconditions.checkArgument(terms.length == 3);
+    return (List<?>) terms[1];
   }
 
   @For("bop")
@@ -188,7 +227,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
     YuckyGrammar grammar = new YuckyGrammar();
     grammar.preprocess();
 
-    YuckyLexer lexer = new YuckyLexer(new StringReader("{(1) : \"1\", \"1\" : 2} - -3 * 2**3**4"));
+    YuckyLexer lexer = new YuckyLexer(new StringReader("{(1) : \"1\", \"1\" : 2} - -3 * 2**3**foo(5, 3**3)"));
     List<Token> tokens = new ArrayList<>();
     Token token = lexer.yylex();
     while (token != null) {

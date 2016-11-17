@@ -90,6 +90,7 @@ FloatLiteral = DecIntegerLiteral [.] [0-9]+
   "nil"                             { return symbol(yytext()); }
   "match"                         { return symbol(yytext()); }
   "with"                         { return symbol(yytext()); }
+  "new"                          { return symbol(yytext()); }
 }
 
 <YYINITIAL> {
