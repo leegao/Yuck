@@ -253,6 +253,11 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return parameters;
   }
 
+  @Rule("statement -> $E")
+  public Object statement(Object expr) {
+    return expr;
+  }
+
   @For("SingleToken")
   public Token singleToken(Object... tokens) {
     Preconditions.checkArgument(tokens.length == 1);
@@ -275,7 +280,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
     YuckyGrammar grammar = new YuckyGrammar();
     grammar.preprocess();
 
-    YuckyLexer lexer = new YuckyLexer(new StringReader("{(1) : function(x){}, \"1\" : new Baz().jar.poo()(132)} - -3 * 2**3**foo(5.baz, 3**3).lol()"));
+    YuckyLexer lexer = new YuckyLexer(new StringReader("{(1) : function(x){ foo(); bar(); }, \"1\" : new Baz().jar.poo()(132)} - -3 * 2**3**foo(5.baz, 3**3).lol()"));
     List<Token> tokens = new ArrayList<>();
     Token token = lexer.yylex();
     while (token != null) {

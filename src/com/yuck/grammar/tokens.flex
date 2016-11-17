@@ -73,6 +73,7 @@ FloatLiteral = DecIntegerLiteral [.] [0-9]+
   "::"                       { return symbol("cons"); }
   "+="                       { return symbol(yytext()); }
   "-="                       { return symbol(yytext()); }
+  ";"                        { return symbol(yytext()); }
   "and"                             { return symbol(yytext()); }
   "or"                             { return symbol(yytext()); }
   "not"                             { return symbol(yytext()); }
