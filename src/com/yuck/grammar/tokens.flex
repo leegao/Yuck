@@ -60,10 +60,10 @@ FloatLiteral = DecIntegerLiteral [.] [0-9]+
   "."                       { return symbol(yytext()); }
   ".."                       { return symbol(yytext()); }
   ","                       { return symbol(yytext()); }
-  "+"                       { return symbol(yytext()); }
+  "+"                       { return symbol("add"); }
   "-"                       { return symbol(yytext()); }
-  "**"                       { return symbol(yytext()); }
-  "*"                       { return symbol(yytext()); }
+  "**"                       { return symbol("pow"); }
+  "*"                       { return symbol("mul"); }
   "/"                       { return symbol(yytext()); }
   "|"                       { return symbol(yytext()); }
   "&"                       { return symbol(yytext()); }
