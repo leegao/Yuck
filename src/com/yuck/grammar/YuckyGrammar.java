@@ -2,11 +2,13 @@ package com.yuck.grammar;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.yuck.auxiliary.descentparsing.*;
 import com.yuck.auxiliary.descentparsing.annotations.For;
 import com.yuck.auxiliary.descentparsing.annotations.Resolve;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
+import javafx.util.Pair;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
@@ -273,6 +275,20 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return "function " + id + "(" + Joiner.on(", ").join(parameters) + ") {\n  " + Joiner.on(";\n  ").join(statements) + "\n}";
   }
 
+  @Resolve(variable = "statement", term = "function")
+  public List<Atom> resolveFunction(List<Token> rest, Set<List<Atom>> candidates) {
+    Preconditions.checkArgument(rest.size() > 1);
+    boolean anonymous = rest.get(1).text.equals("(");
+    for (List<Atom> candidate : candidates) {
+      if (candidate.size() == 1 && anonymous) {
+        return candidate;
+      } else if (candidate.size() != 1 && !anonymous) {
+        return candidate;
+      }
+    }
+    throw new IllegalStateException();
+  }
+
   @Rule("statement -> while $E { ($statement ; : First)* }")
   public Object statement(Token whil, Object cond, Token open, List<?> statements, Token close) {
     return "while " + cond + " { " + Joiner.on("; ").join(statements) + " }";
@@ -288,16 +304,37 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return "for " + Joiner.on(", ").join(ids) + " in " + expr + " { " + Joiner.on("; ").join(statements) + " }";
   }
 
-  @Resolve(variable = "statement", term = "function")
-  public List<Atom> resolveFunction(List<Token> rest, Set<List<Atom>> candidates) {
-    Preconditions.checkArgument(rest.size() > 1);
-    boolean anonymous = rest.get(1).text.equals("(");
+  @Rule("statement -> if $E { ($statement ; : First)* } (else ($statement | { ($statement ; : First)* } ) : Else)?")
+  public Object statement(Token iff, Object cond, Token open, List<?> statements, Token close, Optional<List<?>> el) {
+    String top = "if " + cond + " { " + Joiner.on("; ").join(statements) + " }";
+    if (el.isPresent()) {
+      List<?> elseStatements = el.get();
+      return top + " else " + (elseStatements.size() != 1 ? "{ " : "") + Joiner.on("; ").join(elseStatements) + (elseStatements.size() != 1 ? " }" : "");
+    }
+    return top;
+  }
+
+  @Resolve(
+      // TODO: make this less eyebleedy
+      variable = "statement@($statement|{.$statement@($statement@($statement.;)@group)@star.})@group",
+      term = "{")
+  public List<Atom> resolveElse(List<Token> rest, Set<List<Atom>> candidates) {
+    // Always shift to the `else { statements }` case if rest starts with {
+    boolean brack = rest.get(0).text.equals("{");
     for (List<Atom> candidate : candidates) {
-      if (candidate.size() == 1 && anonymous) {
-        return candidate;
-      } else if (candidate.size() != 1 && !anonymous) {
-        return candidate;
-      }
+      if (candidate.size() == 1 && brack) return candidate;
+      if (candidate.size() != 1 && !brack) return candidate;
+    }
+    throw new IllegalStateException();
+  }
+
+
+  @For("Else")
+  public List<?> elseClause(Token el, List<?> statementish) {
+    if (statementish.size() == 1) {
+      return Lists.newArrayList(statementish.get(0));
+    } else if (statementish.size() == 3){
+      return (List<?>) statementish.get(1);
     }
     throw new IllegalStateException();
   }
@@ -330,6 +367,10 @@ public class YuckyGrammar extends GrammarBase<Token> {
 
   @Override
   protected Set<List<Atom>> handleError(Variable variable, Atom on, List<Token> stream) {
+    if (variable.toString().equals(
+        "$statement@($statement@(else.$statement@($statement|{.$statement@($statement@($statement.;)@group)@star.})@group)@group)@maybe")) {
+      return this.mActionTable.get(new Pair<>(variable, new Terminal(";")));
+    }
     return super.handleError(variable, on, stream);
   }
 
@@ -355,6 +396,8 @@ public class YuckyGrammar extends GrammarBase<Token> {
         "function foo() {print(\"Hello!\")};" +
         "function() {while (true) {}};" +
         "for i in 1 to 3 {}" +
+        "if true {} else if false {}" +
+        "x()" +
     "}";
 
     YuckyLexer lexer = new YuckyLexer(new StringReader(code2));

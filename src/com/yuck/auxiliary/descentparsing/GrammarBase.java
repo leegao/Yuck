@@ -82,7 +82,7 @@ public abstract class GrammarBase<U> {
 
   protected Set<List<Atom>> handleError(Variable variable, Atom on, List<U> stream) {
     Pair<Atom, U> peek = peek(stream);
-    throw  new IllegalStateException("Error: No action at state " + variable + " on " + peek);
+    throw new IllegalStateException("Error: No action at state " + variable + " on " + peek);
   }
 
   private Object parse(List<U> stream, Variable state) {
