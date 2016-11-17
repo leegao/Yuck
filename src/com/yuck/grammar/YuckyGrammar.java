@@ -270,7 +270,22 @@ public class YuckyGrammar extends GrammarBase<Token> {
       Token id,
       Token open, List<?> parameters, Token close,
       Token left, List<?> statements, Token right) {
-    return "function " + id + "(" + Joiner.on(", ").join(parameters) + ") {\n" + Joiner.on(";\n  ").join(statements) + "\n}";
+    return "function " + id + "(" + Joiner.on(", ").join(parameters) + ") {\n  " + Joiner.on(";\n  ").join(statements) + "\n}";
+  }
+
+  @Rule("statement -> while $E { ($statement ; : First)* }")
+  public Object statement(Token whil, Object cond, Token open, List<?> statements, Token close) {
+    return "while " + cond + " { " + Joiner.on("; ").join(statements) + " }";
+  }
+
+  @Rule("statement -> for (id (, id : Second)* : Cat) in $E { ($statement ; : First)* }")
+  public Object statement(
+      Token fo,
+      List<Token> ids,
+      Token in,
+      Object expr,
+      Token open, List<?> statements, Token close) {
+    return "for " + Joiner.on(", ").join(ids) + " in " + expr + " { " + Joiner.on("; ").join(statements) + " }";
   }
 
   @Resolve(variable = "statement", term = "function")
@@ -285,6 +300,14 @@ public class YuckyGrammar extends GrammarBase<Token> {
       }
     }
     throw new IllegalStateException();
+  }
+
+  @For("Cat")
+  public <U> List<U> concat(U head, List<U> tail) {
+    List<U> result = new ArrayList<>();
+    result.add(head);
+    result.addAll(tail);
+    return result;
   }
 
   @For("SingleToken")
@@ -330,7 +353,8 @@ public class YuckyGrammar extends GrammarBase<Token> {
     String code1 = "{(1) : function(x){ foo(); bar(); var x = 3; }, \"1\" : new Baz().jar.poo()(132)} - -3 * 2**3**foo(5.baz, 3**3).lol()";
     String code2 = "function(){" +
         "function foo() {print(\"Hello!\")};" +
-        "function() {};" +
+        "function() {while (true) {}};" +
+        "for i in 1 to 3 {}" +
     "}";
 
     YuckyLexer lexer = new YuckyLexer(new StringReader(code2));
