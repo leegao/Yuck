@@ -69,8 +69,8 @@ FloatLiteral = DecIntegerLiteral [.] [0-9]+
   "&"                       { return symbol(yytext()); }
   "^"                       { return symbol(yytext()); }
   "?"                       { return symbol(yytext()); }
-  ":"                       { return symbol(yytext()); }
-  "::"                       { return symbol(yytext()); }
+  ":"                       { return symbol("%:"); }
+  "::"                       { return symbol("cons"); }
   "+="                       { return symbol(yytext()); }
   "-="                       { return symbol(yytext()); }
   "and"                             { return symbol(yytext()); }
@@ -98,6 +98,7 @@ FloatLiteral = DecIntegerLiteral [.] [0-9]+
 
   /* literals */
   {DecIntegerLiteral}            { return symbol("num"); }
+  {FloatLiteral}            { return symbol("num"); }
   \"                             { string.setLength(0); yybegin(STRING); }
 
   /* comments */

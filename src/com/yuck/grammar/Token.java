@@ -12,4 +12,10 @@ public class Token {
     this.column = column;
     this.text = text;
   }
+
+  @Override
+  public String toString() {
+    if (type.equals("string")) return "\"" + text + "\"";
+    return text;
+  }
 }
