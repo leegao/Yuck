@@ -13,6 +13,8 @@ The aim of the project is simplicity, so there are only 6 primitive types and
 *	function
 *	boolean
 
+In addition, we'll also have general classes and objects.
+
 There are 10 arithmetic operators, they are:
 
 ``` c
@@ -31,6 +33,12 @@ while these will work on everything else as well:
 == !=
 ```
 
+Operators are resolved from their underlying objects, so
+
+``` c
+(a + b) == a.add(b)
+```
+
 Function declaration follows this syntax:
 
 ``` javascript
@@ -38,6 +46,14 @@ function(arg1, arg2, arg3){
 	...
 }
 ```
+
+We can also specify notations of the form
+
+``` javascript
+notation add (x) to (y) = y + x (priority 100)
+```
+
+where notations, if they conflict with some built-in feature of the language, have lower priority.
 
 and variable declaration:
 
