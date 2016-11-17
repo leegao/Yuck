@@ -14,6 +14,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
+import java.util.function.Function;
 
 public class YuckyGrammar extends GrammarBase<Token> {
   @Override
@@ -37,7 +38,8 @@ public class YuckyGrammar extends GrammarBase<Token> {
   level6 := '*'  |  '/'  |  '%' // left
   level7 := 'not' |  '-' // unary, pre
   level8 := '^' // right
-  level9 := (...) // unary, post
+  level9 := (. term)*
+  level10 := E(...) // unary, post
   */
   @Start
   @Rule("E -> $level1")
@@ -96,7 +98,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return level8;
   }
 
-  @Rule("level8 -> $level9 ((pow : bop) $level8)?")
+  @Rule("level8 -> $level10 ((pow : bop) $level8)?")
   public Object level8(Object leaf, Optional<List<?>> pow) {
     if (pow.isPresent()) {
       return "(" + leaf.toString() + foldOperation(pow.get().get(0), pow.get().get(1)) + ")";
@@ -104,17 +106,31 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return leaf;
   }
 
-  @Rule("level9 -> $E.leaf ( %( $args %) : Arguments)*")
-  public Object level9(Object leaf, List<List<?>> arguments) {
+  @Rule("level10' -> . id")
+  public Function<Object, Object> level10_(Token dot, Token id) {
+    return leaf -> {
+      return leaf + "." + id;
+    };
+  }
+
+  @Rule("level10' -> %( $args %)")
+  public Function<Object, Object> level10_(Token left, final List<Object> arguments, Token right) {
+    return leaf -> {
+      Joiner joiner = Joiner.on(", ");
+      return leaf.toString() + "(" + joiner.join(arguments) + ")";
+    };
+  }
+
+  @Rule("level10 -> $E.leaf $level10'*")
+  public Object level10(Object leaf, List<Function<Object, Object>> arguments) {
     if (arguments.isEmpty()) {
       return leaf;
     }
-    Joiner joiner = Joiner.on(", ");
-    String call = leaf.toString() + "(" + joiner.join(arguments.get(0)) + ")";
-    for (List<?> sub : arguments.subList(1, arguments.size())) {
-      call = "(" + call + ")" + "(" + joiner.join(sub) + ")";
+    Object tree = arguments.get(0).apply(leaf);
+    for (Function<Object, Object> appliable : arguments.subList(1, arguments.size())) {
+      tree = appliable.apply(tree.toString().endsWith(")") ? "(" + tree + ")" : tree);
     }
-    return call;
+    return tree;
   }
 
   @Rule("args -> %eps")
@@ -227,7 +243,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
     YuckyGrammar grammar = new YuckyGrammar();
     grammar.preprocess();
 
-    YuckyLexer lexer = new YuckyLexer(new StringReader("{(1) : \"1\", \"1\" : 2} - -3 * 2**3**foo(5, 3**3)"));
+    YuckyLexer lexer = new YuckyLexer(new StringReader("{(1) : \"1\", \"1\" : 2} - -3 * 2**3**foo(5.baz, 3**3).lol()"));
     List<Token> tokens = new ArrayList<>();
     Token token = lexer.yylex();
     while (token != null) {
