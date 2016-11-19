@@ -16,6 +16,8 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.function.Function;
 
+import static com.yuck.auxiliary.descentparsing.Grammar.V;
+
 public class YuckyGrammar extends GrammarBase<Token> {
   @Override
   public String label(Token token) {
@@ -258,16 +260,21 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return expr;
   }
 
-  @Rule("statement -> var id (= $E)?")
-  public Object statement(Token var, Token id, Optional<List<?>> init) {
+  @Rule("var.decl -> var id (= $E)?")
+  public Object vardecl(Token var, Token id, Optional<List<?>> init) {
     if (init.isPresent()) {
       return "var " + id + " = " + init.get().get(1);
     }
     return "var " + id;
   }
 
-  @Rule("statement -> function id %( $parameters %) { ($statement ; : First)* }")
-  public Object statement(
+  @Rule("statement -> $var.decl")
+  public Object statementVarDecl(Object vardecl) {
+    return vardecl;
+  }
+
+  @Rule("func.decl -> function id %( $parameters %) { ($statement ; : First)* }")
+  public Object funcdecl(
       Token function,
       Token id,
       Token open, List<?> parameters, Token close,
@@ -275,14 +282,19 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return "function " + id + "(" + Joiner.on(", ").join(parameters) + ") {\n  " + Joiner.on(";\n  ").join(statements) + "\n}";
   }
 
+  @Rule("statement -> $func.decl")
+  public Object statementFuncDecl(Object funcdecl) {
+    return funcdecl;
+  }
+
   @Resolve(variable = "statement", term = "function")
   public List<Atom> resolveFunction(List<Token> rest, Set<List<Atom>> candidates) {
     Preconditions.checkArgument(rest.size() > 1);
     boolean anonymous = rest.get(1).text.equals("(");
     for (List<Atom> candidate : candidates) {
-      if (candidate.size() == 1 && anonymous) {
+      if (!candidate.get(0).equals(V("func.decl")) && anonymous) {
         return candidate;
-      } else if (candidate.size() != 1 && !anonymous) {
+      } else if (candidate.get(0).equals(V("func.decl")) && !anonymous) {
         return candidate;
       }
     }
@@ -328,6 +340,10 @@ public class YuckyGrammar extends GrammarBase<Token> {
     throw new IllegalStateException();
   }
 
+  @Rule("statement -> class id { (($var.decl ; | $func.decl : First) : First)* }")
+  public Object statement(Token clazz, Token name, Token open, List<?> statements, Token close) {
+    return "class " + name + " { " + Joiner.on("; ").join(statements) + " }";
+  }
 
   @For("Else")
   public List<?> elseClause(Token el, List<?> statementish) {
@@ -397,7 +413,8 @@ public class YuckyGrammar extends GrammarBase<Token> {
         "function() {while (true) {}};" +
         "for i in 1 to 3 {}" +
         "if true {} else if false {}" +
-        "x()" +
+        "x();" +
+        "class Bar { var z; var d; }" +
     "}";
 
     YuckyLexer lexer = new YuckyLexer(new StringReader(code2));

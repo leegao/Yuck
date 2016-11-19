@@ -44,6 +44,7 @@ FloatLiteral = DecIntegerLiteral [.] [0-9]+
 /* keywords */
 <YYINITIAL> {
   "break"              { return symbol(yytext()); }
+  "class"              { return symbol(yytext()); }
   "="                            { return symbol(yytext()); }
   "=="                           { return symbol(yytext()); }
   "!="                           { return symbol(yytext()); }

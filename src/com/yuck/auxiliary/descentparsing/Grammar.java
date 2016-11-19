@@ -143,7 +143,7 @@ public class Grammar {
     return new Terminal(t);
   }
 
-  static Variable V(String v) {
+  public static Variable V(String v) {
     return new Variable(v);
   }
 
