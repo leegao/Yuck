@@ -66,10 +66,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
 
   @Rule("level4 -> $level5 ((to : bop) $level4)?")
   public Object level4(Object left, Optional<List<?>> ranges) {
-    if (ranges.isPresent()) {
-      return left.toString() + ranges.get();
-    }
-    return left;
+    return ranges.map(objects -> left.toString() + objects).orElse(left.toString());
   }
 
   @Rule("level5 -> $level6 ((add | - : bop) $level6 : FoldOp)*")
@@ -84,7 +81,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
 
   private Object merge(Object left, List<?> ops) {
     String buffer = "";
-    for (Object op : ops) buffer += "(";
+    for (Object ignored : ops) buffer += "(";
     buffer += left;
     for (Object op : ops) buffer += op + ")";
     return buffer;
@@ -102,17 +99,12 @@ public class YuckyGrammar extends GrammarBase<Token> {
 
   @Rule("level8 -> $level10 ((pow : bop) $level8)?")
   public Object level8(Object leaf, Optional<List<?>> pow) {
-    if (pow.isPresent()) {
-      return "(" + leaf.toString() + foldOperation(pow.get().get(0), pow.get().get(1)) + ")";
-    }
-    return leaf;
+    return pow.map(objects -> "(" + leaf.toString() + foldOperation(objects.get(0), objects.get(1)) + ")").orElse(leaf.toString());
   }
 
   @Rule("level10' -> . id")
   public Function<Object, Object> level10_(Token dot, Token id) {
-    return leaf -> {
-      return leaf + "." + id;
-    };
+    return leaf -> leaf + "." + id;
   }
 
   @Rule("level10' -> %( $args %)")
@@ -157,7 +149,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
   @For("bop")
   public Object binaryOperator(Object... tokens) {
     Preconditions.checkArgument(tokens.length == 1);
-    return (Object) tokens[0];
+    return tokens[0];
   }
 
   @For("FoldOp")
@@ -374,12 +366,14 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return (Token) tokens[0];
   }
 
+  @SuppressWarnings("unchecked")
   @For("Second")
   public <T> T second(Object... terms) {
     Preconditions.checkArgument(terms.length > 1);
     return (T) terms[1];
   }
 
+  @SuppressWarnings("unchecked")
   @For("First")
   public <T> T first(Object... terms) {
     Preconditions.checkArgument(terms.length > 0);
@@ -422,7 +416,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
         "class Bar { var z; var d; }" +
     "}";
 
-    YuckyLexer lexer = new YuckyLexer(new StringReader(code2));
+    YuckyLexer lexer = new YuckyLexer(new StringReader(code1));
     List<Token> tokens = new ArrayList<>();
     Token token = lexer.yylex();
     while (token != null) {
