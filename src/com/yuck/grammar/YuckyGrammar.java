@@ -115,7 +115,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
 
   @Rule("level10' -> . id")
   public Function<Expression, Expression> level10_(Token dot, Token id) {
-    return leaf -> null;
+    return leaf -> new Selector(leaf, id);
   }
 
   @Rule("level10' -> %( $args %)")
