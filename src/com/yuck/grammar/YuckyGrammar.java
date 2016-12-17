@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.yuck.auxiliary.descentparsing.Grammar.V;
 
@@ -119,7 +120,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @Rule("level10' -> %( $args %)")
-  public Function<Expression, Expression> level10_(Token left, final List<Object> arguments, Token right) {
+  public Function<Expression, Expression> level10_(Token left, final List<Expression> arguments, Token right) {
     return leaf -> null;
   }
 
@@ -194,7 +195,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @Rule("E.leaf -> { }")
-  public Object expressionMap(Token left, Token right) {
+  public Expression expressionMap(Token left, Token right) {
     return new MapLiteral(left, new ArrayList<>(), right);
   }
 
@@ -208,14 +209,19 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @Rule("E.leaf -> new (id (. id)* : QualifiedName) %( $args %)")
-  public Object expLeaf(Token n, Object name, Token open, List<?> arguments, Token closes) {
-    return "new " + name + "(" + Joiner.on(", ").join(arguments) + ")";
+  public Expression expLeaf(Token start, QualifiedName name, Token open, List<Expression> arguments, Token close) {
+    return new NewExpression(start, name, arguments, close);
   }
 
   @For("QualifiedName")
-  public Object buildQualifiedName(Token head, List<Token> tail) {
-    if (tail.isEmpty()) return head;
-    return head + "." + Joiner.on(".").join(tail);
+  public QualifiedName buildQualifiedName(Token head, List<Token> tail) {
+    List<String> names = new ArrayList<>();
+    names.add(head.text);
+    names.addAll(tail.stream().map(token -> token.text).collect(Collectors.toList()));
+    List<Token> tokens = new ArrayList<>();
+    tokens.add(head);
+    tokens.addAll(tail);
+    return new QualifiedName(head, names, tokens.get(tokens.size() - 1));
   }
 
   @Rule("E.leaf -> function %( $parameters %) { ($statement)* }")
