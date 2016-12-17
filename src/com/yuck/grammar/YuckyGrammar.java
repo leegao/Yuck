@@ -3,6 +3,7 @@ package com.yuck.grammar;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.yuck.ast.*;
 import com.yuck.auxiliary.descentparsing.Atom;
 import com.yuck.auxiliary.descentparsing.GrammarBase;
 import com.yuck.auxiliary.descentparsing.Variable;
@@ -10,6 +11,7 @@ import com.yuck.auxiliary.descentparsing.annotations.For;
 import com.yuck.auxiliary.descentparsing.annotations.Resolve;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
+import javafx.util.Pair;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -45,59 +47,60 @@ public class YuckyGrammar extends GrammarBase<Token> {
   */
   @Start
   @Rule("E -> $level1")
-  public Object expression(Object level1) {
+  public Expression expression(Expression level1) {
     return level1;
   }
 
   @Rule("level1 -> $level2 ((or : bop) $level2 : FoldOp)*")
-  public Object level1(Object left, List<Function<Object, Object>> ors) {
+  public Expression level1(Expression left, List<Function<Expression, Expression>> ors) {
     return merge(left, ors);
   }
 
   @Rule("level2 -> $level3 ((and : bop) $level3 : FoldOp)*")
-  public Object level2(Object left, List<Function<Object, Object>> ands) {
+  public Expression level2(Expression left, List<Function<Expression, Expression>> ands) {
     return merge(left, ands);
   }
 
   @Rule("level3 -> $level4 ((< | > | <= | >= | != | == : bop) $level4 : FoldOp)*")
-  public Object level3(Object left, List<Function<Object, Object>> cmps) {
+  public Expression level3(Expression left, List<Function<Expression, Expression>> cmps) {
     return merge(left, cmps);
   }
 
-  @Rule("level4 -> $level5 ((to : bop) $level4)?")
-  public Object level4(Object left, Optional<List<?>> ranges) {
-    return ranges.map(objects -> left.toString() + objects).orElse(left.toString());
+  @Rule("level4 -> $level5 ((to : bop) $level4 : FoldOp)?")
+  public Expression level4(Expression left, Optional<Function<Expression, Expression>> ranges) {
+    return ranges.map(expr -> expr.apply(left)).orElse(left);
   }
 
   @Rule("level5 -> $level6 ((add | - : bop) $level6 : FoldOp)*")
-  public Object level5(Object left, List<Function<Object, Object>> ops) {
+  public Expression level5(Expression left, List<Function<Expression, Expression>> ops) {
     return merge(left, ops);
   }
 
   @Rule("level6 -> $level7 ((mul | / | mod : bop) $level7 : FoldOp)*")
-  public Object level6(Object left, List<Function<Object, Object>> ops) {
+  public Expression level6(Expression left, List<Function<Expression, Expression>> ops) {
     return merge(left, ops);
   }
 
-  private Object merge(Object left, List<Function<Object, Object>> ops) {
-    for (Function<Object, Object> op : ops) left = op.apply(left);
+  private Expression merge(Expression left, List<Function<Expression, Expression>> ops) {
+    for (Function<Expression, Expression> op : ops) left = op.apply(left);
     return left;
   }
 
-  @Rule("level7 -> (- | not) $level7")
-  public Object level7(List<?> op, Object right) {
-    return "(" + op.get(0).toString() + right.toString() + ")";
+  @Rule("level7 -> (- | not : bop) $level7")
+  public Expression level7(Token op, Expression right) {
+    return new UnaryOperator(op, right);
   }
 
   @Rule("level7 -> $level8")
-  public Object level7(Object level8) {
+  public Expression level7(Expression level8) {
     return level8;
   }
 
-  @Rule("level8 -> $level10 ((pow : bop) $level8)?")
-  public Object level8(Object leaf, Optional<List<?>> pow) {
-    return pow.map(objects -> "(" + foldOperation((Token) objects.get(0), objects.get(1)).apply(leaf) + ")")
-        .orElse(leaf.toString());
+  @Rule("level8 -> $level10 ((pow : bop) $level8 : FoldOp)?")
+  public Expression level8(Expression left, Optional<Function<Expression, Expression>> pow) {
+    return pow
+        .map(expr -> expr.apply(left))
+        .orElse(left);
   }
 
   @For("bop")
@@ -106,44 +109,37 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @For("FoldOp")
-  public Function<Object, Object> foldOperation(Token op, Object right) {
-    return left -> left + op.toString() + right;
+  public Function<Expression, Expression> foldOperation(Token op, Expression right) {
+    return left -> new BinaryOperator(op.text, left, right);
   }
 
   @Rule("level10' -> . id")
-  public Function<Object, Object> level10_(Token dot, Token id) {
-    return leaf -> leaf + "." + id;
+  public Function<Expression, Expression> level10_(Token dot, Token id) {
+    return leaf -> null;
   }
 
   @Rule("level10' -> %( $args %)")
-  public Function<Object, Object> level10_(Token left, final List<Object> arguments, Token right) {
-    return leaf -> {
-      Joiner joiner = Joiner.on(", ");
-      return leaf.toString() + "(" + joiner.join(arguments) + ")";
-    };
+  public Function<Expression, Expression> level10_(Token left, final List<Object> arguments, Token right) {
+    return leaf -> null;
   }
 
   @Rule("level10 -> $E.leaf $level10'*")
-  public Object level10(Object leaf, List<Function<Object, Object>> arguments) {
-    if (arguments.isEmpty()) {
-      return leaf;
+  public Expression level10(Expression leaf, List<Function<Expression, Expression>> arguments) {
+    for (Function<Expression, Expression> appliable : arguments) {
+      leaf = appliable.apply(leaf);
     }
-    Object tree = arguments.get(0).apply(leaf);
-    for (Function<Object, Object> appliable : arguments.subList(1, arguments.size())) {
-      tree = appliable.apply(tree.toString().endsWith(")") ? "(" + tree + ")" : tree);
-    }
-    return tree;
+    return leaf;
   }
 
   @Rule("args -> %eps")
-  public List<?> arguments() {
+  public List<Expression> arguments() {
     return new ArrayList<>();
   }
 
   @Rule("args -> $E (, $E : Second)*")
-  public List<?> arguments(Object arg, List<?> rest) {
-    List<Object> list = new ArrayList<>();
-    list.add(arg);
+  public List<Expression> arguments(Expression left, List<Expression> rest) {
+    List<Expression> list = new ArrayList<>();
+    list.add(left);
     list.addAll(rest);
     return list;
   }
@@ -155,26 +151,26 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @Rule("E.leaf -> (num | string | true | false | id : SingleToken)")
-  public Object expLeaf(Token token) {
-    return token;
+  public Expression expLeaf(Token token) {
+    return null;
   }
 
   @Rule("E.leaf -> %( $E %)")
-  public Object expLeaf(Token left, Object group, Token right) {
-    return group;
+  public Expression expLeaf(Token left, Expression group, Token right) {
+    return new GroupExpression(left, group, right);
   }
 
   @Rule("E.leaf -> [ $E (, $E : Second)* ]")
-  public Object expLeaf(Token lbracket, Object head, List<?> expressions, Token rbracket) {
-    List<Object> list = new ArrayList<>();
+  public Expression expLeaf(Token lbracket, Expression head, List<Expression> expressions, Token rbracket) {
+    List<Expression> list = new ArrayList<>();
     list.add(head);
     list.addAll(expressions);
-    return list;
+    return new ListLiteral(lbracket, list, rbracket);
   }
 
   @Rule("E.leaf -> [ ]")
-  public Object expLeaf(Token left, Token right) {
-    return new ArrayList<>();
+  public Expression expLeaf(Token left, Token right) {
+    return new ListLiteral(left, new ArrayList<>(), right);
   }
 
   @Resolve(variable = "E.leaf", term = "[")
@@ -187,19 +183,19 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @Rule("E.leaf -> { $E %: $E (, $E %: $E)* }")
-  public Object expLeaf(Token left, Object key, Token colon, Object val, List<List<?>> tail, Token right) {
-    Map<Object, Object> map = new HashMap<>();
-    map.put(key, val);
+  public Expression expLeaf(Token left, Expression key, Token colon, Expression val, List<List<?>> tail, Token right) {
+    List<Pair<Expression, Expression>> terms = new ArrayList<>();
+    terms.add(new Pair<>(key, val));
     for (List<?> entry : tail) {
       Preconditions.checkArgument(entry.size() == 4);
-      map.put(entry.get(1), entry.get(3));
+      terms.add(new Pair<>((Expression) entry.get(1), (Expression) entry.get(3)));
     }
-    return map;
+    return new MapLiteral(left, terms, right);
   }
 
   @Rule("E.leaf -> { }")
   public Object expressionMap(Token left, Token right) {
-    return new HashMap<>();
+    return new MapLiteral(left, new ArrayList<>(), right);
   }
 
   @Resolve(variable = "E.leaf", term = "{")
