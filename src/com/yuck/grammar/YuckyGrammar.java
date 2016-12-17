@@ -121,7 +121,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
 
   @Rule("level10' -> %( $args %)")
   public Function<Expression, Expression> level10_(Token left, final List<Expression> arguments, Token right) {
-    return leaf -> null;
+    return leaf -> new Call(leaf, arguments, right);
   }
 
   @Rule("level10 -> $E.leaf $level10'*")
@@ -153,7 +153,8 @@ public class YuckyGrammar extends GrammarBase<Token> {
 
   @Rule("E.leaf -> (num | string | true | false | id : SingleToken)")
   public Expression expLeaf(Token token) {
-    return null;
+    // TODO: fixme
+    return new Var(token);
   }
 
   @Rule("E.leaf -> %( $E %)")
@@ -225,23 +226,23 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @Rule("E.leaf -> function %( $parameters %) { ($statement)* }")
-  public Object expLeaf(
+  public Expression expLeaf(
       Token function,
-      Token open, List<?> parameters, Token close,
-      Token left, List<?> statements, Token right) {
-    return "function(" + Joiner.on(", ").join(parameters) + ") {" + Joiner.on("; ").join(statements) + "}";
+      Token open, List<Var> parameters, Token close,
+      Token left, List<Statement> statements, Token right) {
+    return new FunctionExpression(function, parameters, statements, right);
   }
 
   @Rule("parameters -> %eps")
-  public List<?> parameters() {
+  public List<Var> parameters() {
     return new ArrayList<>();
   }
 
   @Rule("parameters -> id (, id : Second)*")
-  public List<?> parameters(Token id, List<?> rest) {
-    List<Object> parameters = new ArrayList<>();
-    parameters.add(id);
-    parameters.addAll(rest);
+  public List<Var> parameters(Token id, List<Token> rest) {
+    List<Var> parameters = new ArrayList<>();
+    parameters.add(new Var(id));
+    parameters.addAll(rest.stream().map(Var::new).collect(Collectors.toList()));
     return parameters;
   }
 
