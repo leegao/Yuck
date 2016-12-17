@@ -15,6 +15,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.yuck.auxiliary.descentparsing.Grammar.V;
@@ -153,6 +154,12 @@ public abstract class GrammarBase<U> {
         return method.invoke(this, args);
       }
     } catch (IllegalAccessException | InvocationTargetException e) {
+      throw Throwables.propagate(e);
+    } catch (IllegalArgumentException e) {
+      System.err.printf(
+          "Cannot invoke %s with arguments %s.\n",
+          method,
+          arguments.stream().map(Pair::getValue).collect(Collectors.toList()));
       throw Throwables.propagate(e);
     }
   }

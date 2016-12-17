@@ -50,17 +50,17 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @Rule("level1 -> $level2 ((or : bop) $level2 : FoldOp)*")
-  public Object level1(Object left, List<?> ors) {
+  public Object level1(Object left, List<Function<Object, Object>> ors) {
     return merge(left, ors);
   }
 
   @Rule("level2 -> $level3 ((and : bop) $level3 : FoldOp)*")
-  public Object level2(Object left, List<?> ands) {
+  public Object level2(Object left, List<Function<Object, Object>> ands) {
     return merge(left, ands);
   }
 
   @Rule("level3 -> $level4 ((< | > | <= | >= | != | == : bop) $level4 : FoldOp)*")
-  public Object level3(Object left, List<?> cmps) {
+  public Object level3(Object left, List<Function<Object, Object>> cmps) {
     return merge(left, cmps);
   }
 
@@ -70,21 +70,18 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @Rule("level5 -> $level6 ((add | - : bop) $level6 : FoldOp)*")
-  public Object level5(Object left, List<?> ops) {
+  public Object level5(Object left, List<Function<Object, Object>> ops) {
     return merge(left, ops);
   }
 
   @Rule("level6 -> $level7 ((mul | / | mod : bop) $level7 : FoldOp)*")
-  public Object level6(Object left, List<?> ops) {
+  public Object level6(Object left, List<Function<Object, Object>> ops) {
     return merge(left, ops);
   }
 
-  private Object merge(Object left, List<?> ops) {
-    String buffer = "";
-    for (Object ignored : ops) buffer += "(";
-    buffer += left;
-    for (Object op : ops) buffer += op + ")";
-    return buffer;
+  private Object merge(Object left, List<Function<Object, Object>> ops) {
+    for (Function<Object, Object> op : ops) left = op.apply(left);
+    return left;
   }
 
   @Rule("level7 -> (- | not) $level7")
@@ -99,7 +96,18 @@ public class YuckyGrammar extends GrammarBase<Token> {
 
   @Rule("level8 -> $level10 ((pow : bop) $level8)?")
   public Object level8(Object leaf, Optional<List<?>> pow) {
-    return pow.map(objects -> "(" + leaf.toString() + foldOperation(objects.get(0), objects.get(1)) + ")").orElse(leaf.toString());
+    return pow.map(objects -> "(" + foldOperation((Token) objects.get(0), objects.get(1)).apply(leaf) + ")")
+        .orElse(leaf.toString());
+  }
+
+  @For("bop")
+  public Token binaryOperator(Token token) {
+    return token;
+  }
+
+  @For("FoldOp")
+  public Function<Object, Object> foldOperation(Token op, Object right) {
+    return left -> left + op.toString() + right;
   }
 
   @Rule("level10' -> . id")
@@ -144,18 +152,6 @@ public class YuckyGrammar extends GrammarBase<Token> {
   public List<?> forArguments(Object... terms) {
     Preconditions.checkArgument(terms.length == 3);
     return (List<?>) terms[1];
-  }
-
-  @For("bop")
-  public Object binaryOperator(Object... tokens) {
-    Preconditions.checkArgument(tokens.length == 1);
-    return tokens[0];
-  }
-
-  @For("FoldOp")
-  public Object foldOperation(Object... terms) {
-    Preconditions.checkArgument(terms.length == 2);
-    return terms[0].toString() + terms[1].toString();
   }
 
   @Rule("E.leaf -> (num | string | true | false | id : SingleToken)")
@@ -416,7 +412,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
         "class Bar { var z; var d; }" +
     "}";
 
-    YuckyLexer lexer = new YuckyLexer(new StringReader(code1));
+    YuckyLexer lexer = new YuckyLexer(new StringReader(code2));
     List<Token> tokens = new ArrayList<>();
     Token token = lexer.yylex();
     while (token != null) {
