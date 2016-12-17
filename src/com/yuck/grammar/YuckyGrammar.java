@@ -3,13 +3,13 @@ package com.yuck.grammar;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.yuck.auxiliary.descentparsing.*;
+import com.yuck.auxiliary.descentparsing.Atom;
+import com.yuck.auxiliary.descentparsing.GrammarBase;
+import com.yuck.auxiliary.descentparsing.Variable;
 import com.yuck.auxiliary.descentparsing.annotations.For;
 import com.yuck.auxiliary.descentparsing.annotations.Resolve;
 import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
-import javafx.util.Pair;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -234,7 +234,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return head + "." + Joiner.on(".").join(tail);
   }
 
-  @Rule("E.leaf -> function %( $parameters %) { ($statement ; : First)* }")
+  @Rule("E.leaf -> function %( $parameters %) { ($statement)* }")
   public Object expLeaf(
       Token function,
       Token open, List<?> parameters, Token close,
@@ -255,8 +255,8 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return parameters;
   }
 
-  @Rule("statement -> $E")
-  public Object statement(Object expr) {
+  @Rule("statement -> $E ;")
+  public Object statement(Object expr, Token semi) {
     return expr;
   }
 
@@ -268,12 +268,12 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return "var " + id;
   }
 
-  @Rule("statement -> $var.decl")
-  public Object statementVarDecl(Object vardecl) {
+  @Rule("statement -> $var.decl ;")
+  public Object statementVarDecl(Object vardecl, Token semi) {
     return vardecl;
   }
 
-  @Rule("func.decl -> function id %( $parameters %) { ($statement ; : First)* }")
+  @Rule("func.decl -> function id %( $parameters %) { ($statement)* }")
   public Object funcdecl(
       Token function,
       Token id,
@@ -301,12 +301,12 @@ public class YuckyGrammar extends GrammarBase<Token> {
     throw new IllegalStateException();
   }
 
-  @Rule("statement -> while $E { ($statement ; : First)* }")
+  @Rule("statement -> while $E { ($statement)* }")
   public Object statement(Token whil, Object cond, Token open, List<?> statements, Token close) {
     return "while " + cond + " { " + Joiner.on("; ").join(statements) + " }";
   }
 
-  @Rule("statement -> for (id (, id : Second)* : Cat) in $E { ($statement ; : First)* }")
+  @Rule("statement -> for (id (, id : Second)* : Cat) in $E { ($statement)* }")
   public Object statement(
       Token fo,
       List<Token> ids,
@@ -316,7 +316,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return "for " + Joiner.on(", ").join(ids) + " in " + expr + " { " + Joiner.on("; ").join(statements) + " }";
   }
 
-  @Rule("statement -> if $E { ($statement ; : First)* } (else ($statement | { ($statement ; : First)* } ) : Else)?")
+  @Rule("statement -> if $E { ($statement)* } (else ($statement | { ($statement)* } ) : Else)?")
   public Object statement(Token iff, Object cond, Token open, List<?> statements, Token close, Optional<List<?>> el) {
     String top = "if " + cond + " { " + Joiner.on("; ").join(statements) + " }";
     if (el.isPresent()) {
@@ -328,7 +328,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
 
   @Resolve(
       // TODO: make this less eyebleedy
-      variable = "statement@($statement|{.$statement@($statement@($statement.;)@group)@star.})@group",
+      variable = "statement@($statement|{.$statement@($statement@($statement)@group)@star.})@group",
       term = "{")
   public List<Atom> resolveElse(List<Token> rest, Set<List<Atom>> candidates) {
     // Always shift to the `else { statements }` case if rest starts with {
@@ -343,6 +343,11 @@ public class YuckyGrammar extends GrammarBase<Token> {
   @Rule("statement -> class id { (($var.decl ; | $func.decl : First) : First)* }")
   public Object statement(Token clazz, Token name, Token open, List<?> statements, Token close) {
     return "class " + name + " { " + Joiner.on("; ").join(statements) + " }";
+  }
+
+  @Rule("statement -> ;")
+  public Object statement(Token semicolon) {
+    return "";
   }
 
   @For("Else")
@@ -383,10 +388,10 @@ public class YuckyGrammar extends GrammarBase<Token> {
 
   @Override
   protected Set<List<Atom>> handleError(Variable variable, Atom on, List<Token> stream) {
-    if (variable.toString().equals(
-        "$statement@($statement@(else.$statement@($statement|{.$statement@($statement@($statement.;)@group)@star.})@group)@group)@maybe")) {
-      return this.mActionTable.get(new Pair<>(variable, new Terminal(";")));
-    }
+//    if (variable.toString().equals(
+//        "$statement@($statement@(else.$statement@($statement|{.$statement@($statement@($statement.;)@group)@star.})@group)@group)@maybe")) {
+//      return this.mActionTable.get(new Pair<>(variable, new Terminal(";")));
+//    }
     return super.handleError(variable, on, stream);
   }
 
@@ -398,8 +403,8 @@ public class YuckyGrammar extends GrammarBase<Token> {
       List<Atom> currentSentence,
       Atom expected) {
     // Try to handle missing semicolons whenever possible.
-    if (expected.toString().equals(";"))
-      return new Token(";", -1, -1, ";");
+//    if (expected.toString().equals(";"))
+//      return new Token(";", -1, -1, ";");
     return super.handleConsumptionError(state, next, stream, currentSentence, expected);
   }
 
@@ -409,7 +414,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
 
     String code1 = "{(1) : function(x){ foo(); bar(); var x = 3; }, \"1\" : new Baz().jar.poo()(132)} - -3 * 2**3**foo(5.baz, 3**3).lol()";
     String code2 = "function(){" +
-        "function foo() {print(\"Hello!\")};" +
+        "function foo() {print(\"Hello!\");}" +
         "function() {while (true) {}};" +
         "for i in 1 to 3 {}" +
         "if true {} else if false {}" +
