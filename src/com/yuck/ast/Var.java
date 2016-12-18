@@ -6,7 +6,7 @@ public class Var extends Expression {
   public final String id;
 
   public Var(Token id) {
-    super(id.line, id.column, id.line, id.column);
+    super(id.startLine, id.startColumn, id.endLine, id.endColumn);
     this.id = id.text;
   }
 }

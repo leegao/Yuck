@@ -10,7 +10,7 @@ public class MapLiteral extends Expression {
   public final ImmutableList<Pair<Expression, Expression>> terms;
 
   public MapLiteral(Token left, List<Pair<Expression,Expression>> terms, Token right) {
-    super(left.line, left.column, right.line, right.column);
+    super(left.startLine, left.startColumn, right.endLine, right.endColumn);
     this.terms = ImmutableList.copyOf(terms);
   }
 }

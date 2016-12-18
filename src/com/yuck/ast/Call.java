@@ -9,7 +9,7 @@ public class Call extends Expression {
   public final ImmutableList<Expression> arguments;
 
   public Call(Expression left, List<Expression> arguments, Token right) {
-    super(left.getStartLine(), left.getStartColumn(), right.line, right.column);
+    super(left.getStartLine(), left.getStartColumn(), right.endLine, right.endColumn);
     this.arguments = ImmutableList.copyOf(arguments);
   }
 }

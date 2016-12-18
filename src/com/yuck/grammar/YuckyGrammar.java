@@ -27,12 +27,6 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return token.type;
   }
 
-//  @Start
-//  @Rule("E -> $E.leaf")
-//  public Object expression(Object leaf) {
-//    return leaf;
-//  }
-
   // Precedence chart
   /*
   level1 := 'or' // left
@@ -360,9 +354,8 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @For("SingleToken")
-  public Token singleToken(Object... tokens) {
-    Preconditions.checkArgument(tokens.length == 1);
-    return (Token) tokens[0];
+  public Token singleToken(Token token) {
+    return token;
   }
 
   @SuppressWarnings("unchecked")

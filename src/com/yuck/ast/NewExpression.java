@@ -10,7 +10,7 @@ public class NewExpression extends Expression {
   public final ImmutableList<Expression> arguments;
 
   public NewExpression(Token start, QualifiedName name, List<Expression> arguments, Token close) {
-    super(start.line, start.column, close.line, close.column);
+    super(start.startLine, start.startColumn, close.endLine, close.endColumn);
     this.name = name;
     this.arguments = ImmutableList.copyOf(arguments);
   }

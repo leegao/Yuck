@@ -10,7 +10,7 @@ public class FunctionExpression extends Expression {
   public final ImmutableList<Statement> statements;
 
   public FunctionExpression(Token left, List<Var> parameters, List<Statement> statements, Token right) {
-    super(left.line, left.column, right.line, right.column);
+    super(left.startLine, left.startColumn, right.endLine, right.endColumn);
 
     this.parameters = ImmutableList.copyOf(parameters);
     this.statements = ImmutableList.copyOf(statements);

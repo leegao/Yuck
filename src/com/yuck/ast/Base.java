@@ -1,5 +1,8 @@
 package com.yuck.ast;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 public abstract class Base {
   private int mStartLine, mStartColumn, mEndLine, mEndColumn;
 
@@ -8,6 +11,10 @@ public abstract class Base {
     this.mStartColumn = startColumn;
     this.mEndLine = endLine;
     this.mEndColumn = endColumn;
+  }
+
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.NO_FIELD_NAMES_STYLE);
   }
 
   public int getStartLine() {
