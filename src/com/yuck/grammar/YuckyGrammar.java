@@ -1,6 +1,7 @@
 package com.yuck.grammar;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.yuck.ast.*;
 import com.yuck.auxiliary.descentparsing.Atom;
@@ -24,24 +25,13 @@ import java.util.stream.Collectors;
 import static com.yuck.auxiliary.descentparsing.Grammar.V;
 
 public class YuckyGrammar extends GrammarBase<Token> {
+
   @Override
   public String label(Token token) {
     return token.type;
   }
 
   // Precedence chart
-  /*
-  level1 := 'or' // left
-  level2 := 'and' // left
-  level3 := '<'  |  '>'  |  '<=' |  '>='  |  '!='  |  '==' // left
-  level4 := 'to' // right
-  level5 := '+'  |  '-' // left
-  level6 := '*'  |  '/'  |  '%' // left
-  level7 := 'not' |  '-' // unary, pre
-  level8 := '^' // right
-  level9 := (. term)*
-  level10 := E(.term | (...))* // unary, post
-  */
   @Start
   @Rule("E -> $level1")
   public Expression expression(Expression level1) {
@@ -149,8 +139,14 @@ public class YuckyGrammar extends GrammarBase<Token> {
 
   @Rule("E.leaf -> (num | string | true | false | id : SingleToken)")
   public Expression expLeaf(Token token) {
-    // TODO: fixme
-    return new Var(token);
+    switch (token.type) {
+      case "id":
+        return new Var(token);
+      case "string":
+        return new StringLiteral(token);
+      default:
+        return new Literal(token);
+    }
   }
 
   @Rule("E.leaf -> %( $E %)")
@@ -410,14 +406,14 @@ public class YuckyGrammar extends GrammarBase<Token> {
       List<Atom> currentSentence,
       Atom expected) {
     // Try to handle missing semicolons whenever possible.
-//    if (expected.toString().equals(";"))
-//      return new Token(";", -1, -1, ";");
+    if (expected.toString().equals(";"))
+      throw new IllegalStateException("Missing a semicolon.");
     return super.handleConsumptionError(state, next, stream, currentSentence, expected);
   }
 
   public static void main(String[] args) throws IOException {
     YuckyGrammar grammar = new YuckyGrammar();
-    grammar.preprocess();
+//    grammar.preprocess();
 
     String code1 = "{(1) : function(x){ foo(); bar(); var x = 3; }, \"1\" : new Baz().jar.poo()(132)} - -3 * 2**3**foo(5.baz, 3**3).lol()";
     String code2 = "function(){" +
