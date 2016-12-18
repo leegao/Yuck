@@ -241,21 +241,18 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @Rule("statement -> $E ;")
-  public Object statement(Object expr, Token semi) {
-    return expr;
+  public Statement statement(Expression expr, Token semi) {
+    return new ExpressionStatement(expr, semi);
   }
 
-  @Rule("var.decl -> var id (= $E)?")
-  public Object vardecl(Token var, Token id, Optional<List<?>> init) {
-    if (init.isPresent()) {
-      return "var " + id + " = " + init.get().get(1);
-    }
-    return "var " + id;
+  @Rule("var.decl -> var id (= $E : Second)?")
+  public Function<Token, Statement> vardecl(Token var, Token id, Optional<Expression> init) {
+    return semi -> new VariableDeclaration(var, id, init, semi);
   }
 
   @Rule("statement -> $var.decl ;")
-  public Object statementVarDecl(Object vardecl, Token semi) {
-    return vardecl;
+  public Object statementVarDecl(Function<Token, Statement> vardecl, Token semi) {
+    return vardecl.apply(semi);
   }
 
   @Rule("func.decl -> function id %( $parameters %) { ($statement)* }")
