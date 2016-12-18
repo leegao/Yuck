@@ -1,6 +1,5 @@
 package com.yuck.grammar;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.yuck.ast.*;
@@ -15,7 +14,10 @@ import javafx.util.Pair;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -317,14 +319,25 @@ public class YuckyGrammar extends GrammarBase<Token> {
     throw new IllegalStateException();
   }
 
-  @Rule("statement -> class id { (($var.decl ; | $func.decl : First) : First)* }")
-  public Object statement(Token clazz, Token name, Token open, List<?> statements, Token close) {
-    return "class " + name + " { " + Joiner.on("; ").join(statements) + " }";
+  @Rule("statement -> class id { ($var.decl ; | $func.decl)* }")
+  public Statement statement(Token clazz, Token name, Token open, List<List<?>> declarations, Token close) {
+    List<VariableDeclaration> variableDeclarations = new ArrayList<>();
+    List<FunctionDeclaration> methodDeclarations = new ArrayList<>();
+    for (List<?> production : declarations) {
+      if (production.size() == 1) {
+        methodDeclarations.add((FunctionDeclaration) production.get(0));
+      } else {
+        Function<Token, VariableDeclaration> varDecl = (Function<Token, VariableDeclaration>) production.get(0);
+        Token semicolon = (Token) production.get(1);
+        variableDeclarations.add(varDecl.apply(semicolon));
+      }
+    }
+    return new ClassStatement(clazz, name, variableDeclarations, methodDeclarations, close);
   }
 
   @Rule("statement -> ;")
-  public Object statement(Token semicolon) {
-    return "";
+  public Statement statement(Token semicolon) {
+    return new EmptyStatement(semicolon);
   }
 
   @For("Else")
