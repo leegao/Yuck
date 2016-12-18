@@ -256,16 +256,16 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @Rule("func.decl -> function id %( $parameters %) { ($statement)* }")
-  public Object funcdecl(
+  public Statement funcdecl(
       Token function,
       Token id,
-      Token open, List<?> parameters, Token close,
-      Token left, List<?> statements, Token right) {
-    return "function " + id + "(" + Joiner.on(", ").join(parameters) + ") {\n  " + Joiner.on(";\n  ").join(statements) + "\n}";
+      Token open, List<Var> parameters, Token close,
+      Token left, List<Statement> statements, Token right) {
+    return new FunctionDeclaration(function, id, parameters, statements, right);
   }
 
   @Rule("statement -> $func.decl")
-  public Object statementFuncDecl(Object funcdecl) {
+  public Statement statementFuncDecl(Statement funcdecl) {
     return funcdecl;
   }
 
@@ -284,8 +284,8 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @Rule("statement -> while $E { ($statement)* }")
-  public Object statement(Token whil, Object cond, Token open, List<?> statements, Token close) {
-    return "while " + cond + " { " + Joiner.on("; ").join(statements) + " }";
+  public Statement statement(Token whil, Expression cond, Token open, List<Statement> statements, Token close) {
+    return new WhileStatement(whil, cond, statements, close);
   }
 
   @Rule("statement -> for (id (, id : Second)* : Cat) in $E { ($statement)* }")
