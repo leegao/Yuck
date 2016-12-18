@@ -251,7 +251,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @Rule("statement -> $var.decl ;")
-  public Object statementVarDecl(Function<Token, Statement> vardecl, Token semi) {
+  public Statement statementVarDecl(Function<Token, Statement> vardecl, Token semi) {
     return vardecl.apply(semi);
   }
 
@@ -288,24 +288,19 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return new WhileStatement(whil, cond, statements, close);
   }
 
-  @Rule("statement -> for (id (, id : Second)* : Cat) in $E { ($statement)* }")
-  public Object statement(
+  @Rule("statement -> for id in $E { ($statement)* }")
+  public Statement statement(
       Token fo,
-      List<Token> ids,
+      Token id,
       Token in,
-      Object expr,
-      Token open, List<?> statements, Token close) {
-    return "for " + Joiner.on(", ").join(ids) + " in " + expr + " { " + Joiner.on("; ").join(statements) + " }";
+      Expression expr,
+      Token open, List<Statement> statements, Token close) {
+    return new ForStatement(fo, id, expr, statements, close);
   }
 
   @Rule("statement -> if $E { ($statement)* } (else ($statement | { ($statement)* } ) : Else)?")
-  public Object statement(Token iff, Object cond, Token open, List<?> statements, Token close, Optional<List<?>> el) {
-    String top = "if " + cond + " { " + Joiner.on("; ").join(statements) + " }";
-    if (el.isPresent()) {
-      List<?> elseStatements = el.get();
-      return top + " else " + (elseStatements.size() != 1 ? "{ " : "") + Joiner.on("; ").join(elseStatements) + (elseStatements.size() != 1 ? " }" : "");
-    }
-    return top;
+  public Statement statement(Token iff, Expression cond, Token open, List<Statement> statements, Token close, Optional<Function<IfStatement, IfStatement>> elseTransform) {
+    return elseTransform.map(transform -> transform.apply(new IfStatement(iff, cond, statements))).orElse(new IfStatement(iff, cond, statements, close));
   }
 
   @Resolve(
@@ -333,13 +328,29 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @For("Else")
-  public List<?> elseClause(Token el, List<?> statementish) {
+  public Function<IfStatement, IfStatement> elseClause(Token el, List<?> statementish) {
+    final int endLine;
+    final int endColumn;
+    final List<Statement> statements;
     if (statementish.size() == 1) {
-      return Lists.newArrayList(statementish.get(0));
+      Statement statement = (Statement) statementish.get(0);
+      statements = Lists.newArrayList(statement);
+      endLine = statement.getEndLine();
+      endColumn = statement.getEndColumn();
     } else if (statementish.size() == 3){
-      return (List<?>) statementish.get(1);
+      statements = (List<Statement>) statementish.get(1);
+      Token close = (Token) statementish.get(2);
+      endLine = close.endLine;
+      endColumn = close.endColumn;
+    } else {
+      throw new IllegalStateException();
     }
-    throw new IllegalStateException();
+    return ifStatement -> {
+      ifStatement.setEndColumn(endColumn);
+      ifStatement.setEndLine(endLine);
+      ifStatement.addElse(statements);
+      return ifStatement;
+    };
   }
 
   @For("Cat")
