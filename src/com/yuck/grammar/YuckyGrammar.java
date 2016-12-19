@@ -108,6 +108,11 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return leaf -> new Call(leaf, arguments, right);
   }
 
+  @Rule("level10' -> [ $E ]")
+  public Function<Expression, Expression> level10_(Token left, final Expression expression, Token right) {
+    return leaf -> new IndexExpression(leaf, expression, right);
+  }
+
   @Rule("level10 -> $E.leaf $level10'*")
   public Expression level10(Expression leaf, List<Function<Expression, Expression>> arguments) {
     for (Function<Expression, Expression> appliable : arguments) {
@@ -417,7 +422,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
         "function() {while (true) {}};" +
         "for i in 1 to 3 {}" +
         "if true {} else if false {}" +
-        "x();" +
+        "x()[1];" +
         "class Bar { var z; var d; }" +
     "};";
 
