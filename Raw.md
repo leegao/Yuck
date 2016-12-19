@@ -94,3 +94,17 @@ a production 1 or more times, and a production 0 or 1 time).
 \mathrm{statement} &\to \mathrm{class} ~ \mathrm{id} { \left(\boxed{\tiny{\mathrm{vardecl}}} ; \mid \boxed{\tiny \mathrm{fundecl}}\right)* } \\
 \mathrm{statement} &\to ;
 \end{align*}
+
+Here, the grammar we've specified is mostly free of 1-lookahead conflicts, so it's amenable to a LL1 grammar with
+explicit conflict resolution. In particular, you will need to resolve conflicts for 
+
+* $\boxed{term}$ at `[`, since it doesn't know whether you want `[]` or `[...]`.  You can resolve this by looking at the
+  next character and shifting to `[]` if it's a `]`, and `[expr, (, expr)*]` otherwise.
+* $\boxed{term}$ at `{`, which is the same problem as above for `{}` versus `{...}`.
+* $\boxed{statement}$ for the token `function`. Here, we're not sure if we want to shift to an expression-statement
+  `function(){ ... };` or a function declaration `function id() {...}`. While it's perfectly fine to just ignore the
+  first form (since it's effectively a NOP), we can resolve this easily by just looking at the next character, and shifting
+  to the expression-statement production iff it's an open parenthesis `(`.
+* Within $\textrm{else} \left(\boxed{statement} \mid \left( \{ \boxed{statement}* \} \right)\right)$. For the token
+  `{`, it's not entirely clearly whether we should shift to the expression-statement for a table or continue the `else {...}` clause.
+  Here, we'll just always shift to the else clause.
