@@ -56,55 +56,81 @@ Let's formalize this grammar in an extension of [BNF](https://en.wikipedia.org/w
 we will allow constructs like $e^*$, $e^+$, and $e?$ (which denotes a production 0 or more times, 
 a production 1 or more times, and a production 0 or 1 time).
 
+#### LL(1) Grammar
+
 \begin{align*}
-\mathrm{expr} &\to \boxed{\tiny \mathrm{level1}} \\
-\mathrm{level1} &\to \boxed{\tiny \mathrm{level2}} \left(\mathrm{or} ~ \boxed{\tiny \mathrm{level2}}\right)* \\
-\mathrm{level2} &\to \boxed{\tiny \mathrm{level3}} \left(\mathrm{and} ~ \boxed{\tiny \mathrm{level3}}\right)* \\
-\mathrm{level3} &\to \boxed{\tiny \mathrm{level4}} \left(\left(< \mid > \mid \le \mid \ge \mid \ne \mid \equiv \right) \boxed{\tiny \mathrm{level4}}\right)* \\
-\mathrm{level4} &\to \boxed{\tiny \mathrm{level5}} \left(\mathrm{to} ~ \boxed{\tiny \mathrm{level4}}\right)? \\
-\mathrm{level5} &\to \boxed{\tiny \mathrm{level6}} \left(\left(+ \mid -\right) \boxed{\tiny \mathrm{level6}}\right)* \\
-\mathrm{level6} &\to \boxed{\tiny \mathrm{level7}} \left(\left(\times \mid / \mid \mathrm{mod}\right) \boxed{\tiny \mathrm{level7}}\right)* \\
-\mathrm{level7} &\to \left(- \mid \mathrm{not}\right) \boxed{\tiny \mathrm{level7}} \\
-\mathrm{level7} &\to \boxed{\tiny \mathrm{level8}} \\
-\mathrm{level8} &\to \boxed{\tiny \mathrm{level9}} \left(\mathrm{pow} ~ \boxed{\tiny \mathrm{level8}}\right)? \\
+\mathrm{expr} &\to \boxed{\scriptstyle \mathrm{level1}} \\
+\mathrm{level1} &\to \boxed{\scriptstyle \mathrm{level2}} \left(\mathrm{or} ~ \boxed{\scriptstyle \mathrm{level2}}\right)* \\
+\mathrm{level2} &\to \boxed{\scriptstyle \mathrm{level3}} \left(\mathrm{and} ~ \boxed{\scriptstyle \mathrm{level3}}\right)* \\
+\mathrm{level3} &\to \boxed{\scriptstyle \mathrm{level4}} \left(\left(< \mid > \mid \le \mid \ge \mid \ne \mid \equiv \right) \boxed{\scriptstyle \mathrm{level4}}\right)* \\
+\mathrm{level4} &\to \boxed{\scriptstyle \mathrm{level5}} \left(\mathrm{to} ~ \boxed{\scriptstyle \mathrm{level4}}\right)? \\
+\mathrm{level5} &\to \boxed{\scriptstyle \mathrm{level6}} \left(\left(+ \mid -\right) \boxed{\scriptstyle \mathrm{level6}}\right)* \\
+\mathrm{level6} &\to \boxed{\scriptstyle \mathrm{level7}} \left(\left(\times \mid / \mid \mathrm{mod}\right) \boxed{\scriptstyle \mathrm{level7}}\right)* \\
+\mathrm{level7} &\to \left(- \mid \mathrm{not}\right) \boxed{\scriptstyle \mathrm{level7}} \\
+\mathrm{level7} &\to \boxed{\scriptstyle \mathrm{level8}} \\
+\mathrm{level8} &\to \boxed{\scriptstyle \mathrm{level9}} \left(\mathrm{pow} ~ \boxed{\scriptstyle \mathrm{level8}}\right)? \\
 \mathrm{level9}' &\to \mathrm{.} ~ \mathrm{id} \\
-\mathrm{level9}' &\to \boldsymbol{(} \boxed{\tiny \mathrm{args}} \boldsymbol{)} \\
-\mathrm{level9}' &\to [ \boxed{\tiny \mathrm{expr}} ] \\
-\mathrm{level9} &\to \boxed{\tiny \mathrm{term}} ~ \boxed{\tiny \mathrm{level9}'}* \\
+\mathrm{level9}' &\to \boldsymbol{(} \boxed{\scriptstyle \mathrm{args}} \boldsymbol{)} \\
+\mathrm{level9}' &\to [ \boxed{\scriptstyle \mathrm{expr}} ] \\
+\mathrm{level9} &\to \boxed{\scriptstyle \mathrm{term}} ~ \boxed{\scriptstyle \mathrm{level9}'}* \\
 \mathrm{args} &\to \epsilon \\
-\mathrm{args} &\to \boxed{\tiny \mathrm{expr}} \left(, \boxed{\tiny \mathrm{expr}}\right)* \\
+\mathrm{args} &\to \boxed{\scriptstyle \mathrm{expr}} \left(, \boxed{\scriptstyle \mathrm{expr}}\right)* \\
 \mathrm{term} &\to \left(\mathrm{num} \mid \mathrm{string} \mid \mathrm{true} \mid \mathrm{false} \mid \mathrm{id}\right) \\
-\mathrm{term} &\to \boldsymbol{(} \boxed{\tiny \mathrm{expr}} \boldsymbol{)} \\
-\mathrm{term} &\to \left[ \boxed{\tiny \mathrm{expr}} \left(, \boxed{\tiny \mathrm{expr}}\right)* \right] \\
+\mathrm{term} &\to \boldsymbol{(} \boxed{\scriptstyle \mathrm{expr}} \boldsymbol{)} \\
+\mathrm{term} &\to \left[ \boxed{\scriptstyle \mathrm{expr}} \left(, \boxed{\scriptstyle \mathrm{expr}}\right)* \right] \\
 \mathrm{term} &\to \left[ ~ \right] \\
-\mathrm{term} &\to \left\{ \boxed{\tiny \mathrm{expr}} : \boxed{\tiny \mathrm{expr}} \left(, \boxed{\tiny \mathrm{expr}} : \boxed{\tiny \mathrm{expr}}\right)* \right\} \\
+\mathrm{term} &\to \left\{ \boxed{\scriptstyle \mathrm{expr}} : \boxed{\scriptstyle \mathrm{expr}} \left(, \boxed{\scriptstyle \mathrm{expr}} : \boxed{\scriptstyle \mathrm{expr}}\right)* \right\} \\
 \mathrm{term} &\to \left\{ ~ \right\} \\
-\mathrm{term} &\to \mathrm{new} \left(\mathrm{id} \left(\mathrm{.} ~ \mathrm{id}\right)*\right) \boldsymbol{(} \boxed{\tiny \mathrm{args}} \boldsymbol{)} \\
-\mathrm{term} &\to \mathrm{function} \boldsymbol{(} \boxed{\tiny \mathrm{parameters}} \boldsymbol{)} { \left(\boxed{\tiny \mathrm{statement}}\right)* } \\
+\mathrm{term} &\to \mathrm{new} \left(\mathrm{id} \left(\mathrm{.} ~ \mathrm{id}\right)*\right) \boldsymbol{(} \boxed{\scriptstyle \mathrm{args}} \boldsymbol{)} \\
+\mathrm{term} &\to \mathrm{function} \boldsymbol{(} \boxed{\scriptstyle \mathrm{parameters}} \boldsymbol{)} { \left(\boxed{\scriptstyle \mathrm{statement}}\right)* } \\
 \mathrm{parameters} &\to \epsilon \\
 \mathrm{parameters} &\to \mathrm{id} \left(, \mathrm{id}\right)* \\
-\mathrm{statement} &\to \boxed{\tiny \mathrm{expr}} ; \\
-\mathrm{vardecl} &\to \mathrm{var} ~ \mathrm{id} \left(= \boxed{\tiny \mathrm{expr}}\right)? \\
-\mathrm{statement} &\to \boxed{\tiny \mathrm{vardecl}} ; \\
-\mathrm{fundecl} &\to \mathrm{function} ~ \mathrm{id} \boldsymbol{(} \boxed{\tiny \mathrm{parameters}} \boldsymbol{)} { \left(\boxed{\tiny \mathrm{statement}}\right)* } \\
-\mathrm{statement} &\to \boxed{\tiny \mathrm{fundecl}} \\
-\mathrm{statement} &\to \mathrm{while} \boxed{\tiny \mathrm{expr}} { \left(\boxed{\tiny \mathrm{statement}}\right)* } \\
-\mathrm{statement} &\to \mathrm{for} ~ \mathrm{id} ~ \mathrm{in} \boxed{\tiny \mathrm{expr}} { \left(\boxed{\tiny \mathrm{statement}}\right)* } \\
-\mathrm{statement} &\to \mathrm{if} \boxed{\tiny \mathrm{expr}} { \left(\boxed{\tiny \mathrm{statement}}\right)* } \left(\mathrm{else} \left(\boxed{\tiny \mathrm{statement}} \mid { \left(\boxed{\tiny \mathrm{statement}}\right)* } \right)\right)? \\
-\mathrm{statement} &\to \mathrm{class} ~ \mathrm{id} { \left(\boxed{\tiny{\mathrm{vardecl}}} ; \mid \boxed{\tiny \mathrm{fundecl}}\right)* } \\
+\mathrm{statement} &\to \boxed{\scriptstyle \mathrm{expr}} ; \\
+\mathrm{vardecl} &\to \mathrm{var} ~ \mathrm{id} \left(= \boxed{\scriptstyle \mathrm{expr}}\right)? \\
+\mathrm{statement} &\to \boxed{\scriptstyle \mathrm{vardecl}} ; \\
+\mathrm{fundecl} &\to \mathrm{function} ~ \mathrm{id} \boldsymbol{(} \boxed{\scriptstyle \mathrm{parameters}} \boldsymbol{)} { \left(\boxed{\scriptstyle \mathrm{statement}}\right)* } \\
+\mathrm{statement} &\to \boxed{\scriptstyle \mathrm{fundecl}} \\
+\mathrm{statement} &\to \mathrm{while} \boxed{\scriptstyle \mathrm{expr}} { \left(\boxed{\scriptstyle \mathrm{statement}}\right)* } \\
+\mathrm{statement} &\to \mathrm{for} ~ \mathrm{id} ~ \mathrm{in} \boxed{\scriptstyle \mathrm{expr}} { \left(\boxed{\scriptstyle \mathrm{statement}}\right)* } \\
+\mathrm{statement} &\to \mathrm{if} \boxed{\scriptstyle \mathrm{expr}} { \left(\boxed{\scriptstyle \mathrm{statement}}\right)* } \left(\mathrm{else} \left(\boxed{\scriptstyle \mathrm{statement}} \mid { \left(\boxed{\scriptstyle \mathrm{statement}}\right)* } \right)\right)? \\
+\mathrm{statement} &\to \mathrm{class} ~ \mathrm{id} { \left(\boxed{\scriptstyle{\mathrm{vardecl}}} ; \mid \boxed{\scriptstyle \mathrm{fundecl}}\right)* } \\
 \mathrm{statement} &\to ;
 \end{align*}
 
 Here, the grammar we've specified is mostly free of 1-lookahead conflicts, so it's amenable to a LL1 grammar with
 explicit conflict resolution. In particular, you will need to resolve conflicts for 
 
-* $~\boxed{term}$ at `[`, since it doesn't know whether you want `[]` or `[...]`.  You can resolve this by looking at the
+* $\to\boxed{term}$ at `[`, since it doesn't know whether you want `[]` or `[...]`.  You can resolve this by looking at the
   next character and shifting to `[]` if it's a `]`, and `[expr, (, expr)*]` otherwise.
-* $~\boxed{term}$ at `{`, which is the same problem as above for `{}` versus `{...}`.
-* $~\boxed{statement}$ for the token `function`. Here, we're not sure if we want to shift to an expression-statement
+* $\to\boxed{term}$ at `{`, which is the same problem as above for `{}` versus `{...}`.
+* $\to\boxed{statement}$ for the token `function`. Here, we're not sure if we want to shift to an expression-statement
   `function(){ ... };` or a function declaration `function id() {...}`. While it's perfectly fine to just ignore the
   first form (since it's effectively a NOP), we can resolve this easily by just looking at the next character, and shifting
   to the expression-statement production iff it's an open parenthesis `(`.
 * Within $\textrm{else} \left(\boxed{statement} \mid \left( \{ \boxed{statement}* \} \right)\right)$. For the token
   `{`, it's not entirely clearly whether we should shift to the expression-statement for a table or continue the `else {...}` clause.
   Here, we'll just always shift to the else clause.
+  
+#### Natural Grammar
+
+For the sake of analysis, it's often easier to give a grammar specification that, while ambiguous, captures just
+the structure of our language. Here, we will give the specification of our language as an inductive class over the
+set of $\to\boxed{e}$, expressions, and $\to\boxed{s}$, statements.
+
+The expressions are given by
+\begin{align*}
+e &\to x \in \mathcal{V} \mid n \in \mathbb{R} \mid \textrm{true} \mid \textrm{false} \mid \left[ e^* \right] \\
+& \mid \left\{ \left(e_k : e_v\right)^* \right\} \mid \mathrm{new} ~ x(e^*) \mid \mathrm{function}(x^*) \{ s^* \} \\
+& \mid e.x \mid e_f\left(e_{\scriptstyle \mathrm{args}}^*\right) \mid e_0\left[e_{\scriptstyle\mathrm{index}}\right] \\
+& \mid e_0 \oplus e_1 \mid \neg e \mid -e \mid e_0 \sqcup e_1 \mid e_0 ~\mathrm{to}~ e_1 \mid e_0 \sqsubseteq e_1
+\end{align*}
+where $\oplus$ denotes binary arithmetic operators, $\sqcup$ denotes logical binary operators, and $\sqsubseteq$ denotes
+binary comparison operators.
+
+Similarly, the statements are given by
+\begin{align*}
+s &\to e \in \mathrm{expr} \mid \mathrm{var}~ x \mid \mathrm{var}~ x = e \mid \mathrm{function}~ f(x^*) \{ s^* \} \\
+&\mid \mathrm{while}~e_{c}~\left\{ s^* \right\} \mid \mathrm{for}~x~\mathrm{in}~e~\left\{ s^* \right\} \\
+&\mid \mathrm{if}~e_c ~\left\{ s^* \right\} \mid \mathrm{if}~e_c ~\left\{ s^* \right\}~\mathrm{else}~\left\{s^*\right\} \\
+&\mid \mathrm{class}~C~\left\{ \left(\mathrm{var}~ x = e? \mid \mathrm{function}~ f(x^*) \{ s^* \}\right)^* \right\}
+\end{align*}
