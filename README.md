@@ -33,4 +33,5 @@ logical operator `and, or`, comparisons `<, >, ==, !=, etc`, and a builtin range
 have other compound expressions like unary operators for `-` and `not`, function calls `f(e, e)`, 
 object instantiations `new Foo(e)`, attribute selection
 `foo.bar = e`, list construction `[a, b, c]`, table construction `{k : v}`, anonymous functions `function(x, y) {...}`, and
-table/list indexing `a[e]`.
+table/list indexing `a[e]`. As primitives, you have boolean `true, false`, floats and ints, and strings like `"Hello World"`.
+Finally, you also have variables like `x, y, foo_bAr133`.
