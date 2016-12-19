@@ -1,7 +1,6 @@
 package com.yuck.grammar;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.yuck.ast.*;
 import com.yuck.auxiliary.descentparsing.Atom;
@@ -32,7 +31,6 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   // Precedence chart
-  @Start
   @Rule("E -> $level1")
   public Expression expression(Expression level1) {
     return level1;
@@ -248,6 +246,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return semi -> new VariableDeclaration(var, id, init, semi);
   }
 
+  @Start
   @Rule("statement -> $var.decl ;")
   public Statement statementVarDecl(Function<Token, Statement> vardecl, Token semi) {
     return vardecl.apply(semi);
@@ -315,6 +314,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
     throw new IllegalStateException();
   }
 
+  @SuppressWarnings("unchecked")
   @Rule("statement -> class id { ($var.decl ; | $func.decl)* }")
   public Statement statement(Token clazz, Token name, Token open, List<List<?>> declarations, Token close) {
     List<VariableDeclaration> variableDeclarations = new ArrayList<>();
@@ -336,6 +336,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return new EmptyStatement(semicolon);
   }
 
+  @SuppressWarnings("unchecked")
   @For("Else")
   public Function<IfStatement, IfStatement> elseClause(Token el, List<?> statementish) {
     final int endLine;
@@ -391,10 +392,6 @@ public class YuckyGrammar extends GrammarBase<Token> {
 
   @Override
   protected Set<List<Atom>> handleError(Variable variable, Atom on, List<Token> stream) {
-//    if (variable.toString().equals(
-//        "$statement@($statement@(else.$statement@($statement|{.$statement@($statement@($statement.;)@group)@star.})@group)@group)@maybe")) {
-//      return this.mActionTable.get(new Pair<>(variable, new Terminal(";")));
-//    }
     return super.handleError(variable, on, stream);
   }
 
@@ -413,17 +410,16 @@ public class YuckyGrammar extends GrammarBase<Token> {
 
   public static void main(String[] args) throws IOException {
     YuckyGrammar grammar = new YuckyGrammar();
-//    grammar.preprocess();
 
     String code1 = "{(1) : function(x){ foo(); bar(); var x = 3; }, \"1\" : new Baz().jar.poo()(132)} - -3 * 2**3**foo(5.baz, 3**3).lol()";
-    String code2 = "function(){" +
+    String code2 = "var x = function(){" +
         "function foo() {print(\"Hello!\");}" +
         "function() {while (true) {}};" +
         "for i in 1 to 3 {}" +
         "if true {} else if false {}" +
         "x();" +
         "class Bar { var z; var d; }" +
-    "}";
+    "};";
 
     YuckyLexer lexer = new YuckyLexer(new StringReader(code2));
     List<Token> tokens = new ArrayList<>();
@@ -432,7 +428,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
       tokens.add(token);
       token = lexer.yylex();
     }
-    Object o = grammar.parse(tokens);
+    Statement o = grammar.parse(tokens);
     System.err.println(o);
   }
 }
