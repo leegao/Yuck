@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,5 +91,52 @@ public class YCodeFunctionContext {
     int n = functions.size();
     functions.put(function, n);
     return n;
+  }
+
+  public ByteBuffer write(ByteBuffer buffer) {
+    // Layout:
+    // MAGIC: ycode
+    // Locals
+    // Upvalues
+    // Constants
+    // Instructions
+    // Functions
+    // Classes
+    // where each list is headed by the number of items
+    buffer.putChar('y').putChar('c').putChar('o').putChar('d').putChar('e');
+    // Locals
+    buffer.putInt(locals.size());
+    for (int i = 0; i < locals.size(); i++) {
+      Preconditions.checkArgument(locals.inverse().containsKey(i));
+      String local = locals.inverse().get(i);
+      Utils.putString(buffer, local);
+    }
+    // Upvalues
+    buffer.putInt(upvalues.size());
+    for (int i = 0; i < upvalues.size(); i++) {
+      Preconditions.checkArgument(upvalues.inverse().containsKey(i));
+      Utils.putString(buffer, upvalues.inverse().get(i));
+    }
+    // Constants
+    buffer.putInt(constants.size());
+    for (int i = 0; i < constants.size(); i++) {
+      Preconditions.checkArgument(constants.inverse().containsKey(i));
+      Utils.putConstant(buffer, constants.inverse().get(i));
+    }
+    // Instructions
+    buffer.putInt(instructions.size());
+    for (Instruction instruction : assemble()) {
+      instruction.write(buffer);
+    }
+    // Functions
+    buffer.putInt(functions.size());
+    for (int i = 0; i < functions.size(); i++) {
+      Preconditions.checkArgument(functions.inverse().containsKey(i));
+      YCodeFunctionContext function = functions.inverse().get(i);
+      function.write(buffer);
+    }
+    // Classes
+    buffer.putInt(0);
+    return buffer;
   }
 }
