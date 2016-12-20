@@ -177,4 +177,11 @@ the potentially altered contexts. Their semantics are given by
 {
   \sigma, \xi \vdash e_f(e_0, \dots, e_n) \Downarrow_e v_{out} \mid \xi_{out}
 } \and
+\inferrule*[right=Index]{
+  \sigma, \xi \vdash e_0 \Downarrow_e v_0 \in \mathrm{dom}(\xi_0) \mid \xi_0 \\
+  \sigma, \xi' \vdash e_1 \Downarrow_e v_1 \mid \xi' \\
+  v = \xi_0(v_0)
+}{
+  \sigma, \xi \vdash e_0[e_1] \Downarrow_e v \mid \xi'
+}
 \end{mathpar}
