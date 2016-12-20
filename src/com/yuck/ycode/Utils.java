@@ -9,6 +9,13 @@ public class Utils {
     return buffer;
   }
 
+  public static String getString(ByteBuffer buffer) {
+    int length = buffer.getInt();
+    byte[] bytes = new byte[length];
+    buffer.get(bytes);
+    return new String(bytes);
+  }
+
   public static ByteBuffer putConstant(ByteBuffer buffer, Object object) {
     if (object instanceof Boolean) {
       return buffer.put((byte) Constant.BOOL.ordinal()).put((byte) ((boolean) object ? 1 : 0));
@@ -21,5 +28,20 @@ public class Utils {
     } else {
       throw new IllegalStateException();
     }
+  }
+
+  public static Object getConstant(ByteBuffer buffer) {
+    Constant constant = Constant.values()[buffer.get()];
+    switch (constant) {
+      case BOOL:
+        return buffer.get() == 0;
+      case INT:
+        return buffer.getInt();
+      case FLOAT:
+        return buffer.getFloat();
+      case STRING:
+        return getString(buffer);
+    }
+    throw new IllegalStateException();
   }
 }

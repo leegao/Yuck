@@ -139,4 +139,41 @@ public class YCodeFunctionContext {
     buffer.putInt(0);
     return buffer;
   }
+
+  public static YCodeFunctionContext read(ByteBuffer buffer) {
+    Preconditions.checkArgument(buffer.getChar() == 'y');
+    Preconditions.checkArgument(buffer.getChar() == 'c');
+    Preconditions.checkArgument(buffer.getChar() == 'o');
+    Preconditions.checkArgument(buffer.getChar() == 'd');
+    Preconditions.checkArgument(buffer.getChar() == 'e');
+    YCodeFunctionContext context = new YCodeFunctionContext(new ArrayList<>());
+    // Locals
+    int numLocals = buffer.getInt();
+    for (int i = 0; i < numLocals; i++) {
+      context.locals.put(Utils.getString(buffer), i);
+    }
+    // Upvalues
+    int numUpvalues = buffer.getInt();
+    for (int i = 0; i < numUpvalues; i++) {
+      context.upvalues.put(Utils.getString(buffer), i);
+    }
+    // Constants
+    int numConstants = buffer.getInt();
+    for (int i = 0; i < numConstants; i++) {
+      context.constants.put(Utils.getConstant(buffer), i);
+    }
+    // Instructions
+    int numInstrunctions = buffer.getInt();
+    for (int i = 0; i < numInstrunctions; i++) {
+      context.instructions.add(Instruction.read(context, buffer));
+    }
+    // Functions
+    int numFunctions = buffer.getInt();
+    for (int i = 0; i < numFunctions; i++) {
+      context.functions.put(YCodeFunctionContext.read(buffer), i);
+    }
+    // Classes
+    Preconditions.checkArgument(buffer.getInt() == 0);
+    return context;
+  }
 }
