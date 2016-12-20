@@ -87,4 +87,19 @@ public class Instruction {
   public int getArgument() {
     return argument;
   }
+
+  public void fixup() {
+    switch (opcode) {
+      case NOP:
+        argument = 0;
+        return;
+      case GOTO:
+      case JUMPZ:
+        int cursor = argument & 0x800000;
+        Preconditions.checkArgument(cursor < context.labelPositions.size());
+        int target = context.labelPositions.get(cursor);
+        int current = context.position(this);
+        argument = target - current;
+    }
+  }
 }

@@ -1,5 +1,6 @@
 package com.yuck.ycode;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
@@ -12,6 +13,8 @@ public class YCodeContext {
   public final BiMap<Object, Integer> constants = HashBiMap.create();
   public final BiMap<String, Integer> labels = HashBiMap.create();
   public final List<Instruction> instructions = new ArrayList<>();
+  public final List<Integer> labelPositions = new ArrayList<>();
+  public final BiMap<Instruction, Integer> instructionPositions = HashBiMap.create();
 
   public YCodeContext(BiMap<String, Integer> upValues) {
     this.upValues = upValues;
@@ -46,10 +49,27 @@ public class YCodeContext {
 
   public void emit(Opcode opcode, Object data) {
     Instruction instruction = Instruction.make(this, opcode, data);
-    this.instructions.add(instruction);
+    int position = instructions.size();
+    instructions.add(instruction);
+    if (opcode == Opcode.NOP && instruction.getArgument() != 0) {
+      labelPositions.add(position);
+    }
+    instructionPositions.put(instruction, position);
   }
 
   public void emit(Opcode opcode) {
     emit(opcode, 0);
+  }
+
+  public int position(Instruction instruction) {
+    Preconditions.checkArgument(instructionPositions.containsKey(instruction));
+    return instructionPositions.get(instruction);
+  }
+
+  public List<Instruction> assemble() {
+    for (Instruction instruction : instructions) {
+      instruction.fixup();
+    }
+    return instructions;
   }
 }
