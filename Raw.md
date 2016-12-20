@@ -119,7 +119,7 @@ set of $\to\boxed{e}$, expressions, and $\to\boxed{s}$, statements.
 
 The expressions are given by
 \begin{align*}
-e &\to x \in \mathcal{V} \mid n \in \mathbb{R} \mid \textrm{true} \mid \textrm{false} \mid \left[ e^* \right] \\
+e &\to x \in \mathcal{V} \mid \mathrm{nil} \mid n \in \mathbb{R} \mid \textrm{true} \mid \textrm{false} \mid \left[ e^* \right] \\
 & \mid \left\{ \left(e_k : e_v\right)^* \right\} \mid \mathrm{new} ~ x(e^*) \mid \mathrm{function}(x^*) \{ s^* \} \\
 & \mid e.x \mid e_f\left(e_{\scriptstyle \mathrm{args}}^*\right) \mid e_0\left[e_{\scriptstyle\mathrm{index}}\right] \\
 & \mid e_0 \oplus e_1 \mid \neg e \mid -e \mid e_0 \sqcup e_1 \mid e_0 ~\mathrm{to}~ e_1 \mid e_0 \sqsubseteq e_1
@@ -191,4 +191,15 @@ the potentially altered contexts. Their semantics are given by
 }{
   \sigma, \xi \vdash e_0 \oplus e_1 \Downarrow_e v \mid \xi'
 }
+\end{mathpar}
+
+For statements, we also have a similar reduction $\sigma, \xi \vdash s \Downarrow_s \sigma', \xi'$ which outputs the next
+set of contexts for the next instruction.
+\begin{mathpar}
+\inferrule*[right=Expr]
+{\sigma, \xi \vdash e \Downarrow_e v \mid \xi'}
+{\sigma, \xi \vdash e \Downarrow_s \sigma, \xi'} \and
+\inferrule*[right=Var]
+{\sigma' = \sigma[x \mapsto \mathrm{nil}]}
+{\sigma, \xi \vdash \mathrm{var}~x \Downarrow_s \sigma', \xi} \and
 \end{mathpar}

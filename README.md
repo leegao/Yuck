@@ -81,7 +81,7 @@ the structure of our language. Here, we will give the specification of our langu
 set of <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/87f0455f890dfea46fc3cf15ec227baa.svg?invert_in_darkmode" align=middle width=39.912345pt height=25.05855pt/>, expressions, and <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/6d1f75a1c2c1cc462878d9e62e281d4e.svg?invert_in_darkmode" align=middle width=39.96366pt height=25.05855pt/>, statements.
 
 The expressions are given by
-<p align="center"><img src="https://rawgit.com/leegao/Yuck/svgs/svgs/2cf91f5110a56ba59796de99b5e61cc7.svg?invert_in_darkmode" align=middle width=334.1481pt height=96.054915pt/></p>
+<p align="center"><img src="https://rawgit.com/leegao/Yuck/svgs/svgs/03a97234d0278e14e923232a8af47f7f.svg?invert_in_darkmode" align=middle width=334.1481pt height=96.054915pt/></p>
 where <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/45848451c711deba755da6422f9e68c6.svg?invert_in_darkmode" align=middle width=12.86109pt height=18.90339pt/> denotes binary arithmetic operators, <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/2cfa3b62e25c55e1f2b62ff472d5fd09.svg?invert_in_darkmode" align=middle width=11.03454pt height=17.99028pt/> denotes logical binary operators, and <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/1397b3a9f0e28824b4fd341b38a1760f.svg?invert_in_darkmode" align=middle width=12.86109pt height=20.63391pt/> denotes
 binary comparison operators.
 
@@ -106,3 +106,7 @@ Let <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/3269f2678ddb29b67eb84abba
 (for local variables) and <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/85e60dfc14844168fd12baa5bfd2517d.svg?invert_in_darkmode" align=middle width=8.0237355pt height=22.55649pt/> (for the heap of objects). Since expressions may, in general, have side-effects, we also have to output
 the potentially altered contexts. Their semantics are given by
 <p align="center"><img src="https://rawgit.com/leegao/Yuck/svgs/svgs/a1e8eacd2fc5b2f7826e09ed8e4e2934.svg?invert_in_darkmode" align=middle width=677.4636pt height=610.1898pt/></p>
+
+For statements, we also have a similar reduction <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/7e22bf7c897eca471172ea96e9d32e34.svg?invert_in_darkmode" align=middle width=111.372195pt height=23.94843pt/> which outputs the next
+set of contexts for the next instruction.
+<p align="center"><img src="https://rawgit.com/leegao/Yuck/svgs/svgs/9f28b88d4ee00fdb1e9b7344ca118bae.svg?invert_in_darkmode" align=middle width=432.9402pt height=40.70484pt/></p>
