@@ -51,9 +51,7 @@ public class Instruction {
       case LOAD_UP:
       case STORE_UP:
         Preconditions.checkArgument(data instanceof String);
-        String upvalue = (String) data;
-        Preconditions.checkArgument(context.upValues.containsKey(upvalue));
-        return new Instruction(opcode, context.upValues.get(upvalue), context);
+        return new Instruction(opcode, context.upvalue((String) data), context);
       case NEW:
       case GET_FIELD:
       case PUT_FIELD:
@@ -83,7 +81,7 @@ public class Instruction {
   public static Opcode variable(YCodeContext context, String string) {
     return context.locals.containsKey(string) ?
         Opcode.LOAD_LOCAL :
-        context.upValues.containsKey(string) ? Opcode.LOAD_UP : Opcode.LOAD_LOCAL;
+        Opcode.LOAD_UP;
   }
 
   public int getArgument() {

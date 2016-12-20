@@ -9,15 +9,17 @@ import java.util.List;
 
 public class YCodeContext {
   public final BiMap<String, Integer> locals = HashBiMap.create();
-  public final BiMap<String, Integer> upValues;
+  public final BiMap<String, Integer> upvalues = HashBiMap.create();
   public final BiMap<Object, Integer> constants = HashBiMap.create();
   public final BiMap<String, Integer> labels = HashBiMap.create();
   public final List<Instruction> instructions = new ArrayList<>();
   public final List<Integer> labelPositions = new ArrayList<>();
   public final BiMap<Instruction, Integer> instructionPositions = HashBiMap.create();
 
-  public YCodeContext(BiMap<String, Integer> upValues) {
-    this.upValues = upValues;
+  public YCodeContext(List<String> arguments) {
+    for (String argument : arguments) {
+      local(argument);
+    }
   }
 
   public int constant(Object o) {
@@ -35,6 +37,15 @@ public class YCodeContext {
     }
     int n = locals.size();
     locals.put(var, n);
+    return n;
+  }
+
+  public int upvalue(String var) {
+    if (upvalues.containsKey(var)) {
+      return upvalues.get(var);
+    }
+    int n = upvalues.size();
+    upvalues.put(var, n);
     return n;
   }
 
