@@ -183,5 +183,12 @@ the potentially altered contexts. Their semantics are given by
   v = \xi_0(v_0)
 }{
   \sigma, \xi \vdash e_0[e_1] \Downarrow_e v \mid \xi'
+} \and
+\inferrule*[right=Binary]{
+  \sigma, \xi \vdash e_0 \Downarrow_e v_0 \mid \xi_0 \\
+  \sigma, \xi_0 \vdash e_1 \Downarrow_e v_1 \mid \xi' \\
+  \xi' \vdash v_0 \oplus v_1 = v
+}{
+  \sigma, \xi \vdash e_0 \oplus e_1 \Downarrow_e v \mid \xi'
 }
 \end{mathpar}
