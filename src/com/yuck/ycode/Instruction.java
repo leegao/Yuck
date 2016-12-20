@@ -7,19 +7,18 @@ import java.nio.ByteBuffer;
 public class Instruction {
   public final Opcode opcode;
   private int argument;
-  public final YCodeContext context;
+  public final YCodeFunctionContext context;
 
-  private Instruction(Opcode opcode, int argument, YCodeContext context) {
+  private Instruction(Opcode opcode, int argument, YCodeFunctionContext context) {
     this.opcode = opcode;
     this.argument = argument;
     this.context = context;
   }
 
-  public static <T> Instruction make(YCodeContext context, Opcode opcode, T data) {
+  public static <T> Instruction make(YCodeFunctionContext context, Opcode opcode, T data) {
     switch (opcode) {
       case POP:
       case ROT2:
-      case CLOSURE:
       case CALL:
       case TABLE_LOAD:
       case TABLE_STORE:
@@ -69,16 +68,20 @@ public class Instruction {
         } else {
           return new Instruction(opcode, 0, context);
         }
+      case CLOSURE:
+        Preconditions.checkArgument(data instanceof YCodeFunctionContext);
+        int f = context.function((YCodeFunctionContext) data);
+        return new Instruction(opcode, f, context);
       default:
         throw new IllegalStateException();
     }
   }
 
-  public static Instruction make(YCodeContext context, Opcode opcode) {
+  public static Instruction make(YCodeFunctionContext context, Opcode opcode) {
     return make(context, opcode, 0);
   }
 
-  public static Opcode variable(YCodeContext context, String string) {
+  public static Opcode variable(YCodeFunctionContext context, String string) {
     return context.locals.containsKey(string) ?
         Opcode.LOAD_LOCAL :
         Opcode.LOAD_UP;
@@ -109,7 +112,7 @@ public class Instruction {
     return buffer;
   }
 
-  public static Instruction read(YCodeContext context, ByteBuffer buffer) {
+  public static Instruction read(YCodeFunctionContext context, ByteBuffer buffer) {
     int op = buffer.get();
     int argument = buffer.getInt();
     return new Instruction(Opcode.values()[op], argument, context);

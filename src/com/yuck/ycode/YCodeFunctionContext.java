@@ -7,7 +7,7 @@ import com.google.common.collect.HashBiMap;
 import java.util.ArrayList;
 import java.util.List;
 
-public class YCodeContext {
+public class YCodeFunctionContext {
   public final BiMap<String, Integer> locals = HashBiMap.create();
   public final BiMap<String, Integer> upvalues = HashBiMap.create();
   public final BiMap<Object, Integer> constants = HashBiMap.create();
@@ -15,8 +15,9 @@ public class YCodeContext {
   public final List<Instruction> instructions = new ArrayList<>();
   public final List<Integer> labelPositions = new ArrayList<>();
   public final BiMap<Instruction, Integer> instructionPositions = HashBiMap.create();
+  public final BiMap<YCodeFunctionContext, Integer> functions = HashBiMap.create();
 
-  public YCodeContext(List<String> arguments) {
+  public YCodeFunctionContext(List<String> arguments) {
     for (String argument : arguments) {
       local(argument);
     }
@@ -82,5 +83,12 @@ public class YCodeContext {
       instruction.fixup();
     }
     return instructions;
+  }
+
+  public int function(YCodeFunctionContext function) {
+    Preconditions.checkArgument(functions.containsKey(function));
+    int n = functions.size();
+    functions.put(function, n);
+    return n;
   }
 }
