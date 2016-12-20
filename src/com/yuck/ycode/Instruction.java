@@ -43,6 +43,16 @@ public class Instruction {
         return new Instruction(opcode, 0, context);
       case LOAD_CONST:
         return new Instruction(opcode, context.constant(data), context);
+      case LOAD_LOCAL:
+      case STORE_LOCAL:
+        Preconditions.checkArgument(data instanceof String);
+        return new Instruction(opcode, context.local((String) data), context);
+      case LOAD_UP:
+      case STORE_UP:
+        Preconditions.checkArgument(data instanceof String);
+        String upvalue = (String) data;
+        Preconditions.checkArgument(context.upValues.containsKey(upvalue));
+        return new Instruction(opcode, context.upValues.get(upvalue), context);
       default:
         throw new IllegalStateException();
     }
