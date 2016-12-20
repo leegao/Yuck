@@ -35,7 +35,6 @@ public class Instruction {
       case MOD:
       case NOT:
       case NEG:
-      case NOP:
       case AND:
       case OR:
       case POW:
@@ -53,6 +52,23 @@ public class Instruction {
         String upvalue = (String) data;
         Preconditions.checkArgument(context.upValues.containsKey(upvalue));
         return new Instruction(opcode, context.upValues.get(upvalue), context);
+      case NEW:
+      case GET_FIELD:
+      case PUT_FIELD:
+        Preconditions.checkArgument(data instanceof String);
+        return new Instruction(opcode, context.constant(data), context);
+      case JUMPZ:
+      case GOTO:
+        Preconditions.checkArgument(data instanceof String);
+        int label = context.label((String) data);
+        return new Instruction(opcode, label | 0x800000, context);
+      case NOP:
+        if (data instanceof String) {
+          Preconditions.checkArgument(!context.labels.containsKey(data));
+          return new Instruction(opcode, context.label((String) data), context);
+        } else {
+          return new Instruction(opcode, 0, context);
+        }
       default:
         throw new IllegalStateException();
     }
@@ -60,6 +76,12 @@ public class Instruction {
 
   public static Instruction make(YCodeContext context, Opcode opcode) {
     return make(context, opcode, 0);
+  }
+
+  public static Opcode variable(YCodeContext context, String string) {
+    return context.locals.containsKey(string) ?
+        Opcode.LOAD_LOCAL :
+        context.upValues.containsKey(string) ? Opcode.LOAD_UP : Opcode.LOAD_LOCAL;
   }
 
   public int getArgument() {
