@@ -134,3 +134,47 @@ s &\to e \in \mathrm{expr} \mid \mathrm{var}~ x \mid \mathrm{var}~ x = e \mid \m
 &\mid \mathrm{if}~e_c ~\left\{ s^* \right\} \mid \mathrm{if}~e_c ~\left\{ s^* \right\}~\mathrm{else}~\left\{s^*\right\} \\
 &\mid \mathrm{class}~C~\left\{ \left(\mathrm{var}~ x = e? \mid \mathrm{function}~ f(x^*) \{ s^* \}\right)^* \right\}
 \end{align*}
+
+While this grammar may not be easily implementable using your everyday flavor of parser generators, it does have
+the advantage that it is compact and it gives you an inductive construction. We can take the structure defined here
+and use it to construct an operational semantic for this language to reveal the types of information that we will
+have to carry around in order to fully execute this program.
+
+### Semantics
+
+#### Simple Operational Semantics (Big Step)
+
+We will give the operational semantics in terms of inferences rules. Here, the sequent
+$$
+\inferrule{A \\ B \\ C}{D}
+$$
+says that if $A, B, C$ all hold, then we can deduce $D$. As we will see, it's very natural to specify the semantics
+of a language in terms of these inference rules.
+
+Let $\sigma, \xi \vdash e \Downarrow_e v \mid \xi'$ denote the "execution" of a Yuck expression $e$ in contexts $\sigma$
+(for local variables) and $\xi$ (for the heap of objects). Since expressions may, in general, have side-effects, we also have to output
+the potentially altered contexts. Their semantics are given by
+\begin{mathpar}
+\inferrule*[right=Var]{\sigma(x) = v}{\sigma, \xi \vdash x \in \mathcal{V} \Downarrow_e v \mid \xi} \and
+\inferrule*[right=Num]{~}{\sigma, \xi \vdash n \in \mathbb{R} \Downarrow_e n \mid \xi} \and
+\inferrule*[right=True]{~}{\sigma, \xi \vdash \mathrm{true} \Downarrow_e \mathrm{true} \mid \xi} \and
+\inferrule*[right=False]{~}{\sigma, \xi \vdash \mathrm{false} \Downarrow_e \mathrm{false}\mid \xi} \and
+\inferrule*[right=List]{\sigma, \xi \vdash e_0 \Downarrow_e v_0 \mid \xi_0 \\ \cdots \\ \sigma, \xi_{n-1} \vdash e_n \Downarrow_e v_n \mid \xi_n}{\sigma, \xi \vdash \left[ e_0, \cdots, e_n \right] \Downarrow_e \left[ v_0, \cdots, v_n \right] \mid \xi_n} \and
+\inferrule*[right=Table]{\sigma, \xi \vdash e_{k_0} \Downarrow_e v_{k_0} \mid \xi'_0  ~~~
+\sigma, \xi'_0 \vdash e_{v_0} \Downarrow_e v_{v_0} \mid \xi_0 \\\\
+\cdots \\\\
+\sigma, \xi_{n-1} \vdash e_{k_n} \Downarrow_e v_{k_n} \mid \xi'_n ~~~~
+\sigma, \xi'_n \vdash e_{v_n} \Downarrow_e v_{v_n} \mid \xi_n}
+{\sigma, \xi \vdash \left\{ e_{k_0} : e_{v_0}, \cdots, e_{k_n} : e_{v_n} \right\} \Downarrow_e \left[ v_{k_0} : v_{v_0}, \cdots, v_{k_n} : v_{v_n} \right] \mid \xi_n} \and
+\inferrule*[right=New]{\sigma, \xi_{k-1} \vdash e_k \Downarrow_e v_k \mid \xi_k \\ \mathrm{Bar} \in \mathcal{C}(\sigma) \\ v_{o}, \xi' = \mathrm{malloc}(\xi_n, \mathrm{Bar}) \\ \sigma, \xi' \vdash v_o.\mathrm{init}(v_0, \cdots, v_n) \Downarrow_s \sigma, \xi_{out}}{\sigma, \xi \vdash \mathrm{new}~ \mathrm{Bar}(e_0, \dots, e_n) \Downarrow_e v_{o} \mid \xi_{out})} \and
+\inferrule*[right=Fun]{\mathrm{fvs}(s_0, \dots, s_n) - \{x_0, \dots, x_k\} \subseteq \mathrm{dom}(\sigma) \\ f, \xi_{out} = \mathrm{malloc}(\xi, \mathrm{function} \cdots) \\ f.\mathrm{bind}(\sigma)}{\sigma, \xi \vdash \mathrm{function}(x_0, \cdots, x_k){s_0, \cdots, s_k \Downarrow_e f \mid \xi_{out}}} \and
+\inferrule*[right=Dot]{\sigma, \xi \vdash e \Downarrow_e o \in \mathrm{dom}(\xi') \mid \xi' \\ v = \xi'(o).x}{\sigma, \xi \vdash e.x \Downarrow_e v \mid \xi'} \and
+\inferrule*[right=Call]{
+  \sigma, \xi \vdash e_f \Downarrow_e f \in \mathrm{dom}(\xi') \mid \xi' \\ 
+  \sigma, \xi'_{k-1} \vdash e_k \Downarrow_e v_k \mid \xi'_k \\ 
+  v_{out}, \xi_{out} = \xi'(f)(v_0, \dots, v_k)
+}
+{
+  \sigma, \xi \vdash e_f(e_0, \dots, e_n) \Downarrow_e v_{out} \mid \xi_{out}
+} \and
+\end{mathpar}

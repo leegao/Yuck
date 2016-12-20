@@ -87,3 +87,22 @@ binary comparison operators.
 
 Similarly, the statements are given by
 <p align="center"><img src="https://rawgit.com/leegao/Yuck/svgs/svgs/4afc5d41c490d9202b6786cd68d49830.svg?invert_in_darkmode" align=middle width=373.46925pt height=93.86322pt/></p>
+
+While this grammar may not be easily implementable using your everyday flavor of parser generators, it does have
+the advantage that it is compact and it gives you an inductive construction. We can take the structure defined here
+and use it to construct an operational semantic for this language to reveal the types of information that we will
+have to carry around in order to fully execute this program.
+
+### Semantics
+
+#### Simple Operational Semantics (Big Step)
+
+We will give the operational semantics in terms of inferences rules. Here, the sequent
+<p align="center"><img src="https://rawgit.com/leegao/Yuck/svgs/svgs/97c2c895f7c87675e5a8a0f1c7e9aeec.svg?invert_in_darkmode" align=middle width=104.300295pt height=35.56146pt/></p>
+says that if <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/3dde922ef7af0f94b6c5c96835fc9e54.svg?invert_in_darkmode" align=middle width=53.23428pt height=22.19118pt/> all hold, then we can deduce <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/78ec2b7008296ce0561cf83393cb746d.svg?invert_in_darkmode" align=middle width=14.14182pt height=22.19118pt/>. As we will see, it's very natural to specify the semantics
+of a language in terms of these inference rules.
+
+Let <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/3269f2678ddb29b67eb84abbae4eeb9a.svg?invert_in_darkmode" align=middle width=111.462285pt height=24.44145pt/> denote the "execution" of a Yuck expression <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/8cd34385ed61aca950a6b06d09fb50ac.svg?invert_in_darkmode" align=middle width=7.7297715pt height=13.88079pt/> in contexts <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/8cda31ed38c6d59d14ebefa440099572.svg?invert_in_darkmode" align=middle width=10.058565pt height=13.88079pt/>
+(for local variables) and <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/85e60dfc14844168fd12baa5bfd2517d.svg?invert_in_darkmode" align=middle width=8.0237355pt height=22.55649pt/> (for the heap of objects). Since expressions may, in general, have side-effects, we also have to output
+the potentially altered contexts. Their semantics are given by
+<p align="center"><img src="https://rawgit.com/leegao/Yuck/svgs/svgs/96fa73efbccbfd619f3773f04098096e.svg?invert_in_darkmode" align=middle width=490.08135pt height=606.1803pt/></p>
