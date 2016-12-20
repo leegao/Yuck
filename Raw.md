@@ -213,5 +213,29 @@ set of contexts for the next instruction.
   \sigma \sqcup [f], \xi \vdash \mathrm{function}(x_0, \dots, x_k) \{s_0, \dots, s_n\} \Downarrow_e v_f \mid \xi' \\
   \sigma' = \sigma[f \mapsto v_f]
 }
-{\sigma, \xi \vdash \mathrm{function}~f(x_0, \dots, x_k) \{s_0, \dots, s_n\} \Downarrow_s \sigma', \xi' }
+{\sigma, \xi \vdash \mathrm{function}~f(x_0, \dots, x_k) \{s_0, \dots, s_n\} \Downarrow_s \sigma', \xi' } \and
+\inferrule*[right=WhileTrue]
+{
+  \sigma = \sigma_{-1}, \xi \vdash e_c \Downarrow_e \textrm{true} \mid \xi_{-1} \\
+  \sigma_{k-1}, \xi_{k-1} \vdash s_k \Downarrow_s \sigma_k, \xi_k \\
+  \sigma_k, \xi_k \vdash \mathrm{while} ~ e_c ~ \{ s_0, \dots, s_n \} \Downarrow_s \sigma', \xi'
+}
+{\sigma, \xi \vdash \mathrm{while} ~ e_c ~ \{ s_0, \dots, s_n \} \Downarrow_s \sigma', \xi'} \and
+\inferrule*[right=WhileFalse]
+{
+  \sigma, \xi \vdash e_c \Downarrow_e \textrm{false} \mid \xi'
+}
+{\sigma, \xi \vdash \mathrm{while} ~ e_c ~ \{ s_0, \dots, s_n \} \Downarrow_s \sigma, \xi'} \and
+\inferrule*[right=IfTrue]
+{
+  \sigma = \sigma_{-1}, \xi \vdash e_c \Downarrow_e \textrm{true} \mid \xi_{-1} \\
+  \sigma_{k-1}, \xi_{k-1} \vdash s_k \Downarrow_s \sigma_k, \xi_k \\
+}
+{\sigma, \xi \vdash \mathrm{if} ~ e_c ~ \{s^*\} ~ \mathrm{else} ~ \{s'^*\} \Downarrow_s \sigma_n, \xi_n} \and
+\inferrule*[right=IfFalse]
+{
+  \sigma = \sigma_{-1}, \xi \vdash e_c \Downarrow_e \textrm{false} \mid \xi_{-1} \\
+  \sigma_{k-1}, \xi_{k-1} \vdash s'_k \Downarrow_s \sigma_k, \xi_k \\
+}
+{\sigma, \xi \vdash \mathrm{if} ~ e_c ~ \{s^*\} ~ \mathrm{else} ~ \{s'^*\} \Downarrow_s \sigma_n, \xi_n} \and
 \end{mathpar}
