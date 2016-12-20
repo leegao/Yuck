@@ -109,4 +109,4 @@ the potentially altered contexts. Their semantics are given by
 
 For statements, we also have a similar reduction <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/7e22bf7c897eca471172ea96e9d32e34.svg?invert_in_darkmode" align=middle width=111.372195pt height=23.94843pt/> which outputs the next
 set of contexts for the next instruction.
-<p align="center"><img src="https://rawgit.com/leegao/Yuck/svgs/svgs/058f9aad2299e36e32813eab59faaeb1.svg?invert_in_darkmode" align=middle width=452.2254pt height=104.485425pt/></p>
+<p align="center"><img src="https://rawgit.com/leegao/Yuck/svgs/svgs/9ae018a1ac842de8da41d588c39c4616.svg?invert_in_darkmode" align=middle width=553.3968pt height=169.17945pt/></p>

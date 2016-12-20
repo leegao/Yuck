@@ -207,5 +207,11 @@ set of contexts for the next instruction.
   \sigma, \xi \vdash e \Downarrow_e v \mid \xi' \\
   \sigma' = \sigma[x \mapsto v]
 }
-{\sigma, \xi \vdash \mathrm{var}~x = e \Downarrow_s \sigma', \xi'}
+{\sigma, \xi \vdash \mathrm{var}~x = e \Downarrow_s \sigma', \xi'} \and
+\inferrule*[right=Fun]
+{
+  \sigma \sqcup [f], \xi \vdash \mathrm{function}(x_0, \dots, x_k) \{s_0, \dots, s_n\} \Downarrow_e v_f \mid \xi' \\
+  \sigma' = \sigma[f \mapsto v_f]
+}
+{\sigma, \xi \vdash \mathrm{function}~f(x_0, \dots, x_k) \{s_0, \dots, s_n\} \Downarrow_s \sigma', \xi' }
 \end{mathpar}
