@@ -241,6 +241,11 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return parameters;
   }
 
+  @Rule("E.leaf -> nil")
+  public Expression expLeafNil(Token nil) {
+    return new Literal(nil);
+  }
+
   @Rule("statement -> $E ;")
   public Statement statement(Expression expr, Token semi) {
     return new ExpressionStatement(expr, semi);
