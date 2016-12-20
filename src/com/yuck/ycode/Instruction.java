@@ -2,6 +2,8 @@ package com.yuck.ycode;
 
 import com.google.common.base.Preconditions;
 
+import java.nio.ByteBuffer;
+
 public class Instruction {
   public final Opcode opcode;
   private int argument;
@@ -101,5 +103,17 @@ public class Instruction {
         int current = context.position(this);
         argument = target - current;
     }
+  }
+
+  public ByteBuffer write(ByteBuffer buffer) {
+    buffer.put((byte) opcode.ordinal());
+    buffer.putInt(argument);
+    return buffer;
+  }
+
+  public static Instruction read(YCodeContext context, ByteBuffer buffer) {
+    int op = buffer.get();
+    int argument = buffer.getInt();
+    return new Instruction(Opcode.values()[op], argument, context);
   }
 }
