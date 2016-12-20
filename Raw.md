@@ -75,7 +75,7 @@ a production 1 or more times, and a production 0 or 1 time).
 \mathrm{level9} &\to \boxed{\scriptstyle \mathrm{term}} ~ \boxed{\scriptstyle \mathrm{level9}'}* \\
 \mathrm{args} &\to \epsilon \\
 \mathrm{args} &\to \boxed{\scriptstyle \mathrm{expr}} \left(, \boxed{\scriptstyle \mathrm{expr}}\right)* \\
-\mathrm{term} &\to \left(\mathrm{num} \mid \mathrm{string} \mid \mathrm{true} \mid \mathrm{false} \mid \mathrm{id}\right) \\
+\mathrm{term} &\to \left(\mathrm{nil} \mid \mathrm{num} \mid \mathrm{string} \mid \mathrm{true} \mid \mathrm{false} \mid \mathrm{id}\right) \\
 \mathrm{term} &\to \boldsymbol{(} \boxed{\scriptstyle \mathrm{expr}} \boldsymbol{)} \\
 \mathrm{term} &\to \left[ \boxed{\scriptstyle \mathrm{expr}} \left(, \boxed{\scriptstyle \mathrm{expr}}\right)* \right] \\
 \mathrm{term} &\to \left[ ~ \right] \\
@@ -199,7 +199,13 @@ set of contexts for the next instruction.
 \inferrule*[right=Expr]
 {\sigma, \xi \vdash e \Downarrow_e v \mid \xi'}
 {\sigma, \xi \vdash e \Downarrow_s \sigma, \xi'} \and
-\inferrule*[right=Var]
+\inferrule*[right=VarNil]
 {\sigma' = \sigma[x \mapsto \mathrm{nil}]}
 {\sigma, \xi \vdash \mathrm{var}~x \Downarrow_s \sigma', \xi} \and
+\inferrule*[right=Var]
+{
+  \sigma, \xi \vdash e \Downarrow_e v \mid \xi' \\
+  \sigma' = \sigma[x \mapsto v]
+}
+{\sigma, \xi \vdash \mathrm{var}~x = e \Downarrow_s \sigma', \xi'}
 \end{mathpar}

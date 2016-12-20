@@ -58,7 +58,7 @@ a production 1 or more times, and a production 0 or 1 time).
 
 #### LL(1) Grammar
 
-<p align="center"><img src="https://rawgit.com/leegao/Yuck/svgs/svgs/2eee32c4c2a859d67a8d66fefa3331ca.svg?invert_in_darkmode" align=middle width=490.42785pt height=982.872pt/></p>
+<p align="center"><img src="https://rawgit.com/leegao/Yuck/svgs/svgs/db695ad5bc3c64c2bcb87e5697228a77.svg?invert_in_darkmode" align=middle width=490.42785pt height=982.872pt/></p>
 
 Here, the grammar we've specified is mostly free of 1-lookahead conflicts, so it's amenable to a LL1 grammar with
 explicit conflict resolution. In particular, you will need to resolve conflicts for 
@@ -109,4 +109,4 @@ the potentially altered contexts. Their semantics are given by
 
 For statements, we also have a similar reduction <img src="https://rawgit.com/leegao/Yuck/svgs/svgs/7e22bf7c897eca471172ea96e9d32e34.svg?invert_in_darkmode" align=middle width=111.372195pt height=23.94843pt/> which outputs the next
 set of contexts for the next instruction.
-<p align="center"><img src="https://rawgit.com/leegao/Yuck/svgs/svgs/9f28b88d4ee00fdb1e9b7344ca118bae.svg?invert_in_darkmode" align=middle width=432.9402pt height=40.70484pt/></p>
+<p align="center"><img src="https://rawgit.com/leegao/Yuck/svgs/svgs/058f9aad2299e36e32813eab59faaeb1.svg?invert_in_darkmode" align=middle width=452.2254pt height=104.485425pt/></p>
