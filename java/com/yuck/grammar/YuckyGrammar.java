@@ -261,7 +261,6 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return semi -> new VariableDeclaration(var, id, init, semi);
   }
 
-  @Start
   @Rule("statement -> $var.decl ;")
   public Statement statementVarDecl(Function<Token, Statement> vardecl, Token semi) {
     return vardecl.apply(semi);
@@ -323,8 +322,8 @@ public class YuckyGrammar extends GrammarBase<Token> {
     // Always shift to the `else { statements }` case if rest starts with {
     boolean brack = rest.get(0).text.equals("{");
     for (List<Atom> candidate : candidates) {
-      if (candidate.size() == 1 && brack) return candidate;
-      if (candidate.size() != 1 && !brack) return candidate;
+      if (candidate.size() != 1 && brack) return candidate;
+      if (candidate.size() == 1 && !brack) return candidate;
     }
     throw new IllegalStateException();
   }
@@ -376,6 +375,12 @@ public class YuckyGrammar extends GrammarBase<Token> {
       ifStatement.addElse(statements);
       return ifStatement;
     };
+  }
+
+  @Start
+  @Rule("root -> $statement*")
+  public List<Statement> statements(List<Statement> statements) {
+    return statements;
   }
 
   @For("Cat")
@@ -447,8 +452,8 @@ public class YuckyGrammar extends GrammarBase<Token> {
         tokens.add(token);
         token = lexer.yylex();
       }
-      Statement o = parse(tokens);
-      System.out.println(o);
+      List<Statement> statements = parse(tokens);
+      System.out.println(statements);
     }
   }
 
