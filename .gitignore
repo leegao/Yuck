@@ -4,3 +4,4 @@ lib/
 out/
 *.java~
 buck-out/
+.buckd/
