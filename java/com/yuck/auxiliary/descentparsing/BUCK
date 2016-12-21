@@ -1,0 +1,16 @@
+java_library(
+  name = 'descentparsing',
+  srcs = glob(['*.java']),
+  deps = [
+    ':annotations',
+    '//third-party:guava',
+    '//third-party:lang3',
+  ],
+  visibility = ['//...'],
+)
+
+java_library(
+  name = 'annotations',
+  srcs = glob(['annotations/*.java']),
+  visibility = ['//...'],
+)

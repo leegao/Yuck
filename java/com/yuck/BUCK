@@ -1,7 +1,11 @@
 java_library(
   name = 'yuck',
-  srcs = glob(['*.java']),
+  srcs = glob(['Yuckc.java']),
   deps = [
+    '//java/com/yuck/ast:ast',
+    '//java/com/yuck/auxiliary/descentparsing:descentparsing',
+    '//java/com/yuck/grammar:grammar',
+    '//java/com/yuck/ycode:ycode',
     '//third-party:guava',
     '//third-party:args4j',
     '//third-party:lang3',

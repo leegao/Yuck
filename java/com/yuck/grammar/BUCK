@@ -1,0 +1,20 @@
+java_library(
+  name = 'grammar',
+  srcs = [file for file in glob(['*.java']) if file != 'Token.java'],
+  deps = [
+    ':token',
+    '//java/com/yuck/auxiliary/descentparsing:descentparsing',
+    '//java/com/yuck/auxiliary/descentparsing:annotations',
+    '//java/com/yuck/ast:ast',
+    '//third-party:guava',
+    '//third-party:lang3',
+    '//third-party:jflex',
+  ],
+  visibility = ['//...'],
+)
+
+java_library(
+  name = 'token',
+  srcs = glob(['Token.java']),
+  visibility = ['//...'],
+)

@@ -1,0 +1,10 @@
+java_library(
+  name = 'ast',
+  srcs = glob(['*.java']),
+  deps = [
+    '//java/com/yuck/grammar:token',
+    '//third-party:guava',
+    '//third-party:lang3',
+  ],
+  visibility = ['//...'],
+)

@@ -1,0 +1,10 @@
+java_library(
+  name = 'ycode',
+  srcs = glob(['*.java']),
+  deps = [
+    '//third-party:guava',
+    '//third-party:lang3',
+    '//third-party:jflex',
+  ],
+  visibility = ['//...'],
+)
