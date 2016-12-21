@@ -1,0 +1,4 @@
+[java]
+  extra_arguments = -g
+  source_level = 8
+  target_level = 8
