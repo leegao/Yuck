@@ -16,6 +16,12 @@ prebuilt_jar(
   visibility = ['//...'],
 )
 
+prebuilt_jar(
+  name = 'gson',
+  binary_jar = 'gson-2.8.0.jar',
+  visibility = ['//...'],
+)
+
 java_binary(
   name = 'jflex-bin',
   main_class = 'jflex.Main',

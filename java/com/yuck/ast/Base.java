@@ -1,10 +1,12 @@
 package com.yuck.ast;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 
 public abstract class Base {
-  private int mStartLine, mStartColumn, mEndLine, mEndColumn;
+  @Expose
+  public final String type = getClass().getSimpleName();
+  private transient int mStartLine, mStartColumn, mEndLine, mEndColumn;
 
   protected Base(int startLine, int startColumn, int endLine, int endColumn) {
     this.mStartLine = startLine;
@@ -14,7 +16,7 @@ public abstract class Base {
   }
 
   public String toString() {
-    return ToStringBuilder.reflectionToString(this, ToStringStyle.NO_FIELD_NAMES_STYLE);
+    return new GsonBuilder().setPrettyPrinting().create().toJson(this);
   }
 
   public int getStartLine() {
