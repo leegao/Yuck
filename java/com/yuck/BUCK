@@ -2,11 +2,11 @@ java_library(
   name = 'yuck',
   srcs = glob(['*.java']),
   deps = [
-    '//lib:guava',
-    '//lib:args4j',
-    '//lib:lang3',
-    '//lib:hamcrest',
-    '//lib:jflex',
+    '//third-party:guava',
+    '//third-party:args4j',
+    '//third-party:lang3',
+    '//third-party:hamcrest',
+    '//third-party:jflex',
   ],
 )
 

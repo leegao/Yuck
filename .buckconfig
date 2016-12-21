@@ -4,5 +4,5 @@
   target_level = 8
 
 [alias]
-  yuck = //src/com/yuck:yuck
-  yuckc = //src/com/yuck:yuckc
+  yuck = //java/com/yuck:yuck
+  yuckc = //java/com/yuck:yuckc
