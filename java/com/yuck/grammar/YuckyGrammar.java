@@ -12,6 +12,7 @@ import com.yuck.auxiliary.descentparsing.annotations.Rule;
 import com.yuck.auxiliary.descentparsing.annotations.Start;
 import javafx.util.Pair;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -22,6 +23,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.yuck.auxiliary.descentparsing.Grammar.V;
+
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
 
 public class YuckyGrammar extends GrammarBase<Token> {
 
@@ -418,27 +423,37 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return super.handleConsumptionError(state, next, stream, currentSentence, expected);
   }
 
+  @Argument
+  private String file;
+
+  public void driver(String[] args) throws IOException {
+
+
+    CmdLineParser parser = new CmdLineParser(this);
+    try {
+      parser.parseArgument(args);
+    } catch (CmdLineException e) {
+      System.err.println(e.getMessage());
+      parser.printUsage(System.err);
+      System.err.println();
+      return;
+    }
+
+    try (FileReader reader = new FileReader(file)) {
+      YuckyLexer lexer = new YuckyLexer(reader);
+      List<Token> tokens = new ArrayList<>();
+      Token token = lexer.yylex();
+      while (token != null) {
+        tokens.add(token);
+        token = lexer.yylex();
+      }
+      Statement o = parse(tokens);
+      System.out.println(o);
+    }
+  }
+
   public static void main(String[] args) throws IOException {
     YuckyGrammar grammar = new YuckyGrammar();
-
-    String code1 = "{(1) : function(x){ foo(); bar(); var x = 3; }, \"1\" : new Baz().jar.poo()(132)} - -3 * 2**3**foo(5.baz, 3**3).lol()";
-    String code2 = "var x = function(){" +
-        "function foo() {print(\"Hello!\");}" +
-        "function() {while (true) {}};" +
-        "for i in 1 to 3 {}" +
-        "if true {} else if false {}" +
-        "x()[1];" +
-        "class Bar { var z; var d; }" +
-    "};";
-
-    YuckyLexer lexer = new YuckyLexer(new StringReader(code2));
-    List<Token> tokens = new ArrayList<>();
-    Token token = lexer.yylex();
-    while (token != null) {
-      tokens.add(token);
-      token = lexer.yylex();
-    }
-    Statement o = grammar.parse(tokens);
-    System.err.println(o);
+    grammar.driver(args);
   }
 }

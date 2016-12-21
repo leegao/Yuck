@@ -1,6 +1,6 @@
 prebuilt_jar(
   name = 'junit',
-  binary_jar = 'junit-4.1.1.jar',
+  binary_jar = 'junit-4.11.jar',
   visibility = ['//...'],
 )
 
@@ -13,6 +13,13 @@ prebuilt_jar(
 prebuilt_jar(
   name = 'guava',
   binary_jar = 'guava-20.0-rc1.jar',
+  visibility = ['//...'],
+)
+
+java_binary(
+  name = 'jflex-bin',
+  main_class = 'jflex.Main',
+  deps = [':jflex'],
   visibility = ['//...'],
 )
 

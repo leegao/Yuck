@@ -9,6 +9,7 @@ java_library(
     '//third-party:guava',
     '//third-party:lang3',
     '//third-party:jflex',
+    '//third-party:args4j',
   ],
   visibility = ['//...'],
 )
@@ -17,4 +18,12 @@ java_library(
   name = 'token',
   srcs = glob(['Token.java']),
   visibility = ['//...'],
+)
+
+java_binary(
+  name = 'yuck-parse',
+  main_class = 'com.yuck.grammar.YuckyGrammar',
+  deps = [
+    ':grammar',
+  ],
 )
