@@ -3,3 +3,4 @@
 lib/
 out/
 *.java~
+buck-out/
