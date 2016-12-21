@@ -2,3 +2,7 @@
   extra_arguments = -g
   source_level = 8
   target_level = 8
+
+[alias]
+  yuck = //src/com/yuck:yuck
+  yuckc = //src/com/yuck:yuckc

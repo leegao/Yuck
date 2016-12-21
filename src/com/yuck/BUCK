@@ -9,3 +9,11 @@ java_library(
     '//lib:jflex',
   ],
 )
+
+java_binary(
+  name = 'yuckc',
+  main_class = 'com.yuck.Yuckc',
+  deps = [
+    ':yuck',
+  ]
+)
