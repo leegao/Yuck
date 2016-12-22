@@ -2,6 +2,7 @@ package com.yuck.ast;
 
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
+import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunctionContext;
 
 public class AssignmentStatement extends Statement {
@@ -15,7 +16,7 @@ public class AssignmentStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext context) {
-    return expr.compile(context).emit(Opcode.STORE_LOCAL, id);
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+    return expr.compile(function, scope).emit(Opcode.STORE_LOCAL, id);
   }
 }

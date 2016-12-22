@@ -1,6 +1,7 @@
 package com.yuck.ast;
 
 import com.yuck.grammar.Token;
+import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunctionContext;
 
 public class GroupExpression extends Expression {
@@ -12,7 +13,7 @@ public class GroupExpression extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext context) {
-    return expression.compile(context);
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+    return expression.compile(function, scope);
   }
 }

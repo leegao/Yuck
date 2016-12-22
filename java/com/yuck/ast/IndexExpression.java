@@ -2,6 +2,7 @@ package com.yuck.ast;
 
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
+import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunctionContext;
 
 public class IndexExpression extends Expression {
@@ -15,9 +16,9 @@ public class IndexExpression extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext context) {
-    left.compile(context);
-    index.compile(context);
-    return context.emit(Opcode.TABLE_LOAD);
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+    left.compile(function, scope);
+    index.compile(function, scope);
+    return function.emit(Opcode.TABLE_LOAD);
   }
 }

@@ -3,12 +3,12 @@ package com.yuck;
 import com.yuck.ast.Statement;
 import com.yuck.grammar.YuckyGrammar;
 import com.yuck.ycode.Instruction;
+import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunctionContext;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,10 +36,11 @@ public class Yuckc {
     try (FileReader reader = new FileReader(yuckFile)) {
       YuckyGrammar grammar = new YuckyGrammar();
       List<Statement> statements = grammar.parseYuckCode(reader);
-      YCodeFunctionContext context = new YCodeFunctionContext(new ArrayList<>());
-      statements.forEach(statement -> statement.compile(context));
+      YCodeFunctionContext functionContext = new YCodeFunctionContext(new ArrayList<>());
+      YCodeCompilationContext scope = new YCodeCompilationContext();
+      statements.forEach(statement -> statement.compile(functionContext, scope));
       int i = 0;
-      for (Instruction instruction : context.assemble()) {
+      for (Instruction instruction : functionContext.assemble()) {
         System.out.printf("%d:\t%s\n", i++, instruction);
       }
     }

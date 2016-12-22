@@ -3,6 +3,7 @@ package com.yuck.ast;
 import com.google.common.collect.ImmutableList;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
+import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunctionContext;
 import javafx.util.Pair;
 
@@ -17,8 +18,8 @@ public class MapLiteral extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext context) {
-    terms.forEach(pair -> {pair.getKey().compile(context); pair.getValue().compile(context);});
-    return context.emit(Opcode.TABLE, terms.size());
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+    terms.forEach(pair -> {pair.getKey().compile(function, scope); pair.getValue().compile(function, scope);});
+    return function.emit(Opcode.TABLE, terms.size());
   }
 }

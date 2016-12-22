@@ -1,6 +1,7 @@
 package com.yuck.ast;
 
 import com.yuck.grammar.Token;
+import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunctionContext;
 
 public class EmptyStatement extends Statement {
@@ -9,7 +10,7 @@ public class EmptyStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext context) {
-    return context;
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+    return function;
   }
 }

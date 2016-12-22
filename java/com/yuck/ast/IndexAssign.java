@@ -2,6 +2,7 @@ package com.yuck.ast;
 
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
+import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunctionContext;
 
 public class IndexAssign extends Statement {
@@ -17,10 +18,10 @@ public class IndexAssign extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext context) {
-    left.compile(context);
-    index.compile(context);
-    assignee.compile(context);
-    return context.emit(Opcode.TABLE_STORE);
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+    left.compile(function, scope);
+    index.compile(function, scope);
+    assignee.compile(function, scope);
+    return function.emit(Opcode.TABLE_STORE);
   }
 }

@@ -3,6 +3,7 @@ package com.yuck.ast;
 import com.google.common.collect.ImmutableList;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
+import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunctionContext;
 
 import java.util.List;
@@ -18,13 +19,13 @@ public class WhileStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext context) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
     // while (condition) { ... } => start; condition; jumpz fallthrough; ...; goto start; fallthrough
-    String headLabel = context.flx("head");
-    String fallthroughLabel = context.flx("fallthrough");
-    context.emit(Opcode.NOP, headLabel);
-    condition.compile(context).emit(Opcode.JUMPZ, fallthroughLabel);
-    statements.forEach(statement -> statement.compile(context));
-    return context.emit(Opcode.GOTO, headLabel).emit(Opcode.NOP, fallthroughLabel);
+    String headLabel = function.flx("head");
+    String fallthroughLabel = function.flx("fallthrough");
+    function.emit(Opcode.NOP, headLabel);
+    condition.compile(function, scope).emit(Opcode.JUMPZ, fallthroughLabel);
+    statements.forEach(statement -> statement.compile(function, scope));
+    return function.emit(Opcode.GOTO, headLabel).emit(Opcode.NOP, fallthroughLabel);
   }
 }

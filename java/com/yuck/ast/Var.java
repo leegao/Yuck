@@ -2,6 +2,7 @@ package com.yuck.ast;
 
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
+import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunctionContext;
 
 public class Var extends Expression {
@@ -15,7 +16,7 @@ public class Var extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext context) {
-    return context.emit(Opcode.LOAD_LOCAL, id);
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+    return function.emit(Opcode.LOAD_LOCAL, id);
   }
 }

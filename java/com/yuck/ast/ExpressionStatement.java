@@ -2,6 +2,7 @@ package com.yuck.ast;
 
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
+import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunctionContext;
 
 public class ExpressionStatement extends Statement {
@@ -13,8 +14,8 @@ public class ExpressionStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext context) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
     // Each expression pushes one item onto the stack
-    return expr.compile(context).emit(Opcode.POP);
+    return expr.compile(function, scope).emit(Opcode.POP);
   }
 }

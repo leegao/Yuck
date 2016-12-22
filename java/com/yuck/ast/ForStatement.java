@@ -3,8 +3,8 @@ package com.yuck.ast;
 import com.google.common.collect.ImmutableList;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
+import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunctionContext;
-import jdk.nashorn.internal.runtime.regexp.joni.constants.OPCode;
 
 import java.util.List;
 
@@ -21,29 +21,29 @@ public class ForStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext context) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
     // for i in list {...} -> var it = list.iterator(); while (it.has_next()) { var i = it.next(); ... }
-    String iter = context.fvs("iter");
-    String label = context.flx("iter");
-    String fallthrough = context.flx("iter");
+    String iter = function.fvs("iter");
+    String label = function.flx("iter");
+    String fallthrough = function.flx("iter");
 
-    expr.compile(context); // TOS is list
-    context.emit(Opcode.STORE_LOCAL, iter);
+    expr.compile(function, scope); // TOS is list
+    function.emit(Opcode.STORE_LOCAL, iter);
     // While loop
-    context.emit(Opcode.NOP, label);
-    context.emit(Opcode.LOAD_LOCAL, iter);
-    context.emit(Opcode.GET_FIELD, "has_next");
-    context.emit(Opcode.CALL, 1);
-    context.emit(Opcode.JUMPZ, fallthrough);
+    function.emit(Opcode.NOP, label);
+    function.emit(Opcode.LOAD_LOCAL, iter);
+    function.emit(Opcode.GET_FIELD, "has_next");
+    function.emit(Opcode.CALL, 1);
+    function.emit(Opcode.JUMPZ, fallthrough);
     // var i = it.next();
-    context.emit(Opcode.LOAD_LOCAL, iter);
-    context.emit(Opcode.GET_FIELD, "next");
-    context.emit(Opcode.CALL, 1);
-    context.emit(Opcode.STORE_LOCAL, id);
-    statements.forEach(statement -> statement.compile(context));
-    context.emit(Opcode.GOTO, label);
-    context.emit(Opcode.NOP, fallthrough);
+    function.emit(Opcode.LOAD_LOCAL, iter);
+    function.emit(Opcode.GET_FIELD, "next");
+    function.emit(Opcode.CALL, 1);
+    function.emit(Opcode.STORE_LOCAL, id);
+    statements.forEach(statement -> statement.compile(function, scope));
+    function.emit(Opcode.GOTO, label);
+    function.emit(Opcode.NOP, fallthrough);
 
-    return context;
+    return function;
   }
 }

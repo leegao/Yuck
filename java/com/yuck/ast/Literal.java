@@ -2,6 +2,7 @@ package com.yuck.ast;
 
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
+import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunctionContext;
 
 public class Literal extends Expression {
@@ -14,19 +15,19 @@ public class Literal extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext context) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
     switch (kind) {
       case "nil":
-        return context.emit(Opcode.NIL);
+        return function.emit(Opcode.NIL);
       case "true":
-        return context.emit(Opcode.LOAD_CONST, true);
+        return function.emit(Opcode.LOAD_CONST, true);
       case "false":
-        return context.emit(Opcode.LOAD_CONST, false);
+        return function.emit(Opcode.LOAD_CONST, false);
       case "num":
         try {
-          return context.emit(Opcode.LOAD_CONST, Integer.valueOf(data));
+          return function.emit(Opcode.LOAD_CONST, Integer.valueOf(data));
         } catch (NumberFormatException e) {
-          return context.emit(Opcode.LOAD_CONST, Float.valueOf(data));
+          return function.emit(Opcode.LOAD_CONST, Float.valueOf(data));
         }
     }
     throw new IllegalStateException();

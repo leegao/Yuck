@@ -2,6 +2,7 @@ package com.yuck.ast;
 
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
+import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunctionContext;
 
 public class UnaryOperator extends Expression {
@@ -14,12 +15,12 @@ public class UnaryOperator extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext context) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
     switch (operator) {
       case "-":
-        return expression.compile(context).emit(Opcode.NEG);
+        return expression.compile(function, scope).emit(Opcode.NEG);
       case "not":
-        return expression.compile(context).emit(Opcode.NOT);
+        return expression.compile(function, scope).emit(Opcode.NOT);
     }
     throw new IllegalStateException();
   }

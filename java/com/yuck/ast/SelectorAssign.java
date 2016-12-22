@@ -2,6 +2,7 @@ package com.yuck.ast;
 
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
+import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunctionContext;
 
 public class SelectorAssign extends Statement {
@@ -17,9 +18,9 @@ public class SelectorAssign extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext context) {
-    left.compile(context);
-    assignee.compile(context);
-    return context.emit(Opcode.PUT_FIELD, select);
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+    left.compile(function, scope);
+    assignee.compile(function, scope);
+    return function.emit(Opcode.PUT_FIELD, select);
   }
 }

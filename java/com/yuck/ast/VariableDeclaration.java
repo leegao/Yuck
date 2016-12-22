@@ -2,6 +2,7 @@ package com.yuck.ast;
 
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
+import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunctionContext;
 
 import java.util.Optional;
@@ -17,12 +18,12 @@ public class VariableDeclaration extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext context) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
     if (init.isPresent()) {
-      init.get().compile(context);
+      init.get().compile(function, scope);
     } else {
-      context.emit(Opcode.NIL);
+      function.emit(Opcode.NIL);
     }
-    return context.emit(Opcode.STORE_LOCAL, id);
+    return function.emit(Opcode.STORE_LOCAL, id);
   }
 }
