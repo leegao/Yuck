@@ -22,6 +22,7 @@ public class BinaryOperator extends Expression {
     switch (operator) {
       case "add": opcode = Opcode.ADD; break;
       case "*": opcode = Opcode.MUL; break;
+      // TODO: add the other operators
       default:
         throw new NotImplementedException();
     }
