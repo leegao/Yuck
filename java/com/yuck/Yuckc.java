@@ -2,6 +2,7 @@ package com.yuck;
 
 import com.yuck.ast.Statement;
 import com.yuck.grammar.YuckyGrammar;
+import com.yuck.ycode.Instruction;
 import com.yuck.ycode.YCodeFunctionContext;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -37,8 +38,9 @@ public class Yuckc {
       List<Statement> statements = grammar.parseYuckCode(reader);
       System.out.println(statements);
       YCodeFunctionContext context = new YCodeFunctionContext(new ArrayList<>());
-      for (Statement statement : statements) {
-        statement.compile(context);
+      statements.forEach(statement -> statement.compile(context));
+      for (Instruction instruction : context.assemble()) {
+        System.out.println(instruction);
       }
     }
   }

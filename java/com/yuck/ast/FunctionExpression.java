@@ -24,7 +24,7 @@ public class FunctionExpression extends Expression {
   public YCodeFunctionContext compile(YCodeFunctionContext context) {
     YCodeFunctionContext func = new YCodeFunctionContext(parameters);
     statements.forEach(statement -> statement.compile(func));
-    func.assemble();
+    func.emit(Opcode.NIL).emit(Opcode.RETURN).assemble();
     return context.emit(Opcode.CLOSURE, func);
   }
 }

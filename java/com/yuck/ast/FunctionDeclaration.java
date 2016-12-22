@@ -25,7 +25,7 @@ public class FunctionDeclaration extends Statement {
   public YCodeFunctionContext compile(YCodeFunctionContext context) {
     YCodeFunctionContext func = new YCodeFunctionContext(parameters);
     statements.forEach(statement -> statement.compile(func));
-    func.assemble();
+    func.emit(Opcode.NIL).emit(Opcode.RETURN).assemble();
     return context.emit(Opcode.CLOSURE, func).emit(Opcode.STORE_LOCAL, id);
   }
 }

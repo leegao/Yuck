@@ -55,7 +55,7 @@ public class YCodeFunctionContext {
     if (labels.containsKey(label)) {
       return labels.get(label);
     }
-    int n = labels.size();
+    int n = labels.size() + 1;
     locals.put(label, n);
     return n;
   }

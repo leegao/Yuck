@@ -124,4 +124,56 @@ public class Instruction {
     int argument = buffer.getInt();
     return new Instruction(Opcode.values()[op], argument, context);
   }
+
+  public String toString() {
+    switch (opcode) {
+      case NIL:
+      case DUP:
+      case POP:
+      case ROT2:
+      case TABLE_LOAD:
+      case TABLE_STORE:
+      case RETURN:
+      case LT:
+      case LE:
+      case EQ:
+      case TO_RANGE:
+      case ADD:
+      case MUL:
+      case SUB:
+      case DIV:
+      case MOD:
+      case NOT:
+      case NEG:
+      case AND:
+      case OR:
+      case POW:
+        return opcode.toString();
+      case LOAD_CONST:
+        return String.format("%s(%s)", opcode.toString(), context.constants.inverse().get(argument));
+      case LOAD_LOCAL:
+      case STORE_LOCAL:
+        return String.format("%s(%s)", opcode.toString(), context.locals.inverse().get(argument));
+      case LOAD_UP:
+      case STORE_UP:
+        return String.format("%s(%s)", opcode.toString(), context.upvalues.inverse().get(argument));
+      case NEW:
+      case GET_FIELD:
+      case PUT_FIELD:
+        return String.format("%s(%s)", opcode.toString(), context.constants.inverse().get(argument));
+      case JUMPZ:
+      case GOTO:
+        return String.format("%s(%s)", opcode.toString(), argument);
+      case NOP:
+        return opcode.toString();
+      case CLOSURE:
+        return String.format("%s(%s)", opcode, argument);
+      case TABLE:
+      case CALL:
+      case LIST:
+        return String.format("%s(%s)", opcode, argument);
+      default:
+        throw new IllegalStateException();
+    }
+  }
 }

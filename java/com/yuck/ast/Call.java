@@ -21,6 +21,6 @@ public class Call extends Expression {
   public YCodeFunctionContext compile(YCodeFunctionContext context) {
     left.compile(context);
     arguments.forEach(expr -> expr.compile(context));
-    return context.emit(Opcode.CALL, arguments.size());
+    return context.emit(Opcode.CALL, arguments.size() + 1);
   }
 }
