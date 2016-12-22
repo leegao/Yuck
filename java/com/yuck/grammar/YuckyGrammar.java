@@ -28,6 +28,7 @@ import static com.yuck.auxiliary.descentparsing.Grammar.V;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class YuckyGrammar extends GrammarBase<Token> {
 
@@ -252,9 +253,23 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return new Literal(nil);
   }
 
-  @Rule("statement -> $E ;")
-  public Statement statement(Expression expr, Token semi) {
+  @Rule("statement -> $E (= $E : Assignment)?;")
+  public Statement statement(Expression expr, Optional<Expression> assignment, Token semi) {
+    if (assignment.isPresent()) {
+      // check the type of expr to disambiguate
+      Expression assignee = assignment.get();
+      if (expr instanceof Var) {
+        return new AssignmentStatement(((Var) expr).token, assignee, semi);
+      } else {
+        throw new NotImplementedException();
+      }
+    }
     return new ExpressionStatement(expr, semi);
+  }
+
+  @For("Assignment")
+  public Expression assignment(Token eq, Expression assignment) {
+    return assignment;
   }
 
   @Rule("var.decl -> var id (= $E : Second)?")
@@ -265,22 +280,6 @@ public class YuckyGrammar extends GrammarBase<Token> {
   @Rule("statement -> $var.decl ;")
   public Statement statementVarDecl(Function<Token, Statement> vardecl, Token semi) {
     return vardecl.apply(semi);
-  }
-
-  @Rule("statement -> id = $E ;")
-  public Statement statement(Token id, Token eq, Expression expr, Token semi) {
-    return new AssignmentStatement(id, expr, semi);
-  }
-
-  @Resolve(variable = "statement", term = "id")
-  public List<Atom> resolveId(
-      List<Token> rest,
-      @For("id = $E ;") List<Atom> assignment,
-      @For("$E ;") List<Atom> exprStatement) {
-    if (rest.size() > 1 && rest.get(1).type.equals("=")) {
-      return assignment;
-    }
-    return exprStatement;
   }
 
   @Rule("func.decl -> function id %( $parameters %) { ($statement : First)* }")

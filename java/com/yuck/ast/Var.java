@@ -6,10 +6,12 @@ import com.yuck.ycode.YCodeFunctionContext;
 
 public class Var extends Expression {
   public final String id;
+  public Token token;
 
   public Var(Token id) {
     super(id.startLine, id.startColumn, id.endLine, id.endColumn);
     this.id = id.text;
+    this.token = id;
   }
 
   @Override
