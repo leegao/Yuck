@@ -27,22 +27,24 @@ public class ForStatement extends Statement {
     String label = function.flx("iter");
     String fallthrough = function.flx("iter");
 
-    expr.compile(function, compilationContext); // TOS is list
-    function.emit(Opcode.STORE_LOCAL, iter);
-    // While loop
-    function.emit(Opcode.NOP, label);
-    function.emit(Opcode.LOAD_LOCAL, iter);
-    function.emit(Opcode.GET_FIELD, "has_next");
-    function.emit(Opcode.CALL, 1);
-    function.emit(Opcode.JUMPZ, fallthrough);
-    // var i = it.next();
-    function.emit(Opcode.LOAD_LOCAL, iter);
-    function.emit(Opcode.GET_FIELD, "next");
-    function.emit(Opcode.CALL, 1);
-    function.emit(Opcode.STORE_LOCAL, id);
-    statements.forEach(statement -> statement.compile(function, compilationContext));
-    function.emit(Opcode.GOTO, label);
-    function.emit(Opcode.NOP, fallthrough);
+    try (YCodeCompilationContext.Scope scope = compilationContext.push()) {
+      expr.compile(function, compilationContext); // TOS is list
+      function.emit(Opcode.STORE_LOCAL, iter);
+      // While loop
+      function.emit(Opcode.NOP, label);
+      function.emit(Opcode.LOAD_LOCAL, iter);
+      function.emit(Opcode.GET_FIELD, "has_next");
+      function.emit(Opcode.CALL, 1);
+      function.emit(Opcode.JUMPZ, fallthrough);
+      // var i = it.next();
+      function.emit(Opcode.LOAD_LOCAL, iter);
+      function.emit(Opcode.GET_FIELD, "next");
+      function.emit(Opcode.CALL, 1);
+      function.emit(Opcode.STORE_LOCAL, id);
+      statements.forEach(statement -> statement.compile(function, compilationContext));
+      function.emit(Opcode.GOTO, label);
+      function.emit(Opcode.NOP, fallthrough);
+    }
 
     return function;
   }

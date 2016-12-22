@@ -25,7 +25,9 @@ public class WhileStatement extends Statement {
     String fallthroughLabel = function.flx("fallthrough");
     function.emit(Opcode.NOP, headLabel);
     condition.compile(function, compilationContext).emit(Opcode.JUMPZ, fallthroughLabel);
-    statements.forEach(statement -> statement.compile(function, compilationContext));
+    try (YCodeCompilationContext.Scope scope = compilationContext.push()) {
+      statements.forEach(statement -> statement.compile(function, compilationContext));
+    }
     return function.emit(Opcode.GOTO, headLabel).emit(Opcode.NOP, fallthroughLabel);
   }
 }
