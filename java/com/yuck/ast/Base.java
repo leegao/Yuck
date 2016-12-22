@@ -3,8 +3,7 @@ package com.yuck.ast;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import com.yuck.ycode.YCodeFunction;
 
 public abstract class Base {
   @Expose
@@ -54,7 +53,7 @@ public abstract class Base {
     this.mEndColumn = mEndColumn;
   }
 
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
     throw new RuntimeException(String.format("%s.compile() is not implemented.", getClass().getSimpleName()));
   }
 }

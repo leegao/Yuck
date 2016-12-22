@@ -3,7 +3,7 @@ package com.yuck.ast;
 import com.google.common.collect.ImmutableList;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public class ClassStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
     throw new NotImplementedException();
   }
 }

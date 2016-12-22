@@ -3,7 +3,7 @@ package com.yuck.ast;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 
 public class UnaryOperator extends Expression {
   public final String operator;
@@ -15,12 +15,12 @@ public class UnaryOperator extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
     switch (operator) {
       case "-":
-        return expression.compile(function, compilationContext).emit(Opcode.NEG);
+        return expression.compile(function, context).emit(Opcode.NEG);
       case "not":
-        return expression.compile(function, compilationContext).emit(Opcode.NOT);
+        return expression.compile(function, context).emit(Opcode.NOT);
     }
     throw new IllegalStateException();
   }

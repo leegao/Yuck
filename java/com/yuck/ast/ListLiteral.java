@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 
 import java.util.List;
 
@@ -17,8 +17,8 @@ public class ListLiteral extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
-    list.forEach(expression -> expression.compile(function, compilationContext));
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
+    list.forEach(expression -> expression.compile(function, context));
     return function.emit(Opcode.LIST, list.size());
   }
 }

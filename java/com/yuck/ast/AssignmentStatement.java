@@ -3,7 +3,7 @@ package com.yuck.ast;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 
 public class AssignmentStatement extends Statement {
   public final String id;
@@ -16,7 +16,7 @@ public class AssignmentStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
-    return expr.compile(function, compilationContext).emit(Opcode.STORE_LOCAL, id);
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
+    return expr.compile(function, context).emit(Opcode.STORE_LOCAL, id);
   }
 }

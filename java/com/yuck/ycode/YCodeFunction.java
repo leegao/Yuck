@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class YCodeFunctionContext {
+public class YCodeFunction {
   public final BiMap<String, Integer> locals = HashBiMap.create();
   public final BiMap<String, Integer> upvalues = HashBiMap.create();
   public final BiMap<Object, Integer> constants = HashBiMap.create();
@@ -16,9 +16,9 @@ public class YCodeFunctionContext {
   public final List<Instruction> instructions = new ArrayList<>();
   public final List<Integer> labelPositions = new ArrayList<>();
   public final BiMap<Instruction, Integer> instructionPositions = HashBiMap.create();
-  public final BiMap<YCodeFunctionContext, Integer> functions = HashBiMap.create();
+  public final BiMap<YCodeFunction, Integer> functions = HashBiMap.create();
 
-  public YCodeFunctionContext(List<String> arguments) {
+  public YCodeFunction(List<String> arguments) {
     for (String argument : arguments) {
       local(argument);
     }
@@ -60,7 +60,7 @@ public class YCodeFunctionContext {
     return n;
   }
 
-  public YCodeFunctionContext emit(Opcode opcode, Object data) {
+  public YCodeFunction emit(Opcode opcode, Object data) {
     Instruction instruction = Instruction.make(this, opcode, data);
     int position = instructions.size();
     instructions.add(instruction);
@@ -71,7 +71,7 @@ public class YCodeFunctionContext {
     return this;
   }
 
-  public YCodeFunctionContext emit(Opcode opcode) {
+  public YCodeFunction emit(Opcode opcode) {
     return emit(opcode, 0);
   }
 
@@ -87,7 +87,7 @@ public class YCodeFunctionContext {
     return instructions;
   }
 
-  public int function(YCodeFunctionContext function) {
+  public int function(YCodeFunction function) {
     Preconditions.checkArgument(!functions.containsKey(function));
     int n = functions.size();
     functions.put(function, n);
@@ -133,7 +133,7 @@ public class YCodeFunctionContext {
     buffer.putInt(functions.size());
     for (int i = 0; i < functions.size(); i++) {
       Preconditions.checkArgument(functions.inverse().containsKey(i));
-      YCodeFunctionContext function = functions.inverse().get(i);
+      YCodeFunction function = functions.inverse().get(i);
       function.write(buffer);
     }
     // Classes
@@ -141,13 +141,13 @@ public class YCodeFunctionContext {
     return buffer;
   }
 
-  public static YCodeFunctionContext read(ByteBuffer buffer) {
+  public static YCodeFunction read(ByteBuffer buffer) {
     Preconditions.checkArgument(buffer.getChar() == 'y');
     Preconditions.checkArgument(buffer.getChar() == 'c');
     Preconditions.checkArgument(buffer.getChar() == 'o');
     Preconditions.checkArgument(buffer.getChar() == 'd');
     Preconditions.checkArgument(buffer.getChar() == 'e');
-    YCodeFunctionContext context = new YCodeFunctionContext(new ArrayList<>());
+    YCodeFunction context = new YCodeFunction(new ArrayList<>());
     // Locals
     int numLocals = buffer.getInt();
     for (int i = 0; i < numLocals; i++) {
@@ -171,7 +171,7 @@ public class YCodeFunctionContext {
     // Functions
     int numFunctions = buffer.getInt();
     for (int i = 0; i < numFunctions; i++) {
-      context.functions.put(YCodeFunctionContext.read(buffer), i);
+      context.functions.put(YCodeFunction.read(buffer), i);
     }
     // Classes
     Preconditions.checkArgument(buffer.getInt() == 0);

@@ -3,7 +3,7 @@ package com.yuck.ast;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 
 public class Selector extends Expression {
   public final Expression left;
@@ -16,8 +16,8 @@ public class Selector extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
-    left.compile(function, compilationContext);
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
+    left.compile(function, context);
     return function.emit(Opcode.GET_FIELD, select);
   }
 }

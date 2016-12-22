@@ -7,15 +7,15 @@ import java.nio.ByteBuffer;
 public class Instruction {
   public final Opcode opcode;
   private int argument;
-  public final YCodeFunctionContext context;
+  public final YCodeFunction context;
 
-  private Instruction(Opcode opcode, int argument, YCodeFunctionContext context) {
+  private Instruction(Opcode opcode, int argument, YCodeFunction context) {
     this.opcode = opcode;
     this.argument = argument;
     this.context = context;
   }
 
-  public static <T> Instruction make(YCodeFunctionContext context, Opcode opcode, T data) {
+  public static <T> Instruction make(YCodeFunction context, Opcode opcode, T data) {
     int mult = 1;
     switch (opcode) {
       case NIL:
@@ -68,8 +68,8 @@ public class Instruction {
           return new Instruction(opcode, 0, context);
         }
       case CLOSURE:
-        Preconditions.checkArgument(data instanceof YCodeFunctionContext);
-        int f = context.function((YCodeFunctionContext) data);
+        Preconditions.checkArgument(data instanceof YCodeFunction);
+        int f = context.function((YCodeFunction) data);
         return new Instruction(opcode, f, context);
       case TABLE:
         mult = 2;
@@ -83,11 +83,11 @@ public class Instruction {
     }
   }
 
-  public static Instruction make(YCodeFunctionContext context, Opcode opcode) {
+  public static Instruction make(YCodeFunction context, Opcode opcode) {
     return make(context, opcode, 0);
   }
 
-  public static Opcode variable(YCodeFunctionContext context, String string) {
+  public static Opcode variable(YCodeFunction context, String string) {
     return context.locals.containsKey(string) ?
         Opcode.LOAD_LOCAL :
         Opcode.LOAD_UP;
@@ -121,7 +121,7 @@ public class Instruction {
     return buffer;
   }
 
-  public static Instruction read(YCodeFunctionContext context, ByteBuffer buffer) {
+  public static Instruction read(YCodeFunction context, ByteBuffer buffer) {
     int op = buffer.get();
     int argument = buffer.getInt();
     return new Instruction(Opcode.values()[op], argument, context);

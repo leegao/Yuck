@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 
 import java.util.List;
 
@@ -19,9 +19,9 @@ public class Call extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
-    left.compile(function, compilationContext);
-    arguments.forEach(expr -> expr.compile(function, compilationContext));
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
+    left.compile(function, context);
+    arguments.forEach(expr -> expr.compile(function, context));
     return function.emit(Opcode.CALL, arguments.size() + 1);
   }
 }

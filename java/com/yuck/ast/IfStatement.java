@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,19 +31,19 @@ public class IfStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
     String labelElse = function.flx("else");
     String labelFallthrough = function.flx("fallthrough");
-    condition.compile(function, compilationContext).emit(Opcode.JUMPZ, labelElse);
-    try (YCodeCompilationContext.Scope scope = compilationContext.push()) {
-      statements.forEach(statement -> statement.compile(function, compilationContext));
+    condition.compile(function, context).emit(Opcode.JUMPZ, labelElse);
+    try (YCodeCompilationContext.Scope scope = context.push()) {
+      statements.forEach(statement -> statement.compile(function, context));
     }
     if (elseStatements.isPresent())
       function.emit(Opcode.GOTO, labelFallthrough);
     function.emit(Opcode.NOP, labelElse);
     if (elseStatements.isPresent()) {
-      try (YCodeCompilationContext.Scope scope = compilationContext.push()) {
-        elseStatements.get().forEach(elseStatement -> elseStatement.compile(function, compilationContext));
+      try (YCodeCompilationContext.Scope scope = context.push()) {
+        elseStatements.get().forEach(elseStatement -> elseStatement.compile(function, context));
       }
       function.emit(Opcode.NOP, labelFallthrough);
     }

@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 
 import java.util.List;
 
@@ -19,14 +19,14 @@ public class WhileStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
     // while (condition) { ... } => start; condition; jumpz fallthrough; ...; goto start; fallthrough
     String headLabel = function.flx("head");
     String fallthroughLabel = function.flx("fallthrough");
     function.emit(Opcode.NOP, headLabel);
-    condition.compile(function, compilationContext).emit(Opcode.JUMPZ, fallthroughLabel);
-    try (YCodeCompilationContext.Scope scope = compilationContext.push()) {
-      statements.forEach(statement -> statement.compile(function, compilationContext));
+    condition.compile(function, context).emit(Opcode.JUMPZ, fallthroughLabel);
+    try (YCodeCompilationContext.Scope scope = context.push()) {
+      statements.forEach(statement -> statement.compile(function, context));
     }
     return function.emit(Opcode.GOTO, headLabel).emit(Opcode.NOP, fallthroughLabel);
   }

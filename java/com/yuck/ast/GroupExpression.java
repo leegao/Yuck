@@ -2,7 +2,7 @@ package com.yuck.ast;
 
 import com.yuck.grammar.Token;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 
 public class GroupExpression extends Expression {
   public final Expression expression;
@@ -13,7 +13,7 @@ public class GroupExpression extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
-    return expression.compile(function, compilationContext);
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
+    return expression.compile(function, context);
   }
 }

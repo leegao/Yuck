@@ -3,7 +3,7 @@ package com.yuck.ast;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 
 public class ExpressionStatement extends Statement {
   public final Expression expr;
@@ -14,8 +14,8 @@ public class ExpressionStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
     // Each expression pushes one item onto the stack
-    return expr.compile(function, compilationContext).emit(Opcode.POP);
+    return expr.compile(function, context).emit(Opcode.POP);
   }
 }

@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 
 import java.util.List;
 
@@ -21,14 +21,14 @@ public class ForStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
     // for i in list {...} -> var it = list.iterator(); while (it.has_next()) { var i = it.next(); ... }
     String iter = function.fvs("iter");
     String label = function.flx("iter");
     String fallthrough = function.flx("iter");
 
-    try (YCodeCompilationContext.Scope scope = compilationContext.push()) {
-      expr.compile(function, compilationContext); // TOS is list
+    try (YCodeCompilationContext.Scope scope = context.push()) {
+      expr.compile(function, context); // TOS is list
       function.emit(Opcode.STORE_LOCAL, iter);
       // While loop
       function.emit(Opcode.NOP, label);
@@ -41,7 +41,7 @@ public class ForStatement extends Statement {
       function.emit(Opcode.GET_FIELD, "next");
       function.emit(Opcode.CALL, 1);
       function.emit(Opcode.STORE_LOCAL, id);
-      statements.forEach(statement -> statement.compile(function, compilationContext));
+      statements.forEach(statement -> statement.compile(function, context));
       function.emit(Opcode.GOTO, label);
       function.emit(Opcode.NOP, fallthrough);
     }

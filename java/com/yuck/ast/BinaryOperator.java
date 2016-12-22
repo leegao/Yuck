@@ -2,7 +2,7 @@ package com.yuck.ast;
 
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class BinaryOperator extends Expression {
@@ -18,7 +18,7 @@ public class BinaryOperator extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
     Opcode opcode;
     boolean not = false;
     switch (operator) {
@@ -40,8 +40,8 @@ public class BinaryOperator extends Expression {
       default:
         throw new NotImplementedException();
     }
-    left.compile(function, compilationContext);
-    right.compile(function, compilationContext);
+    left.compile(function, context);
+    right.compile(function, context);
     function.emit(opcode);
     if (not) function.emit(Opcode.NOT);
     return function;

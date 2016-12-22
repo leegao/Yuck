@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 
 import java.util.List;
 
@@ -20,11 +20,11 @@ public class NewExpression extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
     function.emit(Opcode.NEW, Joiner.on('.').join(name.names))
         .emit(Opcode.DUP)
         .emit(Opcode.GET_FIELD, "init");
-    arguments.forEach(expression -> expression.compile(function, compilationContext));
+    arguments.forEach(expression -> expression.compile(function, context));
     return function.emit(Opcode.CALL, arguments.size() + 1).emit(Opcode.POP);
   }
 }

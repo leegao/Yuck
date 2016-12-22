@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,8 +22,8 @@ public class FunctionExpression extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
-    YCodeFunctionContext func = new YCodeFunctionContext(parameters);
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
+    YCodeFunction func = new YCodeFunction(parameters);
     YCodeCompilationContext newCompilationContext = new YCodeCompilationContext();
     try (YCodeCompilationContext.Scope scope = newCompilationContext.push()) {
       statements.forEach(statement -> statement.compile(func, newCompilationContext));

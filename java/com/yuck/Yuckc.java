@@ -4,7 +4,7 @@ import com.yuck.ast.Statement;
 import com.yuck.grammar.YuckyGrammar;
 import com.yuck.ycode.Instruction;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -36,7 +36,7 @@ public class Yuckc {
     try (FileReader reader = new FileReader(yuckFile)) {
       YuckyGrammar grammar = new YuckyGrammar();
       List<Statement> statements = grammar.parseYuckCode(reader);
-      YCodeFunctionContext functionContext = new YCodeFunctionContext(new ArrayList<>());
+      YCodeFunction functionContext = new YCodeFunction(new ArrayList<>());
       YCodeCompilationContext compilationContext = new YCodeCompilationContext();
       try (YCodeCompilationContext.Scope scope = compilationContext.push()) {
         statements.forEach(statement -> statement.compile(functionContext, compilationContext));

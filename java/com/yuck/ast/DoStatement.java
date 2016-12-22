@@ -3,7 +3,7 @@ package com.yuck.ast;
 import com.google.common.collect.ImmutableList;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.YCodeCompilationContext;
-import com.yuck.ycode.YCodeFunctionContext;
+import com.yuck.ycode.YCodeFunction;
 
 import java.util.List;
 
@@ -16,9 +16,9 @@ public class DoStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
-    try (YCodeCompilationContext.Scope scope = compilationContext.push()) {
-      statements.forEach(statement -> statement.compile(function, compilationContext));
+  public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
+    try (YCodeCompilationContext.Scope scope = context.push()) {
+      statements.forEach(statement -> statement.compile(function, context));
     }
     return function;
   }
