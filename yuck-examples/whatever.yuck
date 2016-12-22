@@ -7,3 +7,5 @@ if yahoo == 3 {
 } else {
   var x = 1 to z;
 }
+return x;
+// foo.y = 3;
