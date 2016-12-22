@@ -1,6 +1,8 @@
 package com.yuck.ast;
 
 import com.yuck.grammar.Token;
+import com.yuck.ycode.Opcode;
+import com.yuck.ycode.YCodeFunctionContext;
 
 public class UnaryOperator extends Expression {
   public final String operator;
@@ -9,5 +11,16 @@ public class UnaryOperator extends Expression {
     super(operator.startLine, operator.startColumn, expression.getEndLine(), expression.getEndColumn());
     this.operator = operator.text;
     this.expression = expression;
+  }
+
+  @Override
+  public YCodeFunctionContext compile(YCodeFunctionContext context) {
+    switch (operator) {
+      case "-":
+        return expression.compile(context).emit(Opcode.NEG);
+      case "not":
+        return expression.compile(context).emit(Opcode.NOT);
+    }
+    throw new IllegalStateException();
   }
 }
