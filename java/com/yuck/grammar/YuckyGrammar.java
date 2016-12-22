@@ -14,6 +14,7 @@ import javafx.util.Pair;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -445,20 +446,28 @@ public class YuckyGrammar extends GrammarBase<Token> {
     }
 
     try (FileReader reader = new FileReader(file)) {
-      YuckyLexer lexer = new YuckyLexer(reader);
-      List<Token> tokens = new ArrayList<>();
-      Token token = lexer.yylex();
-      while (token != null) {
-        tokens.add(token);
-        token = lexer.yylex();
-      }
-      List<Statement> statements = parse(tokens);
-      System.out.println(statements);
+      System.out.println(parseYuckCode(reader));
     }
   }
 
   public static void main(String[] args) throws IOException {
     YuckyGrammar grammar = new YuckyGrammar();
     grammar.driver(args);
+  }
+
+  public List<Statement> parseYuckCode(Reader reader) throws IOException {
+    YuckyLexer lexer = new YuckyLexer(reader);
+    List<Token> tokens = new ArrayList<>();
+    Token token = lexer.yylex();
+    while (token != null) {
+      tokens.add(token);
+      token = lexer.yylex();
+    }
+    return parse(tokens);
+  }
+
+  public List<Statement> parseYuckCode(String code) throws IOException {
+    StringReader reader = new StringReader(code);
+    return parseYuckCode(reader);
   }
 }

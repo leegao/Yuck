@@ -1,5 +1,9 @@
 package com.yuck.ast;
 
+import com.yuck.ycode.Opcode;
+import com.yuck.ycode.YCodeFunctionContext;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 public class BinaryOperator extends Expression {
   public final String operator;
   public final Expression left;
@@ -10,5 +14,19 @@ public class BinaryOperator extends Expression {
     this.operator = operator;
     this.left = left;
     this.right = right;
+  }
+
+  @Override
+  public YCodeFunctionContext compile(YCodeFunctionContext context) {
+    Opcode opcode;
+    switch (operator) {
+      case "add": opcode = Opcode.ADD; break;
+      case "*": opcode = Opcode.MUL; break;
+      default:
+        throw new NotImplementedException();
+    }
+    left.compile(context);
+    right.compile(context);
+    return context.emit(opcode);
   }
 }

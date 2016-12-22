@@ -19,7 +19,6 @@ public class Instruction {
     switch (opcode) {
       case POP:
       case ROT2:
-      case CALL:
       case TABLE_LOAD:
       case TABLE_STORE:
       case TABLE:
@@ -72,6 +71,10 @@ public class Instruction {
         Preconditions.checkArgument(data instanceof YCodeFunctionContext);
         int f = context.function((YCodeFunctionContext) data);
         return new Instruction(opcode, f, context);
+      case CALL:
+        Preconditions.checkArgument(data instanceof Integer);
+        int numArguments = (int) data;
+        return new Instruction(opcode, numArguments, context);
       default:
         throw new IllegalStateException();
     }

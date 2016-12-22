@@ -60,7 +60,7 @@ public class YCodeFunctionContext {
     return n;
   }
 
-  public void emit(Opcode opcode, Object data) {
+  public YCodeFunctionContext emit(Opcode opcode, Object data) {
     Instruction instruction = Instruction.make(this, opcode, data);
     int position = instructions.size();
     instructions.add(instruction);
@@ -68,10 +68,11 @@ public class YCodeFunctionContext {
       labelPositions.add(position);
     }
     instructionPositions.put(instruction, position);
+    return this;
   }
 
-  public void emit(Opcode opcode) {
-    emit(opcode, 0);
+  public YCodeFunctionContext emit(Opcode opcode) {
+    return emit(opcode, 0);
   }
 
   public int position(Instruction instruction) {

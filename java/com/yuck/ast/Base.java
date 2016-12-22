@@ -2,6 +2,8 @@ package com.yuck.ast;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
+import com.yuck.ycode.YCodeFunctionContext;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public abstract class Base {
   @Expose
@@ -49,5 +51,9 @@ public abstract class Base {
 
   public void setEndColumn(int mEndColumn) {
     this.mEndColumn = mEndColumn;
+  }
+
+  public YCodeFunctionContext compile(YCodeFunctionContext context) {
+    throw new NotImplementedException();
   }
 }

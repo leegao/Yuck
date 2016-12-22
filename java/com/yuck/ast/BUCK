@@ -3,6 +3,7 @@ java_library(
   srcs = glob(['*.java']),
   deps = [
     '//java/com/yuck/grammar:token',
+    '//java/com/yuck/ycode:ycode',
     '//third-party:guava',
     '//third-party:lang3',
     '//third-party:gson',
