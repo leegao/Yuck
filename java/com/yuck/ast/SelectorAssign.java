@@ -18,9 +18,9 @@ public class SelectorAssign extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
-    left.compile(function, scope);
-    assignee.compile(function, scope);
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+    left.compile(function, compilationContext);
+    assignee.compile(function, compilationContext);
     return function.emit(Opcode.PUT_FIELD, select);
   }
 }

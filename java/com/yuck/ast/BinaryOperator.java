@@ -18,7 +18,7 @@ public class BinaryOperator extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
     Opcode opcode;
     boolean not = false;
     switch (operator) {
@@ -40,8 +40,8 @@ public class BinaryOperator extends Expression {
       default:
         throw new NotImplementedException();
     }
-    left.compile(function, scope);
-    right.compile(function, scope);
+    left.compile(function, compilationContext);
+    right.compile(function, compilationContext);
     function.emit(opcode);
     if (not) function.emit(Opcode.NOT);
     return function;

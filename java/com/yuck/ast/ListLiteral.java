@@ -17,8 +17,8 @@ public class ListLiteral extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
-    list.forEach(expression -> expression.compile(function, scope));
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+    list.forEach(expression -> expression.compile(function, compilationContext));
     return function.emit(Opcode.LIST, list.size());
   }
 }

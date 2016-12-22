@@ -21,13 +21,13 @@ public class ForStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
     // for i in list {...} -> var it = list.iterator(); while (it.has_next()) { var i = it.next(); ... }
     String iter = function.fvs("iter");
     String label = function.flx("iter");
     String fallthrough = function.flx("iter");
 
-    expr.compile(function, scope); // TOS is list
+    expr.compile(function, compilationContext); // TOS is list
     function.emit(Opcode.STORE_LOCAL, iter);
     // While loop
     function.emit(Opcode.NOP, label);
@@ -40,7 +40,7 @@ public class ForStatement extends Statement {
     function.emit(Opcode.GET_FIELD, "next");
     function.emit(Opcode.CALL, 1);
     function.emit(Opcode.STORE_LOCAL, id);
-    statements.forEach(statement -> statement.compile(function, scope));
+    statements.forEach(statement -> statement.compile(function, compilationContext));
     function.emit(Opcode.GOTO, label);
     function.emit(Opcode.NOP, fallthrough);
 

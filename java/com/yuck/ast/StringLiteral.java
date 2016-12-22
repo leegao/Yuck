@@ -13,7 +13,7 @@ public class StringLiteral extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
     return function.emit(Opcode.LOAD_CONST, text);
   }
 }

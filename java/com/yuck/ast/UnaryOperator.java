@@ -15,12 +15,12 @@ public class UnaryOperator extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
     switch (operator) {
       case "-":
-        return expression.compile(function, scope).emit(Opcode.NEG);
+        return expression.compile(function, compilationContext).emit(Opcode.NEG);
       case "not":
-        return expression.compile(function, scope).emit(Opcode.NOT);
+        return expression.compile(function, compilationContext).emit(Opcode.NOT);
     }
     throw new IllegalStateException();
   }

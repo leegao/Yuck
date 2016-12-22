@@ -16,8 +16,8 @@ public class Selector extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
-    left.compile(function, scope);
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+    left.compile(function, compilationContext);
     return function.emit(Opcode.GET_FIELD, select);
   }
 }

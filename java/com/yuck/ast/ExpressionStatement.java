@@ -14,8 +14,8 @@ public class ExpressionStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
     // Each expression pushes one item onto the stack
-    return expr.compile(function, scope).emit(Opcode.POP);
+    return expr.compile(function, compilationContext).emit(Opcode.POP);
   }
 }

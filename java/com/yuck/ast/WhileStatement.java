@@ -19,13 +19,13 @@ public class WhileStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
     // while (condition) { ... } => start; condition; jumpz fallthrough; ...; goto start; fallthrough
     String headLabel = function.flx("head");
     String fallthroughLabel = function.flx("fallthrough");
     function.emit(Opcode.NOP, headLabel);
-    condition.compile(function, scope).emit(Opcode.JUMPZ, fallthroughLabel);
-    statements.forEach(statement -> statement.compile(function, scope));
+    condition.compile(function, compilationContext).emit(Opcode.JUMPZ, fallthroughLabel);
+    statements.forEach(statement -> statement.compile(function, compilationContext));
     return function.emit(Opcode.GOTO, headLabel).emit(Opcode.NOP, fallthroughLabel);
   }
 }

@@ -54,7 +54,7 @@ public abstract class Base {
     this.mEndColumn = mEndColumn;
   }
 
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
     throw new RuntimeException(String.format("%s.compile() is not implemented.", getClass().getSimpleName()));
   }
 }

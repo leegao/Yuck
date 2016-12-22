@@ -18,8 +18,9 @@ public class MapLiteral extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
-    terms.forEach(pair -> {pair.getKey().compile(function, scope); pair.getValue().compile(function, scope);});
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+    terms.forEach(pair -> {pair.getKey().compile(function, compilationContext); pair.getValue().compile(function,
+        compilationContext);});
     return function.emit(Opcode.TABLE, terms.size());
   }
 }

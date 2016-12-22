@@ -16,9 +16,9 @@ public class IndexExpression extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
-    left.compile(function, scope);
-    index.compile(function, scope);
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+    left.compile(function, compilationContext);
+    index.compile(function, compilationContext);
     return function.emit(Opcode.TABLE_LOAD);
   }
 }

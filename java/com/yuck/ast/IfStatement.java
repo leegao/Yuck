@@ -31,16 +31,16 @@ public class IfStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
     String labelElse = function.flx("else");
     String labelFallthrough = function.flx("fallthrough");
-    condition.compile(function, scope).emit(Opcode.JUMPZ, labelElse);
-    statements.forEach(statement -> statement.compile(function, scope));
+    condition.compile(function, compilationContext).emit(Opcode.JUMPZ, labelElse);
+    statements.forEach(statement -> statement.compile(function, compilationContext));
     if (elseStatements.isPresent())
       function.emit(Opcode.GOTO, labelFallthrough);
     function.emit(Opcode.NOP, labelElse);
     if (elseStatements.isPresent()) {
-      elseStatements.get().forEach(elseStatement -> elseStatement.compile(function, scope));
+      elseStatements.get().forEach(elseStatement -> elseStatement.compile(function, compilationContext));
       function.emit(Opcode.NOP, labelFallthrough);
     }
     return function;

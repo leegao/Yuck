@@ -37,8 +37,10 @@ public class Yuckc {
       YuckyGrammar grammar = new YuckyGrammar();
       List<Statement> statements = grammar.parseYuckCode(reader);
       YCodeFunctionContext functionContext = new YCodeFunctionContext(new ArrayList<>());
-      YCodeCompilationContext scope = new YCodeCompilationContext();
-      statements.forEach(statement -> statement.compile(functionContext, scope));
+      YCodeCompilationContext compilationContext = new YCodeCompilationContext();
+      try (YCodeCompilationContext.Scope scope = compilationContext.push()) {
+        statements.forEach(statement -> statement.compile(functionContext, compilationContext));
+      }
       int i = 0;
       for (Instruction instruction : functionContext.assemble()) {
         System.out.printf("%d:\t%s\n", i++, instruction);

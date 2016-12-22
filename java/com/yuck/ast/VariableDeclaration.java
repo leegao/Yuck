@@ -18,9 +18,9 @@ public class VariableDeclaration extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
     if (init.isPresent()) {
-      init.get().compile(function, scope);
+      init.get().compile(function, compilationContext);
     } else {
       function.emit(Opcode.NIL);
     }

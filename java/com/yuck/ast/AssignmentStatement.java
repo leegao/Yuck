@@ -16,7 +16,7 @@ public class AssignmentStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
-    return expr.compile(function, scope).emit(Opcode.STORE_LOCAL, id);
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+    return expr.compile(function, compilationContext).emit(Opcode.STORE_LOCAL, id);
   }
 }

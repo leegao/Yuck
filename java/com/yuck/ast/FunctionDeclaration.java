@@ -23,9 +23,14 @@ public class FunctionDeclaration extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
     YCodeFunctionContext func = new YCodeFunctionContext(parameters);
-    statements.forEach(statement -> statement.compile(func, new YCodeCompilationContext()));
+    YCodeCompilationContext newCompilationContext = new YCodeCompilationContext();
+    try (YCodeCompilationContext.Scope scope = newCompilationContext.push()) {
+      statements.forEach(statement -> {
+        statement.compile(func, newCompilationContext);
+      });
+    }
     func.emit(Opcode.NIL).emit(Opcode.RETURN).assemble();
     return function.emit(Opcode.CLOSURE, func).emit(Opcode.STORE_LOCAL, id);
   }

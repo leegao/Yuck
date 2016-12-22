@@ -14,7 +14,7 @@ public class ReturnStatement extends Statement {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
-    return expression.compile(function, scope).emit(Opcode.RETURN);
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+    return expression.compile(function, compilationContext).emit(Opcode.RETURN);
   }
 }

@@ -13,7 +13,7 @@ public class GroupExpression extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
-    return expression.compile(function, scope);
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+    return expression.compile(function, compilationContext);
   }
 }

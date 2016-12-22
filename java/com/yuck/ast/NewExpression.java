@@ -20,11 +20,11 @@ public class NewExpression extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
     function.emit(Opcode.NEW, Joiner.on('.').join(name.names))
         .emit(Opcode.DUP)
         .emit(Opcode.GET_FIELD, "init");
-    arguments.forEach(expression -> expression.compile(function, scope));
+    arguments.forEach(expression -> expression.compile(function, compilationContext));
     return function.emit(Opcode.CALL, arguments.size() + 1).emit(Opcode.POP);
   }
 }

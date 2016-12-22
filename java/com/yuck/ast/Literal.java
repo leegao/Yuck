@@ -15,7 +15,7 @@ public class Literal extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
     switch (kind) {
       case "nil":
         return function.emit(Opcode.NIL);

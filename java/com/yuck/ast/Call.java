@@ -19,9 +19,9 @@ public class Call extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
-    left.compile(function, scope);
-    arguments.forEach(expr -> expr.compile(function, scope));
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
+    left.compile(function, compilationContext);
+    arguments.forEach(expr -> expr.compile(function, compilationContext));
     return function.emit(Opcode.CALL, arguments.size() + 1);
   }
 }

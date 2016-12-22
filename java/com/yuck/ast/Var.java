@@ -16,7 +16,7 @@ public class Var extends Expression {
   }
 
   @Override
-  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext scope) {
+  public YCodeFunctionContext compile(YCodeFunctionContext function, YCodeCompilationContext compilationContext) {
     return function.emit(Opcode.LOAD_LOCAL, id);
   }
 }
