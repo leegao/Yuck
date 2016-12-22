@@ -56,7 +56,7 @@ public class YCodeFunctionContext {
       return labels.get(label);
     }
     int n = labels.size() + 1;
-    locals.put(label, n);
+    labels.put(label, n);
     return n;
   }
 
@@ -88,7 +88,7 @@ public class YCodeFunctionContext {
   }
 
   public int function(YCodeFunctionContext function) {
-    Preconditions.checkArgument(functions.containsKey(function));
+    Preconditions.checkArgument(!functions.containsKey(function));
     int n = functions.size();
     functions.put(function, n);
     return n;

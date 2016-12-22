@@ -19,15 +19,30 @@ public class BinaryOperator extends Expression {
   @Override
   public YCodeFunctionContext compile(YCodeFunctionContext context) {
     Opcode opcode;
+    boolean not = false;
     switch (operator) {
       case "add": opcode = Opcode.ADD; break;
       case "*": opcode = Opcode.MUL; break;
-      // TODO: add the other operators
+      case "or": opcode = Opcode.OR; break;
+      case "and": opcode = Opcode.AND; break;
+      case ">=": not = true;
+      case "<": opcode = Opcode.LT; break;
+      case ">": not = true;
+      case "<=": opcode = Opcode.LE; break;
+      case "!=": not = true;
+      case "==": opcode = Opcode.EQ; break;
+      case "to": opcode = Opcode.TO_RANGE; break;
+      case "-": opcode = Opcode.SUB; break;
+      case "/": opcode = Opcode.DIV; break;
+      case "mod": opcode = Opcode.MOD; break;
+      case "pow": opcode = Opcode.POW; break;
       default:
         throw new NotImplementedException();
     }
     left.compile(context);
     right.compile(context);
-    return context.emit(opcode);
+    context.emit(opcode);
+    if (not) context.emit(Opcode.NOT);
+    return context;
   }
 }

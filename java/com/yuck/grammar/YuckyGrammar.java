@@ -226,7 +226,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return new QualifiedName(head, names, tokens.get(tokens.size() - 1));
   }
 
-  @Rule("E.leaf -> function %( $parameters %) { ($statement)* }")
+  @Rule("E.leaf -> function %( $parameters %) { ($statement : First)* }")
   public Expression expLeaf(
       Token function,
       Token open, List<Var> parameters, Token close,
@@ -283,7 +283,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return exprStatement;
   }
 
-  @Rule("func.decl -> function id %( $parameters %) { ($statement)* }")
+  @Rule("func.decl -> function id %( $parameters %) { ($statement : First)* }")
   public Statement funcdecl(
       Token function,
       Token id,
@@ -311,12 +311,12 @@ public class YuckyGrammar extends GrammarBase<Token> {
     throw new IllegalStateException();
   }
 
-  @Rule("statement -> while $E { ($statement)* }")
+  @Rule("statement -> while $E { ($statement : First)* }")
   public Statement statement(Token whil, Expression cond, Token open, List<Statement> statements, Token close) {
     return new WhileStatement(whil, cond, statements, close);
   }
 
-  @Rule("statement -> for id in $E { ($statement)* }")
+  @Rule("statement -> for id in $E { ($statement : First)* }")
   public Statement statement(
       Token fo,
       Token id,
@@ -326,7 +326,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return new ForStatement(fo, id, expr, statements, close);
   }
 
-  @Rule("statement -> if $E { ($statement)* } (else ($statement | { ($statement)* } ) : Else)?")
+  @Rule("statement -> if $E { ($statement : First)* } (else ($statement | { ($statement : First)* } ) : Else)?")
   public Statement statement(Token iff, Expression cond, Token open, List<Statement> statements, Token close, Optional<Function<IfStatement, IfStatement>> elseTransform) {
     return elseTransform.map(transform -> transform.apply(new IfStatement(iff, cond, statements))).orElse(new IfStatement(iff, cond, statements, close));
   }

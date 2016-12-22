@@ -36,11 +36,11 @@ public class Yuckc {
     try (FileReader reader = new FileReader(yuckFile)) {
       YuckyGrammar grammar = new YuckyGrammar();
       List<Statement> statements = grammar.parseYuckCode(reader);
-      System.out.println(statements);
       YCodeFunctionContext context = new YCodeFunctionContext(new ArrayList<>());
       statements.forEach(statement -> statement.compile(context));
+      int i = 0;
       for (Instruction instruction : context.assemble()) {
-        System.out.println(instruction);
+        System.out.printf("%d:\t%s\n", i++, instruction);
       }
     }
   }

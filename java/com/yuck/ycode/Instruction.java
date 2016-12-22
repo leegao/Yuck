@@ -60,10 +60,9 @@ public class Instruction {
       case GOTO:
         Preconditions.checkArgument(data instanceof String);
         int label = context.label((String) data);
-        return new Instruction(opcode, label | 0x800000, context);
+        return new Instruction(opcode, -label, context);
       case NOP:
         if (data instanceof String) {
-          Preconditions.checkArgument(!context.labels.containsKey(data));
           return new Instruction(opcode, context.label((String) data), context);
         } else {
           return new Instruction(opcode, 0, context);
@@ -105,11 +104,14 @@ public class Instruction {
         return;
       case GOTO:
       case JUMPZ:
-        int cursor = argument & 0x800000;
-        Preconditions.checkArgument(cursor < context.labelPositions.size());
+        if (argument >= 0) {
+          return;
+        }
+        int cursor = -argument - 1;
+        Preconditions.checkArgument(cursor < context.labelPositions.size(), String.format("%x\n", cursor));
         int target = context.labelPositions.get(cursor);
-        int current = context.position(this);
-        argument = target - current;
+        argument = target;
+        return;
     }
   }
 
