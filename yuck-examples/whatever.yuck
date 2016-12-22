@@ -1,7 +1,7 @@
 function foo() {
   print("Hello World");
 }
-
+y = 3;
 if yahoo == 3 {
   foo();
 } else {
