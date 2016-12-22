@@ -260,8 +260,10 @@ public class YuckyGrammar extends GrammarBase<Token> {
       Expression assignee = assignment.get();
       if (expr instanceof Var) {
         return new AssignmentStatement(((Var) expr).token, assignee, semi);
-      } else if (expr instanceof IndexExpression){
+      } else if (expr instanceof IndexExpression) {
         return new IndexAssign(((IndexExpression) expr).left, ((IndexExpression) expr).index, assignee, semi);
+      } else if (expr instanceof Selector){
+        return new SelectorAssign(((Selector) expr).left, ((Selector) expr).select, assignee, semi);
       } else {
         throw new NotImplementedException();
       }
