@@ -375,6 +375,11 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return new ReturnStatement(ret, expression.orElse(new Literal(new Token("nil", -1, -1, "nil"))), semicolon);
   }
 
+  @Rule("statement -> do { ($statement : First)* }")
+  public Statement statement(Token doToken, Token open, List<Statement> statements, Token close) {
+    return new DoStatement(doToken, statements, close);
+  }
+
   @SuppressWarnings("unchecked")
   @For("Else")
   public Function<IfStatement, IfStatement> elseClause(Token el, List<?> statementish) {
