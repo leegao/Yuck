@@ -16,13 +16,13 @@ public class Instruction {
   }
 
   public static <T> Instruction make(YCodeFunctionContext context, Opcode opcode, T data) {
+    int mult = 1;
     switch (opcode) {
+      case NIL:
       case POP:
       case ROT2:
       case TABLE_LOAD:
       case TABLE_STORE:
-      case TABLE:
-      case LIST:
       case RETURN:
       case LT:
       case LE:
@@ -71,10 +71,13 @@ public class Instruction {
         Preconditions.checkArgument(data instanceof YCodeFunctionContext);
         int f = context.function((YCodeFunctionContext) data);
         return new Instruction(opcode, f, context);
+      case TABLE:
+        mult = 2;
       case CALL:
+      case LIST:
         Preconditions.checkArgument(data instanceof Integer);
         int numArguments = (Integer) data;
-        return new Instruction(opcode, numArguments, context);
+        return new Instruction(opcode, mult * numArguments, context);
       default:
         throw new IllegalStateException();
     }
