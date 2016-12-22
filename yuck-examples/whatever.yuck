@@ -1,0 +1,9 @@
+function foo() {
+  print("Hello World");
+}
+
+if yahoo == 3 {
+  foo();
+} else {
+  var x = 1 to z;
+}

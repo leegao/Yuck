@@ -2,6 +2,8 @@ package com.yuck.ast;
 
 import com.google.common.collect.ImmutableList;
 import com.yuck.grammar.Token;
+import com.yuck.ycode.YCodeFunctionContext;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
 
@@ -20,5 +22,10 @@ public class ClassStatement extends Statement {
     this.name = name.text;
     this.variableDeclarations = ImmutableList.copyOf(variableDeclarations);
     this.methodDeclarations = ImmutableList.copyOf(methodDeclarations);
+  }
+
+  @Override
+  public YCodeFunctionContext compile(YCodeFunctionContext context) {
+    throw new NotImplementedException();
   }
 }

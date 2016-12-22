@@ -177,4 +177,22 @@ public class YCodeFunctionContext {
     Preconditions.checkArgument(buffer.getInt() == 0);
     return context;
   }
+
+  public String fvs(String prefix) {
+    int n = 0;
+    String name = prefix + "$" + n;
+    while (locals.containsKey(name)) {
+      name = prefix + "$" + n;
+    }
+    return name;
+  }
+
+  public String flx(String prefix) {
+    int n = 0;
+    String name = prefix + "$" + n;
+    while (labels.containsKey(name)) {
+      name = prefix + "$" + n;
+    }
+    return name;
+  }
 }

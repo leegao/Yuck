@@ -54,6 +54,6 @@ public abstract class Base {
   }
 
   public YCodeFunctionContext compile(YCodeFunctionContext context) {
-    throw new NotImplementedException();
+    throw new RuntimeException(String.format("%s.compile() is not implemented.", getClass().getSimpleName()));
   }
 }
