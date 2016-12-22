@@ -19,6 +19,7 @@ public class Instruction {
     int mult = 1;
     switch (opcode) {
       case NIL:
+      case DUP:
       case POP:
       case ROT2:
       case TABLE_LOAD:
