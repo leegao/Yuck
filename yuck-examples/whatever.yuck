@@ -8,4 +8,4 @@ if yahoo == 3 {
   var x = 1 to z;
 }
 return x;
-// foo.y = 3;
+foo[y] = 3;
