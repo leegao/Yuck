@@ -12,16 +12,18 @@ public class YCodeFunction {
   public final BiMap<String, Integer> locals = HashBiMap.create();
   public final BiMap<String, Integer> upvalues = HashBiMap.create();
   public final BiMap<Object, Integer> constants = HashBiMap.create();
-  public final BiMap<String, Integer> labels = HashBiMap.create();
+  public transient final BiMap<String, Integer> labels = HashBiMap.create();
   public final List<Instruction> instructions = new ArrayList<>();
-  public final List<Integer> labelPositions = new ArrayList<>();
+  public transient final List<Integer> labelPositions = new ArrayList<>();
   public final BiMap<Instruction, Integer> instructionPositions = HashBiMap.create();
   public final BiMap<YCodeFunction, Integer> functions = HashBiMap.create();
+  public final String name;
 
-  protected YCodeFunction(List<String> arguments) {
+  protected YCodeFunction(List<String> arguments, String name) {
     for (String argument : arguments) {
       local(argument);
     }
+    this.name = name;
   }
 
   public int constant(Object o) {
@@ -105,6 +107,8 @@ public class YCodeFunction {
     // Classes
     // where each list is headed by the number of items
     buffer.putChar('y').putChar('c').putChar('o').putChar('d').putChar('e');
+    // Name
+    Utils.putString(buffer, name);
     // Locals
     buffer.putInt(locals.size());
     for (int i = 0; i < locals.size(); i++) {
@@ -147,35 +151,38 @@ public class YCodeFunction {
     Preconditions.checkArgument(buffer.getChar() == 'o');
     Preconditions.checkArgument(buffer.getChar() == 'd');
     Preconditions.checkArgument(buffer.getChar() == 'e');
-    YCodeFunction context = new YCodeFunction(new ArrayList<>());
+    String name = Utils.getString(buffer);
+    YCodeFunction function = new YCodeFunction(new ArrayList<>(), name);
     // Locals
     int numLocals = buffer.getInt();
     for (int i = 0; i < numLocals; i++) {
-      context.locals.put(Utils.getString(buffer), i);
+      function.locals.put(Utils.getString(buffer), i);
     }
     // Upvalues
     int numUpvalues = buffer.getInt();
     for (int i = 0; i < numUpvalues; i++) {
-      context.upvalues.put(Utils.getString(buffer), i);
+      function.upvalues.put(Utils.getString(buffer), i);
     }
     // Constants
     int numConstants = buffer.getInt();
     for (int i = 0; i < numConstants; i++) {
-      context.constants.put(Utils.getConstant(buffer), i);
+      function.constants.put(Utils.getConstant(buffer), i);
     }
     // Instructions
     int numInstrunctions = buffer.getInt();
     for (int i = 0; i < numInstrunctions; i++) {
-      context.instructions.add(Instruction.read(context, buffer));
+      Instruction instruction = Instruction.read(function, buffer);
+      function.instructions.add(instruction);
+      function.instructionPositions.put(instruction, i);
     }
     // Functions
     int numFunctions = buffer.getInt();
     for (int i = 0; i < numFunctions; i++) {
-      context.functions.put(YCodeFunction.read(buffer), i);
+      function.functions.put(YCodeFunction.read(buffer), i);
     }
     // Classes
     Preconditions.checkArgument(buffer.getInt() == 0);
-    return context;
+    return function;
   }
 
   public String fvs(String prefix) {

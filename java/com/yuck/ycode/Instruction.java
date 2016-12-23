@@ -109,9 +109,7 @@ public class Instruction {
         }
         int cursor = -argument - 1;
         Preconditions.checkArgument(cursor < context.labelPositions.size(), String.format("%x\n", cursor));
-        int target = context.labelPositions.get(cursor);
-        argument = target;
-        return;
+        argument = context.labelPositions.get(cursor);
     }
   }
 
@@ -169,7 +167,7 @@ public class Instruction {
       case NOP:
         return opcode.toString();
       case CLOSURE:
-        return String.format("%s(%s)", opcode, argument);
+        return String.format("%s(%s)", opcode, context.functions.inverse().get(argument).name);
       case TABLE:
       case CALL:
       case LIST:

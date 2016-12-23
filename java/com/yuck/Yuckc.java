@@ -11,6 +11,8 @@ import org.kohsuke.args4j.CmdLineParser;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,9 +39,10 @@ public class Yuckc {
     try (FileReader reader = new FileReader(yuckFile)) {
       YuckyGrammar grammar = new YuckyGrammar();
       List<Statement> statements = grammar.parseYuckCode(reader);
+      String name = Paths.get(yuckFile).getFileName().toString();
       YCodeCompilationContext context = new YCodeCompilationContext(
           statements,
-          yuckFile,
+          String.format("@(%s)", name),
           new ArrayList<>());
       YCodeFunction function = context.compile();
       int i = 0;

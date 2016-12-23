@@ -67,7 +67,7 @@ public class YCodeCompilationContext {
   }
 
   public YCodeFunction compile() {
-    YCodeFunction function = new YCodeFunction(parameters);
+    YCodeFunction function = new YCodeFunction(parameters, name);
     try (Scope topLevel = push()) {
       parameters.forEach(topLevel::addLocal);
       statements.forEach(statement -> statement.compile(function, this));
