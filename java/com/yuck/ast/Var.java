@@ -1,6 +1,7 @@
 package com.yuck.ast;
 
 import com.yuck.grammar.Token;
+import com.yuck.ycode.Instruction;
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunction;
@@ -17,6 +18,8 @@ public class Var extends Expression {
 
   @Override
   public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
-    return function.emit(Opcode.LOAD_LOCAL, id);
+    String variable = context.lookup(id).orElse(id);
+    Opcode opcode = Instruction.variable(function, variable);
+    return function.emit(opcode, variable);
   }
 }

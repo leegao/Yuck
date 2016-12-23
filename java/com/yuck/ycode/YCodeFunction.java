@@ -18,7 +18,7 @@ public class YCodeFunction {
   public final BiMap<Instruction, Integer> instructionPositions = HashBiMap.create();
   public final BiMap<YCodeFunction, Integer> functions = HashBiMap.create();
 
-  public YCodeFunction(List<String> arguments) {
+  protected YCodeFunction(List<String> arguments) {
     for (String argument : arguments) {
       local(argument);
     }

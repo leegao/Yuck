@@ -19,11 +19,12 @@ public class VariableDeclaration extends Statement {
 
   @Override
   public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
+    String variable = context.getScope().addLocal(id);
     if (init.isPresent()) {
       init.get().compile(function, context);
     } else {
       function.emit(Opcode.NIL);
     }
-    return function.emit(Opcode.STORE_LOCAL, id);
+    return function.emit(Opcode.STORE_LOCAL, variable);
   }
 }

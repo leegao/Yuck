@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Yuckc {
   @Argument
@@ -36,13 +37,13 @@ public class Yuckc {
     try (FileReader reader = new FileReader(yuckFile)) {
       YuckyGrammar grammar = new YuckyGrammar();
       List<Statement> statements = grammar.parseYuckCode(reader);
-      YCodeFunction functionContext = new YCodeFunction(new ArrayList<>());
-      YCodeCompilationContext compilationContext = new YCodeCompilationContext();
-      try (YCodeCompilationContext.Scope scope = compilationContext.push()) {
-        statements.forEach(statement -> statement.compile(functionContext, compilationContext));
-      }
+      YCodeCompilationContext context = new YCodeCompilationContext(
+          statements,
+          yuckFile,
+          new ArrayList<>());
+      YCodeFunction function = context.compile();
       int i = 0;
-      for (Instruction instruction : functionContext.assemble()) {
+      for (Instruction instruction : function.instructions) {
         System.out.printf("%d:\t%s\n", i++, instruction);
       }
     }

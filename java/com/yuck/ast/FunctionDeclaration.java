@@ -24,14 +24,8 @@ public class FunctionDeclaration extends Statement {
 
   @Override
   public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
-    YCodeFunction func = new YCodeFunction(parameters);
-    YCodeCompilationContext newCompilationContext = new YCodeCompilationContext();
-    try (YCodeCompilationContext.Scope scope = newCompilationContext.push()) {
-      statements.forEach(statement -> {
-        statement.compile(func, newCompilationContext);
-      });
-    }
-    func.emit(Opcode.NIL).emit(Opcode.RETURN).assemble();
-    return function.emit(Opcode.CLOSURE, func).emit(Opcode.STORE_LOCAL, id);
+    YCodeCompilationContext nestedContext = new YCodeCompilationContext(statements, context.name + "." + id, parameters);
+    YCodeFunction func = nestedContext.compile().emit(Opcode.NIL).emit(Opcode.RETURN);
+    return function.emit(Opcode.CLOSURE, func).emit(Opcode.STORE_LOCAL, context.getScope().addLocal(id));
   }
 }

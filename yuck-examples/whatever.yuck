@@ -1,8 +1,9 @@
 function foo() {
   print("Hello World");
 }
-y = 3;
+var y = 3;
 if yahoo == 3 {
+  var y = 5;
   foo();
 } else {
   var x = 1 to z;
