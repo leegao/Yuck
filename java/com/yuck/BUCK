@@ -6,6 +6,7 @@ java_library(
     '//java/com/yuck/auxiliary/descentparsing:descentparsing',
     '//java/com/yuck/grammar:grammar',
     '//java/com/yuck/ycode:ycode',
+    '//java/com/yuck/interpreter:interpreter',
     '//third-party:guava',
     '//third-party:args4j',
     '//third-party:lang3',
