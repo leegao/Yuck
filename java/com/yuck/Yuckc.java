@@ -8,16 +8,19 @@ import com.yuck.ycode.YCodeFunction;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class Yuckc {
+  @Option(name = "--human-readable", aliases = {"-H"})
+  private boolean human;
+
   @Argument
   private String yuckFile;
 
@@ -45,9 +48,13 @@ public class Yuckc {
           String.format("@(%s)", name),
           new ArrayList<>());
       YCodeFunction function = context.compile();
-      int i = 0;
-      for (Instruction instruction : function.instructions) {
-        System.out.printf("%d:\t%s\n", i++, instruction);
+      if (human) {
+        int i = 0;
+        for (Instruction instruction : function.instructions) {
+          System.out.printf("%d:\t%s\n", i++, instruction);
+        }
+      } else {
+        throw new NotImplementedException();
       }
     }
   }
