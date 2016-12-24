@@ -3,8 +3,9 @@ function f() {
   return x;
 }
 
-if (1 < f()) {
-  return 1 + 2 ** 3;
+if (1 < f(3)) {
+  x = 5;
+  return 1 + f() ** 3;
 } else {
   return 5;
 }

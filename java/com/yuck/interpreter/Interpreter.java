@@ -245,6 +245,11 @@ public class Interpreter {
           }
           break;
         }
+        case LOAD_UP: {
+          Preconditions.checkArgument(context.previous.isPresent(), "Cannot get an upvalue from the root context.");
+          context.push(context.previous.get().lookup(function.upvalues.inverse().get(instruction.getArgument())));
+          break;
+        }
         default:
           System.err.printf("%s not supported.", instruction);
           throw new NotImplementedException();
