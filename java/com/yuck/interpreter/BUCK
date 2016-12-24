@@ -7,6 +7,7 @@ java_library(
     '//third-party:guava',
     '//third-party:lang3',
     '//third-party:jflex',
+    '//third-party:gson',
   ],
   visibility = ['//...'],
 )
