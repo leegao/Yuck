@@ -123,7 +123,10 @@ public class Interpreter {
           YuckObject yuckConstant = YuckObject.translate(constant);
           context.push(yuckConstant);
           break;
+        case NOP:
+          break;
         default:
+          System.err.printf("%s not supported.", instruction);
           throw new NotImplementedException();
       }
       pc = next;

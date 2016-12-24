@@ -22,9 +22,11 @@ public class BinaryOperator extends Expression {
     Opcode opcode;
     boolean not = false;
     switch (operator) {
-      case "add": opcode = Opcode.ADD; break;
+      case "+": opcode = Opcode.ADD; break;
       case "*": opcode = Opcode.MUL; break;
+      case "||":
       case "or": opcode = Opcode.OR; break;
+      case "&&":
       case "and": opcode = Opcode.AND; break;
       case ">=": not = true;
       case "<": opcode = Opcode.LT; break;
@@ -36,7 +38,7 @@ public class BinaryOperator extends Expression {
       case "-": opcode = Opcode.SUB; break;
       case "/": opcode = Opcode.DIV; break;
       case "mod": opcode = Opcode.MOD; break;
-      case "pow": opcode = Opcode.POW; break;
+      case "**": opcode = Opcode.POW; break;
       default:
         throw new NotImplementedException();
     }

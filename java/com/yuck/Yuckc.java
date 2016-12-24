@@ -62,7 +62,7 @@ public class Yuckc {
             throw new IllegalStateException(String.format("%s does not end in a .yuck extension. Please specify a --output file.", yuckFile));
           }
         }
-        try (DataOutputStream writer = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(output)))) {
+        try (DataOutputStream writer = new DataOutputStream(new FileOutputStream(output))) {
           function.write(writer);
           writer.flush();
         }

@@ -108,7 +108,7 @@ public class YCodeFunction {
     // Functions
     // Classes
     // where each list is headed by the number of items
-    buffer.write(new byte[] {'y', 'c', 'o', 'd', 'e'});
+    buffer.write(new byte[] {0, 'y', 'c', 'o', 'd', 'e'});
     // Name
     Utils.writeString(buffer, name);
     // Locals
@@ -143,16 +143,16 @@ public class YCodeFunction {
       function.write(buffer);
     }
     // Classes
-    buffer.writeInt(0);
+    buffer.writeShort(0);
     return buffer;
   }
 
   public static YCodeFunction read(DataInputStream buffer) throws IOException {
-    Preconditions.checkArgument(buffer.readChar() == 'y');
-    Preconditions.checkArgument(buffer.readChar() == 'c');
-    Preconditions.checkArgument(buffer.readChar() == 'o');
-    Preconditions.checkArgument(buffer.readChar() == 'd');
-    Preconditions.checkArgument(buffer.readChar() == 'e');
+    byte[] header = new byte[6];
+    buffer.read(header);
+    Preconditions.checkArgument(
+        new String(header).equals("\0ycode"),
+        String.format("'%s': Header should be '\\0ycode'", new String(header)));
     String name = Utils.readString(buffer);
     YCodeFunction function = new YCodeFunction(new ArrayList<>(), name);
     // Locals
