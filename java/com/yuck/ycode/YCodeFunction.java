@@ -4,7 +4,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-import java.nio.ByteBuffer;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,7 +98,7 @@ public class YCodeFunction {
     return n;
   }
 
-  public ByteBuffer write(ByteBuffer buffer) {
+  public DataOutputStream write(DataOutputStream buffer) throws IOException {
     // Layout:
     // MAGIC: ycode
     // Locals
@@ -106,82 +108,82 @@ public class YCodeFunction {
     // Functions
     // Classes
     // where each list is headed by the number of items
-    buffer.putChar('y').putChar('c').putChar('o').putChar('d').putChar('e');
+    buffer.write(new byte[] {'y', 'c', 'o', 'd', 'e'});
     // Name
-    Utils.putString(buffer, name);
+    Utils.writeString(buffer, name);
     // Locals
-    buffer.putInt(locals.size());
+    buffer.writeShort(locals.size());
     for (int i = 0; i < locals.size(); i++) {
       Preconditions.checkArgument(locals.inverse().containsKey(i));
       String local = locals.inverse().get(i);
-      Utils.putString(buffer, local);
+      Utils.writeString(buffer, local);
     }
     // Upvalues
-    buffer.putInt(upvalues.size());
+    buffer.writeShort(upvalues.size());
     for (int i = 0; i < upvalues.size(); i++) {
       Preconditions.checkArgument(upvalues.inverse().containsKey(i));
-      Utils.putString(buffer, upvalues.inverse().get(i));
+      Utils.writeString(buffer, upvalues.inverse().get(i));
     }
     // Constants
-    buffer.putInt(constants.size());
+    buffer.writeShort(constants.size());
     for (int i = 0; i < constants.size(); i++) {
       Preconditions.checkArgument(constants.inverse().containsKey(i));
-      Utils.putConstant(buffer, constants.inverse().get(i));
+      Utils.writeConstant(buffer, constants.inverse().get(i));
     }
     // Instructions
-    buffer.putInt(instructions.size());
+    buffer.writeShort(instructions.size());
     for (Instruction instruction : assemble()) {
       instruction.write(buffer);
     }
     // Functions
-    buffer.putInt(functions.size());
+    buffer.writeShort(functions.size());
     for (int i = 0; i < functions.size(); i++) {
       Preconditions.checkArgument(functions.inverse().containsKey(i));
       YCodeFunction function = functions.inverse().get(i);
       function.write(buffer);
     }
     // Classes
-    buffer.putInt(0);
+    buffer.writeInt(0);
     return buffer;
   }
 
-  public static YCodeFunction read(ByteBuffer buffer) {
-    Preconditions.checkArgument(buffer.getChar() == 'y');
-    Preconditions.checkArgument(buffer.getChar() == 'c');
-    Preconditions.checkArgument(buffer.getChar() == 'o');
-    Preconditions.checkArgument(buffer.getChar() == 'd');
-    Preconditions.checkArgument(buffer.getChar() == 'e');
-    String name = Utils.getString(buffer);
+  public static YCodeFunction read(DataInputStream buffer) throws IOException {
+    Preconditions.checkArgument(buffer.readChar() == 'y');
+    Preconditions.checkArgument(buffer.readChar() == 'c');
+    Preconditions.checkArgument(buffer.readChar() == 'o');
+    Preconditions.checkArgument(buffer.readChar() == 'd');
+    Preconditions.checkArgument(buffer.readChar() == 'e');
+    String name = Utils.readString(buffer);
     YCodeFunction function = new YCodeFunction(new ArrayList<>(), name);
     // Locals
-    int numLocals = buffer.getInt();
+    int numLocals = buffer.readShort();
     for (int i = 0; i < numLocals; i++) {
-      function.locals.put(Utils.getString(buffer), i);
+      function.locals.put(Utils.readString(buffer), i);
     }
     // Upvalues
-    int numUpvalues = buffer.getInt();
+    int numUpvalues = buffer.readShort();
     for (int i = 0; i < numUpvalues; i++) {
-      function.upvalues.put(Utils.getString(buffer), i);
+      function.upvalues.put(Utils.readString(buffer), i);
     }
     // Constants
-    int numConstants = buffer.getInt();
+    int numConstants = buffer.readShort();
     for (int i = 0; i < numConstants; i++) {
-      function.constants.put(Utils.getConstant(buffer), i);
+      function.constants.put(Utils.readConstant(buffer), i);
     }
     // Instructions
-    int numInstrunctions = buffer.getInt();
+    int numInstrunctions = buffer.readShort();
     for (int i = 0; i < numInstrunctions; i++) {
       Instruction instruction = Instruction.read(function, buffer);
       function.instructions.add(instruction);
       function.instructionPositions.put(instruction, i);
     }
     // Functions
-    int numFunctions = buffer.getInt();
+    int numFunctions = buffer.readShort();
     for (int i = 0; i < numFunctions; i++) {
       function.functions.put(YCodeFunction.read(buffer), i);
     }
     // Classes
-    Preconditions.checkArgument(buffer.getInt() == 0);
+    Preconditions.checkArgument(buffer.readShort() == 0);
     return function;
   }
 

@@ -1,5 +1,6 @@
 package com.yuck;
 
+import com.google.common.base.Preconditions;
 import com.yuck.ast.Statement;
 import com.yuck.grammar.YuckyGrammar;
 import com.yuck.ycode.Instruction;
@@ -11,8 +12,10 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +24,10 @@ public class Yuckc {
   @Option(name = "--human-readable", aliases = {"-H"})
   private boolean human;
 
-  @Argument
+  @Option(name = "--output", aliases = {"-o"}, forbids = {"--human-readable"})
+  private File output;
+
+  @Argument(required = true)
   private String yuckFile;
 
   public static void main(String[] args) throws IOException {
@@ -54,7 +60,13 @@ public class Yuckc {
           System.out.printf("%d:\t%s\n", i++, instruction);
         }
       } else {
-        throw new NotImplementedException();
+        if (output == null) {
+          throw new NotImplementedException();
+        }
+        try (DataOutputStream writer = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(output)))) {
+          function.write(writer);
+          writer.flush();
+        }
       }
     }
   }

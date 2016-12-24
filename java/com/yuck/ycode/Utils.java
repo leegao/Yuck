@@ -1,46 +1,55 @@
 package com.yuck.ycode;
 
-import java.nio.ByteBuffer;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class Utils {
-  public static ByteBuffer putString(ByteBuffer buffer, String string) {
-    buffer.putInt(string.length());
-    buffer.put(string.getBytes());
+  public static DataOutputStream writeString(DataOutputStream buffer, String string) throws IOException {
+    buffer.writeShort(string.length());
+    buffer.write(string.getBytes());
     return buffer;
   }
 
-  public static String getString(ByteBuffer buffer) {
-    int length = buffer.getInt();
+  public static String readString(DataInputStream buffer) throws IOException {
+    int length = buffer.readShort();
     byte[] bytes = new byte[length];
-    buffer.get(bytes);
+    buffer.read(bytes);
     return new String(bytes);
   }
 
-  public static ByteBuffer putConstant(ByteBuffer buffer, Object object) {
+  public static DataOutputStream writeConstant(DataOutputStream buffer, Object object) throws IOException {
     if (object instanceof Boolean) {
-      return buffer.put((byte) Constant.BOOL.ordinal()).put((byte) ((boolean) object ? 1 : 0));
+      buffer.writeByte(Constant.BOOL.ordinal());
+      buffer.writeBoolean((boolean) object);
+      return buffer;
     } else if (object instanceof Integer) {
-      return buffer.put((byte) Constant.INT.ordinal()).putInt((int) object);
+      buffer.writeByte(Constant.INT.ordinal());
+      buffer.writeInt((int) object);
+      return buffer;
     } else if (object instanceof Float || object instanceof Double) {
-      return buffer.put((byte) Constant.FLOAT.ordinal()).putFloat((float) object);
+      buffer.writeByte(Constant.FLOAT.ordinal());
+      buffer.writeFloat((float) object);
+      return buffer;
     } else if (object instanceof String) {
-      return putString(buffer.put((byte) Constant.STRING.ordinal()), (String) object);
+      buffer.writeByte(Constant.STRING.ordinal());
+      return writeString(buffer, (String) object);
     } else {
       throw new IllegalStateException();
     }
   }
 
-  public static Object getConstant(ByteBuffer buffer) {
-    Constant constant = Constant.values()[buffer.get()];
+  public static Object readConstant(DataInputStream buffer) throws IOException {
+    Constant constant = Constant.values()[buffer.readByte()];
     switch (constant) {
       case BOOL:
-        return buffer.get() == 0;
+        return buffer.readBoolean();
       case INT:
-        return buffer.getInt();
+        return buffer.readInt();
       case FLOAT:
-        return buffer.getFloat();
+        return buffer.readFloat();
       case STRING:
-        return getString(buffer);
+        return readString(buffer);
     }
     throw new IllegalStateException();
   }

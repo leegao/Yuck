@@ -2,6 +2,9 @@ package com.yuck.ycode;
 
 import com.google.common.base.Preconditions;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class Instruction {
@@ -113,15 +116,15 @@ public class Instruction {
     }
   }
 
-  public ByteBuffer write(ByteBuffer buffer) {
-    buffer.put((byte) opcode.ordinal());
-    buffer.putInt(argument);
+  public DataOutputStream write(DataOutputStream buffer) throws IOException {
+    buffer.writeByte(opcode.ordinal());
+    buffer.writeInt(argument);
     return buffer;
   }
 
-  public static Instruction read(YCodeFunction context, ByteBuffer buffer) {
-    int op = buffer.get();
-    int argument = buffer.getInt();
+  public static Instruction read(YCodeFunction context, DataInputStream buffer) throws IOException {
+    int op = buffer.readByte();
+    int argument = buffer.readInt();
     return new Instruction(Opcode.values()[op], argument, context);
   }
 
