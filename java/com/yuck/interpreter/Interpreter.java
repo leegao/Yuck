@@ -250,6 +250,12 @@ public class Interpreter {
           context.push(context.previous.get().lookup(function.upvalues.inverse().get(instruction.getArgument())));
           break;
         }
+        case STORE_UP: {
+          Preconditions.checkArgument(context.previous.isPresent(), "Cannot get an upvalue from the root context.");
+          YuckObject top = context.pop();
+          context.previous.get().storeup(function.upvalues.inverse().get(instruction.getArgument()), top);
+          break;
+        }
         default:
           System.err.printf("%s not supported.", instruction);
           throw new NotImplementedException();

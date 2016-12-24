@@ -1,11 +1,12 @@
 var x = 3;
 function f() {
+  x = 7;
   return x;
 }
 
 if (1 < f(3)) {
   x = 5;
-  return 1 + f() ** 3;
+  return 1 + f() ** x;
 } else {
   return 5;
 }

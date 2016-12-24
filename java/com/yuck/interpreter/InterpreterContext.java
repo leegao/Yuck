@@ -49,4 +49,13 @@ public class InterpreterContext {
     Preconditions.checkArgument(previous.isPresent());
     return previous.get().lookup(name);
   }
+
+  public void storeup(String name, YuckObject val) {
+    if (localNames.containsKey(name)) {
+      locals.put(localNames.get(name), val);
+      return;
+    }
+    Preconditions.checkArgument(previous.isPresent());
+    previous.get().storeup(name, val);
+  }
 }
