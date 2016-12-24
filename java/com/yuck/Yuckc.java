@@ -1,10 +1,9 @@
 package com.yuck;
 
-import com.google.common.base.Preconditions;
 import com.yuck.ast.Statement;
+import com.yuck.compilation.YCodeCompilationContext;
 import com.yuck.grammar.YuckyGrammar;
 import com.yuck.ycode.Instruction;
-import com.yuck.compilation.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunction;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -13,9 +12,6 @@ import org.kohsuke.args4j.Option;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.WritableByteChannel;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +57,10 @@ public class Yuckc {
         }
       } else {
         if (output == null) {
-          throw new NotImplementedException();
+          output = new File(yuckFile.replaceFirst("\\.yuck$", ".yc"));
+          if (output.toString().equals(yuckFile)) {
+            throw new IllegalStateException(String.format("%s does not end in a .yuck extension. Please specify a --output file.", yuckFile));
+          }
         }
         try (DataOutputStream writer = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(output)))) {
           function.write(writer);
