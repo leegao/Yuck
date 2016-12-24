@@ -1,9 +1,9 @@
-package com.yuck.auxiliary.descentparsing.annotations;
+package com.yuck.parsing.annotations;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface For {
+public @interface Rule {
   String value();
 }

@@ -3,7 +3,7 @@ java_library(
   srcs = glob(['Yuckc.java']),
   deps = [
     '//java/com/yuck/ast:ast',
-    '//java/com/yuck/auxiliary/descentparsing:descentparsing',
+    '//java/com/yuck/parsing:parsing',
     '//java/com/yuck/grammar:grammar',
     '//java/com/yuck/ycode:ycode',
     '//java/com/yuck/interpreter:interpreter',

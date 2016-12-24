@@ -3,13 +3,13 @@ package com.yuck.grammar;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.yuck.ast.*;
-import com.yuck.auxiliary.descentparsing.Atom;
-import com.yuck.auxiliary.descentparsing.GrammarBase;
-import com.yuck.auxiliary.descentparsing.Variable;
-import com.yuck.auxiliary.descentparsing.annotations.For;
-import com.yuck.auxiliary.descentparsing.annotations.Resolve;
-import com.yuck.auxiliary.descentparsing.annotations.Rule;
-import com.yuck.auxiliary.descentparsing.annotations.Start;
+import com.yuck.parsing.Atom;
+import com.yuck.parsing.GrammarBase;
+import com.yuck.parsing.Variable;
+import com.yuck.parsing.annotations.For;
+import com.yuck.parsing.annotations.Resolve;
+import com.yuck.parsing.annotations.Rule;
+import com.yuck.parsing.annotations.Start;
 import javafx.util.Pair;
 
 import java.io.FileReader;
@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.yuck.auxiliary.descentparsing.Grammar.V;
+import static com.yuck.parsing.Grammar.V;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;

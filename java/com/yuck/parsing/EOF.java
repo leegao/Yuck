@@ -1,4 +1,4 @@
-package com.yuck.auxiliary.descentparsing;
+package com.yuck.parsing;
 
 public class EOF extends Atom {
   protected EOF() {

@@ -1,14 +1,14 @@
-package com.yuck.auxiliary.descentparsing;
+package com.yuck.parsing;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
-import com.yuck.auxiliary.descentparsing.annotations.For;
-import com.yuck.auxiliary.descentparsing.annotations.Resolve;
-import com.yuck.auxiliary.descentparsing.annotations.Rule;
-import com.yuck.auxiliary.descentparsing.annotations.Start;
+import com.yuck.parsing.annotations.For;
+import com.yuck.parsing.annotations.Resolve;
+import com.yuck.parsing.annotations.Rule;
+import com.yuck.parsing.annotations.Start;
 import javafx.util.Pair;
 
 import java.lang.annotation.Annotation;
@@ -18,7 +18,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.yuck.auxiliary.descentparsing.Grammar.V;
 
 @SuppressWarnings({"unused", "unchecked"})
 public abstract class GrammarBase<U> {
@@ -180,7 +179,7 @@ public abstract class GrammarBase<U> {
 
       Resolve resolver = method.getDeclaredAnnotation(Resolve.class);
       if (resolver != null) {
-        Variable variable = V(resolver.variable());
+        Variable variable = Grammar.V(resolver.variable());
         Atom term = resolver.term().equals("%eof") ? new EOF() : new Terminal(resolver.term());
         mConflictHandlerRegistry.put(new Pair<>(variable, term), method);
       }

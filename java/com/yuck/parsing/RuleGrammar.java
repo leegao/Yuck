@@ -1,4 +1,4 @@
-package com.yuck.auxiliary.descentparsing;
+package com.yuck.parsing;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -17,9 +17,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.yuck.auxiliary.descentparsing.Grammar.E;
-import static com.yuck.auxiliary.descentparsing.Grammar.T;
-import static com.yuck.auxiliary.descentparsing.Grammar.V;
+import static com.yuck.parsing.Grammar.E;
+import static com.yuck.parsing.Grammar.T;
+import static com.yuck.parsing.Grammar.V;
 
 /**
  * E -> eps | $E_group2 $E'

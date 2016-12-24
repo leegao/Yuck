@@ -1,17 +1,15 @@
-package com.yuck.auxiliary.descentparsing.javatest;
+package com.yuck.parsing.javatest;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
-import com.yuck.auxiliary.descentparsing.Atom;
-import com.yuck.auxiliary.descentparsing.GrammarBase;
-import com.yuck.auxiliary.descentparsing.Variable;
-import com.yuck.auxiliary.descentparsing.annotations.For;
-import com.yuck.auxiliary.descentparsing.annotations.Resolve;
-import com.yuck.auxiliary.descentparsing.annotations.Rule;
-import com.yuck.auxiliary.descentparsing.annotations.Start;
+import com.yuck.parsing.Atom;
+import com.yuck.parsing.GrammarBase;
+import com.yuck.parsing.Variable;
+import com.yuck.parsing.annotations.For;
+import com.yuck.parsing.annotations.Rule;
+import com.yuck.parsing.annotations.Start;
 import javafx.util.Pair;
 
 import java.util.List;

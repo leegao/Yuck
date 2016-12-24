@@ -1,4 +1,4 @@
-package com.yuck.auxiliary.descentparsing;
+package com.yuck.parsing;
 
 import com.google.common.collect.*;
 import javafx.util.Pair;

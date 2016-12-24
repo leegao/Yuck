@@ -3,8 +3,8 @@ java_library(
   srcs = [file for file in glob(['*.java']) if file != 'Token.java'],
   deps = [
     ':token',
-    '//java/com/yuck/auxiliary/descentparsing:descentparsing',
-    '//java/com/yuck/auxiliary/descentparsing:annotations',
+    '//java/com/yuck/parsing:parsing',
+    '//java/com/yuck/parsing:annotations',
     '//java/com/yuck/ast:ast',
     '//java/com/yuck/compilation:compilation',
     '//third-party:guava',
