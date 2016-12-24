@@ -4,6 +4,8 @@ function f() {
   return x;
 }
 
+var y = 1 to 3;
+
 if (1 < f(3)) {
   x = 5;
   return 1 + f() ** x;

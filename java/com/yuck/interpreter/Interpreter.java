@@ -246,14 +246,38 @@ public class Interpreter {
           break;
         }
         case LOAD_UP: {
-          Preconditions.checkArgument(context.previous.isPresent(), "Cannot get an upvalue from the root context.");
-          context.push(context.previous.get().lookup(function.upvalues.inverse().get(instruction.getArgument())));
+          String upvalue = function.upvalues.inverse().get(instruction.getArgument());
+          Preconditions.checkArgument(context.previous.isPresent(), String.format("Cannot get an upvalue (%s) from the root context.", upvalue));
+          context.push(context.previous.get().lookup(upvalue));
           break;
         }
         case STORE_UP: {
-          Preconditions.checkArgument(context.previous.isPresent(), "Cannot get an upvalue from the root context.");
+          String upvalue = function.upvalues.inverse().get(instruction.getArgument());
+          Preconditions.checkArgument(context.previous.isPresent(), String.format("Cannot set an upvalue (%s) from the root context.", upvalue));
           YuckObject top = context.pop();
-          context.previous.get().storeup(function.upvalues.inverse().get(instruction.getArgument()), top);
+          context.previous.get().storeup(upvalue, top);
+          break;
+        }
+        case DUP: {
+          context.push(context.stack.getLast());
+          break;
+        }
+        case NIL: {
+          context.push(new YuckNil());
+          break;
+        }
+        case TO_RANGE: {
+          YuckObject right = context.pop();
+          YuckObject left = context.pop();
+          YuckList result = new YuckList();
+          if (left instanceof YuckInteger && right instanceof YuckInteger) {
+            for (int i = ((YuckInteger) left).number; i <= ((YuckInteger) right).number; i++) {
+              result.add(new YuckInteger(i));
+            }
+          } else {
+            throw new NotImplementedException();
+          }
+          context.push(result);
           break;
         }
         default:
