@@ -213,7 +213,7 @@ public class Interpreter {
         case NOP:
           break;
         case STORE_LOCAL:
-          context.add(instruction.getArgument(), context.pop());
+          context.add(instruction.getArgument(), function.locals.inverse().get(instruction.getArgument()), context.pop());
           break;
         case LOAD_LOCAL:
           context.push(context.get(instruction.getArgument()));
@@ -231,13 +231,13 @@ public class Interpreter {
           }
           YuckObject callable = context.pop();
           if (callable instanceof YuckFunction) {
-            InterpreterContext nextContext = new InterpreterContext();
+            InterpreterContext nextContext = new InterpreterContext(context);
             YuckFunction closure = (YuckFunction) callable;
             int local = 0;
             for (YuckObject argument : arguments) {
-              nextContext.add(local++, argument);
+              nextContext.add(local, closure.function.locals.inverse().get(local), argument);
+              local++;
             }
-            // TODO: upvalues
             InterpreterContext result = interpret(closure.function, nextContext);
             context.push(result.pop());
           } else {

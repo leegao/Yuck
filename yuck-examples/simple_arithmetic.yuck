@@ -1,9 +1,9 @@
 var x = 3;
-function f(x) {
+function f() {
   return x;
 }
 
-if (1 < f(x)) {
+if (1 < f()) {
   return 1 + 2 ** 3;
 } else {
   return 5;
