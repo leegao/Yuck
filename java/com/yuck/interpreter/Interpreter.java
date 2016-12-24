@@ -280,6 +280,14 @@ public class Interpreter {
           context.push(result);
           break;
         }
+        case LIST: {
+          YuckList result = new YuckList();
+          for (int i = 0; i < instruction.getArgument(); i++) {
+            result.list.add(0, context.pop());
+          }
+          context.push(result);
+          break;
+        }
         default:
           System.err.printf("%s not supported.", instruction);
           throw new NotImplementedException();
