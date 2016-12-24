@@ -19,7 +19,7 @@ public class YCodeFunction {
   public final BiMap<YCodeFunction, Integer> functions = HashBiMap.create();
   public final String name;
 
-  protected YCodeFunction(List<String> arguments, String name) {
+  public YCodeFunction(List<String> arguments, String name) {
     for (String argument : arguments) {
       local(argument);
     }

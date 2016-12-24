@@ -3,7 +3,7 @@ package com.yuck.ast;
 import com.google.common.collect.ImmutableList;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
-import com.yuck.ycode.YCodeCompilationContext;
+import com.yuck.compilation.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunction;
 import javafx.util.Pair;
 

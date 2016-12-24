@@ -3,7 +3,7 @@ package com.yuck;
 import com.yuck.ast.Statement;
 import com.yuck.grammar.YuckyGrammar;
 import com.yuck.ycode.Instruction;
-import com.yuck.ycode.YCodeCompilationContext;
+import com.yuck.compilation.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunction;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;

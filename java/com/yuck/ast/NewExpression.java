@@ -4,7 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
-import com.yuck.ycode.YCodeCompilationContext;
+import com.yuck.compilation.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunction;
 
 import java.util.List;

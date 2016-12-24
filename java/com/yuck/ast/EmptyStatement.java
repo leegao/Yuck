@@ -1,7 +1,7 @@
 package com.yuck.ast;
 
 import com.yuck.grammar.Token;
-import com.yuck.ycode.YCodeCompilationContext;
+import com.yuck.compilation.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunction;
 
 public class EmptyStatement extends Statement {

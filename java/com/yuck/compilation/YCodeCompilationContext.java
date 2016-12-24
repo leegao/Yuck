@@ -1,10 +1,10 @@
-package com.yuck.ycode;
+package com.yuck.compilation;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
-import com.yuck.ast.Statement;
+import com.yuck.ycode.YCodeFunction;
 
 import java.io.Closeable;
 import java.util.ArrayList;
@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class YCodeCompilationContext {
-  private final List<Statement> statements;
+  private final List<? extends Compilable<YCodeFunction>> statements;
   public final String name;
   private final List<String> parameters;
 
-  public YCodeCompilationContext(List<Statement> statements, String name, List<String> parameters) {
+  public YCodeCompilationContext(List<? extends Compilable<YCodeFunction>> statements, String name, List<String> parameters) {
     this.statements = statements;
     this.name = name;
     this.parameters = parameters;
@@ -74,5 +74,19 @@ public class YCodeCompilationContext {
     }
     function.assemble();
     return function;
+  }
+
+  public void enterTopLevel() {
+    push();
+  }
+
+  public YCodeFunction graduallyCompile(YCodeFunction topLevel, Compilable<YCodeFunction> statement) {
+    topLevel.instructions.clear();
+    topLevel.labels.clear();
+    topLevel.instructionPositions.clear();
+    topLevel.labelPositions.clear();
+    statement.compile(topLevel, this);
+    topLevel.assemble();
+    return topLevel;
   }
 }

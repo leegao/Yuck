@@ -1,7 +1,7 @@
 package com.yuck.ast;
 
 import com.yuck.ycode.Opcode;
-import com.yuck.ycode.YCodeCompilationContext;
+import com.yuck.compilation.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunction;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 

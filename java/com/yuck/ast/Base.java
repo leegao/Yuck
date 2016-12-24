@@ -2,10 +2,11 @@ package com.yuck.ast;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
-import com.yuck.ycode.YCodeCompilationContext;
+import com.yuck.compilation.Compilable;
+import com.yuck.compilation.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunction;
 
-public abstract class Base {
+public abstract class Base implements Compilable<YCodeFunction> {
   @Expose
   public final String type = getClass().getSimpleName();
   private transient int mStartLine, mStartColumn, mEndLine, mEndColumn;
