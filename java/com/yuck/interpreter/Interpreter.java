@@ -125,6 +125,12 @@ public class Interpreter {
           break;
         case NOP:
           break;
+        case STORE_LOCAL:
+          context.add(instruction.getArgument(), context.pop());
+          break;
+        case LOAD_LOCAL:
+          context.push(context.get(instruction.getArgument()));
+          break;
         default:
           System.err.printf("%s not supported.", instruction);
           throw new NotImplementedException();

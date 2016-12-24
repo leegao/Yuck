@@ -1,4 +1,6 @@
-if (1 < 2) {
+var x = 3;
+
+if (1 < x) {
   return 1 + 2 ** 3;
 } else {
   return 5;
