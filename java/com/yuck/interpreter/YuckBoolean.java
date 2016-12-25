@@ -5,7 +5,8 @@ import java.util.Objects;
 public class YuckBoolean extends YuckObject {
   public final boolean bool;
 
-  public YuckBoolean(boolean bool) {
+  public YuckBoolean(boolean bool, InterpreterContext context) {
+    super(context);
     this.bool = bool;
   }
 

@@ -31,7 +31,7 @@ public class Interpreter {
               "Stack is not deep enough at " + instruction);
           YuckObject right = context.pop();
           YuckObject left = context.pop();
-          context.push(new YuckBoolean(left.equals(right)));
+          context.push(new YuckBoolean(left.equals(right), context));
           break;
         }
         case ADD:
@@ -54,28 +54,28 @@ public class Interpreter {
             int b = ((YuckInteger) right).number;
             switch (instruction.opcode) {
               case ADD:
-                result = new YuckInteger(a + b);
+                result = new YuckInteger(a + b, context);
                 break;
               case SUB:
-                result = new YuckInteger(a - b);
+                result = new YuckInteger(a - b, context);
                 break;
               case MUL:
-                result = new YuckInteger(a * b);
+                result = new YuckInteger(a * b, context);
                 break;
               case DIV:
-                result = new YuckInteger(a / b);
+                result = new YuckInteger(a / b, context);
                 break;
               case MOD:
-                result = new YuckInteger(a % b);
+                result = new YuckInteger(a % b, context);
                 break;
               case POW:
-                result = new YuckFloat((float) Math.pow(a, b));
+                result = new YuckFloat((float) Math.pow(a, b), context);
                 break;
               case LE:
-                result = new YuckBoolean(a <= b);
+                result = new YuckBoolean(a <= b, context);
                 break;
               case LT:
-                result = new YuckBoolean(a < b);
+                result = new YuckBoolean(a < b, context);
                 break;
               default:
                 throw new IllegalStateException();
@@ -87,28 +87,28 @@ public class Interpreter {
             int b = ((YuckInteger) right).number;
             switch (instruction.opcode) {
               case ADD:
-                result = new YuckFloat(a + b);
+                result = new YuckFloat(a + b, context);
                 break;
               case SUB:
-                result = new YuckFloat(a - b);
+                result = new YuckFloat(a - b, context);
                 break;
               case MUL:
-                result = new YuckFloat(a * b);
+                result = new YuckFloat(a * b, context);
                 break;
               case DIV:
-                result = new YuckFloat(a / b);
+                result = new YuckFloat(a / b, context);
                 break;
               case MOD:
-                result = new YuckFloat(a % b);
+                result = new YuckFloat(a % b, context);
                 break;
               case POW:
-                result = new YuckFloat((float) Math.pow(a, b));
+                result = new YuckFloat((float) Math.pow(a, b), context);
                 break;
               case LE:
-                result = new YuckBoolean(a <= b);
+                result = new YuckBoolean(a <= b, context);
                 break;
               case LT:
-                result = new YuckBoolean(a < b);
+                result = new YuckBoolean(a < b, context);
                 break;
               default:
                 throw new IllegalStateException();
@@ -120,28 +120,28 @@ public class Interpreter {
             float b = ((YuckFloat) right).number;
             switch (instruction.opcode) {
               case ADD:
-                result = new YuckFloat(a + b);
+                result = new YuckFloat(a + b, context);
                 break;
               case SUB:
-                result = new YuckFloat(a - b);
+                result = new YuckFloat(a - b, context);
                 break;
               case MUL:
-                result = new YuckFloat(a * b);
+                result = new YuckFloat(a * b, context);
                 break;
               case DIV:
-                result = new YuckFloat(a / b);
+                result = new YuckFloat(a / b, context);
                 break;
               case MOD:
-                result = new YuckFloat(a % b);
+                result = new YuckFloat(a % b, context);
                 break;
               case POW:
-                result = new YuckFloat((float) Math.pow(a, b));
+                result = new YuckFloat((float) Math.pow(a, b), context);
                 break;
               case LE:
-                result = new YuckBoolean(a <= b);
+                result = new YuckBoolean(a <= b, context);
                 break;
               case LT:
-                result = new YuckBoolean(a < b);
+                result = new YuckBoolean(a < b, context);
                 break;
               default:
                 throw new IllegalStateException();
@@ -153,28 +153,28 @@ public class Interpreter {
             float b = ((YuckFloat) right).number;
             switch (instruction.opcode) {
               case ADD:
-                result = new YuckFloat(a + b);
+                result = new YuckFloat(a + b, context);
                 break;
               case SUB:
-                result = new YuckFloat(a - b);
+                result = new YuckFloat(a - b, context);
                 break;
               case MUL:
-                result = new YuckFloat(a * b);
+                result = new YuckFloat(a * b, context);
                 break;
               case DIV:
-                result = new YuckFloat(a / b);
+                result = new YuckFloat(a / b, context);
                 break;
               case MOD:
-                result = new YuckFloat(a % b);
+                result = new YuckFloat(a % b, context);
                 break;
               case POW:
-                result = new YuckFloat((float) Math.pow(a, b));
+                result = new YuckFloat((float) Math.pow(a, b), context);
                 break;
               case LE:
-                result = new YuckBoolean(a <= b);
+                result = new YuckBoolean(a <= b, context);
                 break;
               case LT:
-                result = new YuckBoolean(a < b);
+                result = new YuckBoolean(a < b, context);
                 break;
               default:
                 throw new IllegalStateException();
@@ -203,7 +203,7 @@ public class Interpreter {
           return context;
         case LOAD_CONST:
           Object constant = function.constants.inverse().get(instruction.getArgument());
-          YuckObject yuckConstant = YuckObject.translate(constant);
+          YuckObject yuckConstant = YuckObject.translate(constant, context);
           context.push(yuckConstant);
           break;
         case NOP:
@@ -259,16 +259,16 @@ public class Interpreter {
           break;
         }
         case NIL: {
-          context.push(new YuckNil());
+          context.push(new YuckNil(context));
           break;
         }
         case TO_RANGE: {
           YuckObject right = context.pop();
           YuckObject left = context.pop();
-          YuckList result = new YuckList();
+          YuckList result = new YuckList(context);
           if (left instanceof YuckInteger && right instanceof YuckInteger) {
             for (int i = ((YuckInteger) left).number; i <= ((YuckInteger) right).number; i++) {
-              result.add(new YuckInteger(i));
+              result.add(new YuckInteger(i, context));
             }
           } else {
             throw new NotImplementedException();
@@ -277,7 +277,7 @@ public class Interpreter {
           break;
         }
         case LIST: {
-          YuckList result = new YuckList();
+          YuckList result = new YuckList(context);
           for (int i = 0; i < instruction.getArgument(); i++) {
             result.list.add(0, context.pop());
           }
@@ -286,7 +286,7 @@ public class Interpreter {
         }
         case POP: context.pop(); break;
         case TABLE: {
-          YuckTable result = new YuckTable();
+          YuckTable result = new YuckTable(context);
           for (int i = 0; i < instruction.getArgument(); i += 2) {
             YuckObject val = context.pop();
             YuckObject key = context.pop();
@@ -299,9 +299,9 @@ public class Interpreter {
           YuckObject top = context.pop();
           YuckObject result;
           if (top instanceof YuckFloat) {
-            result = new YuckFloat(-((YuckFloat) top).number);
+            result = new YuckFloat(-((YuckFloat) top).number, context);
           } else if (top instanceof YuckInteger) {
-            result = new YuckInteger(-((YuckInteger) top).number);
+            result = new YuckInteger(-((YuckInteger) top).number, context);
           } else {
             throw new NotImplementedException();
           }
@@ -312,7 +312,7 @@ public class Interpreter {
           YuckObject top = context.pop();
           YuckObject result;
           if (top instanceof YuckBoolean) {
-            result = new YuckBoolean(!((YuckBoolean) top).bool);
+            result = new YuckBoolean(!((YuckBoolean) top).bool, context);
           } else {
             throw new NotImplementedException();
           }

@@ -26,6 +26,7 @@ public class YuckFunction extends YuckObject {
   }
 
   public YuckFunction(YCodeFunction function, InterpreterContext context) {
+    super(context);
     this.function = function;
   }
 }

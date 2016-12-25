@@ -12,7 +12,8 @@ public class YuckTable extends YuckObject {
 
   public Map<YuckObject, YuckObject> yuckObjectMap = new HashMap<>();
 
-  public YuckTable() {
+  public YuckTable(InterpreterContext context) {
+    super(context);
   }
 
   @Override

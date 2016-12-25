@@ -4,16 +4,21 @@ import com.google.gson.GsonBuilder;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public abstract class YuckObject {
-  public abstract YuckObjectKind getKind();
-  private String type = getClass().getSimpleName();
+  protected YuckObject(InterpreterContext context) {
+    this.context = context;
+  }
 
-  public static YuckObject translate(Object constant) {
+  public abstract YuckObjectKind getKind();
+  private final String type = getClass().getSimpleName();
+  private transient final InterpreterContext context;
+
+  public static YuckObject translate(Object constant, InterpreterContext context) {
     if (constant instanceof Integer) {
-      return new YuckInteger((Integer) constant);
+      return new YuckInteger((Integer) constant, context);
     } else if (constant instanceof Float) {
-      return new YuckFloat((Float) constant);
+      return new YuckFloat((Float) constant, context);
     } else if (constant instanceof Boolean) {
-      return new YuckBoolean((Boolean) constant);
+      return new YuckBoolean((Boolean) constant, context);
     } else {
       throw new NotImplementedException();
     }

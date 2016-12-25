@@ -1,6 +1,10 @@
 package com.yuck.interpreter;
 
 public class YuckNil extends YuckObject {
+  public YuckNil(InterpreterContext context) {
+    super(context);
+  }
+
   @Override
   public YuckObjectKind getKind() {
     return YuckObjectKind.NIL;

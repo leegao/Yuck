@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class YuckList extends YuckObject {
+  public YuckList(InterpreterContext context) {
+    super(context);
+  }
+
   @Override
   public YuckObjectKind getKind() {
     return YuckObjectKind.LIST;

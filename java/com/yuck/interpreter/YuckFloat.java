@@ -10,7 +10,8 @@ public class YuckFloat extends YuckObject {
     return YuckObjectKind.FLOAT;
   }
 
-  public YuckFloat(float number) {
+  public YuckFloat(float number, InterpreterContext context) {
+    super(context);
     this.number = number;
   }
 

@@ -23,7 +23,8 @@ public class YuckInteger extends YuckObject {
     return YuckObjectKind.INT;
   }
 
-  public YuckInteger(int number) {
+  public YuckInteger(int number, InterpreterContext context) {
+    super(context);
     this.number = number;
   }
 }
