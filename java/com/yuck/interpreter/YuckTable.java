@@ -27,4 +27,14 @@ public class YuckTable extends YuckObject {
   public int hashCode() {
     return Objects.hash(yuckObjectMap);
   }
+
+  @Override
+  public YuckObject tableLoad(YuckObject key) {
+    return yuckObjectMap.get(key);
+  }
+
+  @Override
+  public void tableStore(YuckObject key, YuckObject val) {
+    yuckObjectMap.put(key, val);
+  }
 }

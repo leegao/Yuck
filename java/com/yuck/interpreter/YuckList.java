@@ -28,4 +28,21 @@ public class YuckList extends YuckObject {
   public void add(YuckObject yuckObject) {
     list.add(yuckObject);
   }
+
+  @Override
+  public YuckObject tableLoad(YuckObject key) {
+    if (key instanceof YuckInteger) {
+      return list.get(((YuckInteger) key).number);
+    }
+    return super.tableLoad(key);
+  }
+
+  @Override
+  public void tableStore(YuckObject key, YuckObject val) {
+    if (key instanceof YuckInteger) {
+      list.set(((YuckInteger) key).number, val);
+      return;
+    }
+    super.tableStore(key, val);
+  }
 }
