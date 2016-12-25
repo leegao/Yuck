@@ -288,6 +288,17 @@ public class Interpreter {
           context.push(result);
           break;
         }
+        case POP: context.pop(); break;
+        case TABLE: {
+          YuckTable result = new YuckTable();
+          for (int i = 0; i < instruction.getArgument(); i += 2) {
+            YuckObject val = context.pop();
+            YuckObject key = context.pop();
+            result.yuckObjectMap.put(key, val);
+          }
+          context.push(result);
+          break;
+        }
         default:
           System.err.printf("%s not supported.", instruction);
           throw new NotImplementedException();

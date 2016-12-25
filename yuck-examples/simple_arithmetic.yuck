@@ -6,7 +6,7 @@ function f() {
 
 var y = 1 to f();
 var z = [3, x, [y]];
-return z;
+return {1 : 2, x : true};
 
 if (1 < f(3)) {
   x = 5;
