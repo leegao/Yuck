@@ -103,4 +103,9 @@ public class YuckInteger extends YuckObject {
       throw new NotImplementedException();
     }
   }
+
+  @Override
+  public boolean isFilled() {
+    return number != 0;
+  }
 }

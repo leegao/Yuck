@@ -38,4 +38,9 @@ public class YuckTable extends YuckObject {
   public void tableStore(YuckObject key, YuckObject val) {
     yuckObjectMap.put(key, val);
   }
+
+  @Override
+  public boolean isFilled() {
+    return yuckObjectMap.size() != 0;
+  }
 }

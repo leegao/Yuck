@@ -29,4 +29,9 @@ public class YuckFunction extends YuckObject {
     super(context);
     this.function = function;
   }
+
+  @Override
+  public boolean isFilled() {
+    return true;
+  }
 }

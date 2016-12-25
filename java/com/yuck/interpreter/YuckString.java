@@ -27,4 +27,9 @@ public class YuckString extends YuckObject {
   public int hashCode() {
     return Objects.hash(string);
   }
+
+  @Override
+  public boolean isFilled() {
+    return string.length() != 0;
+  }
 }

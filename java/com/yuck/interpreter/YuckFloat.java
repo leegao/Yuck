@@ -73,4 +73,9 @@ public class YuckFloat extends YuckObject {
     }
     return result;
   }
+
+  @Override
+  public boolean isFilled() {
+    return number != 0;
+  }
 }

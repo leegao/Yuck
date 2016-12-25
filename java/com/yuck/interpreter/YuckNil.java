@@ -19,4 +19,9 @@ public class YuckNil extends YuckObject {
   public int hashCode() {
     return 0;
   }
+
+  @Override
+  public boolean isFilled() {
+    return false;
+  }
 }

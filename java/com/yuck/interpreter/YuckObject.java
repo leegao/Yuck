@@ -49,4 +49,8 @@ public abstract class YuckObject {
   public YuckObject binary(Opcode opcode, YuckObject other) {
     throw new NotImplementedException();
   }
+
+  public boolean isFilled() {
+    throw new NotImplementedException();
+  }
 }

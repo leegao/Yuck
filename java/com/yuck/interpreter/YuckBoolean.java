@@ -27,4 +27,9 @@ public class YuckBoolean extends YuckObject {
   public int hashCode() {
     return Objects.hash(bool);
   }
+
+  @Override
+  public boolean isFilled() {
+    return bool;
+  }
 }

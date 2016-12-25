@@ -52,12 +52,8 @@ public class Interpreter {
         }
         case JUMPZ:
           YuckObject value = context.pop();
-          if (value instanceof YuckBoolean) {
-            if (!((YuckBoolean) value).bool) {
-              next = instruction.getArgument();
-            }
-          } else {
-            throw new NotImplementedException();
+          if (!value.isFilled()) {
+            next = instruction.getArgument();
           }
           break;
         case GOTO:

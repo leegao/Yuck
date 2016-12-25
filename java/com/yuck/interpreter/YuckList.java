@@ -49,4 +49,9 @@ public class YuckList extends YuckObject {
     }
     super.tableStore(key, val);
   }
+
+  @Override
+  public boolean isFilled() {
+    return list.size() != 0;
+  }
 }
