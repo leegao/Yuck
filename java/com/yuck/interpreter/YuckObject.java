@@ -19,6 +19,13 @@ public abstract class YuckObject {
     }
   }
 
+  @Override
+  public abstract boolean equals(Object other);
+
+  @Override
+  public abstract int hashCode();
+
+  @Override
   public String toString() {
     return new GsonBuilder().setPrettyPrinting().create().toJson(this);
   }

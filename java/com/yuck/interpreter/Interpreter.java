@@ -25,6 +25,15 @@ public class Interpreter {
       Instruction instruction = function.instructions.get(pc);
       int next = pc + 1;
       switch (instruction.opcode) {
+        case EQ: {
+          Preconditions.checkArgument(
+              context.depth() >= 2,
+              "Stack is not deep enough at " + instruction);
+          YuckObject right = context.pop();
+          YuckObject left = context.pop();
+          context.push(new YuckBoolean(left.equals(right)));
+          break;
+        }
         case ADD:
         case SUB:
         case MUL:
@@ -32,7 +41,6 @@ public class Interpreter {
         case MOD:
         case LE:
         case LT:
-        case EQ:
         case POW: {
           Preconditions.checkArgument(
               context.depth() >= 2,
@@ -69,9 +77,6 @@ public class Interpreter {
               case LT:
                 result = new YuckBoolean(a < b);
                 break;
-              case EQ:
-                result = new YuckBoolean(a == b);
-                break;
               default:
                 throw new IllegalStateException();
             }
@@ -104,9 +109,6 @@ public class Interpreter {
                 break;
               case LT:
                 result = new YuckBoolean(a < b);
-                break;
-              case EQ:
-                result = new YuckBoolean(a == b);
                 break;
               default:
                 throw new IllegalStateException();
@@ -141,9 +143,6 @@ public class Interpreter {
               case LT:
                 result = new YuckBoolean(a < b);
                 break;
-              case EQ:
-                result = new YuckBoolean(a == b);
-                break;
               default:
                 throw new IllegalStateException();
             }
@@ -176,9 +175,6 @@ public class Interpreter {
                 break;
               case LT:
                 result = new YuckBoolean(a < b);
-                break;
-              case EQ:
-                result = new YuckBoolean(a == b);
                 break;
               default:
                 throw new IllegalStateException();
