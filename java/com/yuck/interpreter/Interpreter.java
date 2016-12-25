@@ -319,6 +319,20 @@ public class Interpreter {
           context.push(result);
           break;
         }
+        case TABLE_LOAD: {
+          YuckObject key = context.pop();
+          YuckObject base = context.pop();
+          YuckObject result = base.tableLoad(key);
+          context.push(result);
+          break;
+        }
+        case TABLE_STORE: {
+          YuckObject val = context.pop();
+          YuckObject key = context.pop();
+          YuckObject base = context.pop();
+          base.tableStore(key, val);
+          break;
+        }
         default:
           System.err.printf("%s not supported.", instruction);
           throw new NotImplementedException();

@@ -29,4 +29,12 @@ public abstract class YuckObject {
   public String toString() {
     return new GsonBuilder().setPrettyPrinting().create().toJson(this);
   }
+
+  public YuckObject tableLoad(YuckObject key) {
+    throw new NotImplementedException();
+  }
+
+  public void tableStore(YuckObject key, YuckObject val) {
+    throw new NotImplementedException();
+  }
 }
