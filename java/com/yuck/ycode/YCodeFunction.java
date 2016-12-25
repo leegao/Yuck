@@ -189,18 +189,18 @@ public class YCodeFunction {
 
   public String fvs(String prefix) {
     int n = 0;
-    String name = prefix + "$" + n;
+    String name = prefix + "$" + n++;
     while (locals.containsKey(name)) {
-      name = prefix + "$" + n;
+      name = prefix + "$" + n++;
     }
     return name;
   }
 
   public String flx(String prefix) {
     int n = 0;
-    String name = prefix + "$" + n;
+    String name = prefix + "$" + n++;
     while (labels.containsKey(name)) {
-      name = prefix + "$" + n;
+      name = prefix + "$" + n++;
     }
     return name;
   }

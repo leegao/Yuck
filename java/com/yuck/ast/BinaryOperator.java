@@ -1,5 +1,6 @@
 package com.yuck.ast;
 
+import com.sun.org.apache.bcel.internal.generic.POP;
 import com.yuck.ycode.Opcode;
 import com.yuck.compilation.YCodeCompilationContext;
 import com.yuck.ycode.YCodeFunction;
@@ -25,9 +26,30 @@ public class BinaryOperator extends Expression {
       case "+": opcode = Opcode.ADD; break;
       case "*": opcode = Opcode.MUL; break;
       case "||":
-      case "or": opcode = Opcode.OR; break;
+      case "or": {
+        // left is true -> left, or right
+        String fallthrough = function.flx("fallthrough");
+        left.compile(function, context);
+        function.emit(Opcode.DUP);
+        function.emit(Opcode.NOT);
+        function.emit(Opcode.JUMPZ, fallthrough);
+        function.emit(Opcode.POP);
+        right.compile(function, context);
+        function.emit(Opcode.NOP, fallthrough);
+        return function;
+      }
       case "&&":
-      case "and": opcode = Opcode.AND; break;
+      case "and": {
+        // left is false -> left, or right
+        String fallthrough = function.flx("fallthrough");
+        left.compile(function, context);
+        function.emit(Opcode.DUP);
+        function.emit(Opcode.JUMPZ, fallthrough);
+        function.emit(Opcode.POP);
+        right.compile(function, context);
+        function.emit(Opcode.NOP, fallthrough);
+        return function;
+      }
       case ">=": not = true;
       case "<": opcode = Opcode.LT; break;
       case ">": not = true;

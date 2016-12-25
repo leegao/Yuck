@@ -5,7 +5,6 @@ import com.google.common.base.Preconditions;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 public class Instruction {
   public final Opcode opcode;
@@ -24,7 +23,6 @@ public class Instruction {
       case NIL:
       case DUP:
       case POP:
-      case ROT2:
       case TABLE_LOAD:
       case TABLE_STORE:
       case RETURN:
@@ -39,8 +37,6 @@ public class Instruction {
       case MOD:
       case NOT:
       case NEG:
-      case AND:
-      case OR:
       case POW:
         Preconditions.checkArgument(data.equals(0));
         return new Instruction(opcode, 0, context);
@@ -133,7 +129,6 @@ public class Instruction {
       case NIL:
       case DUP:
       case POP:
-      case ROT2:
       case TABLE_LOAD:
       case TABLE_STORE:
       case RETURN:
@@ -148,8 +143,6 @@ public class Instruction {
       case MOD:
       case NOT:
       case NEG:
-      case AND:
-      case OR:
       case POW:
         return opcode.toString();
       case LOAD_CONST:

@@ -295,6 +295,30 @@ public class Interpreter {
           context.push(result);
           break;
         }
+        case NEG: {
+          YuckObject top = context.pop();
+          YuckObject result;
+          if (top instanceof YuckFloat) {
+            result = new YuckFloat(-((YuckFloat) top).number);
+          } else if (top instanceof YuckInteger) {
+            result = new YuckInteger(-((YuckInteger) top).number);
+          } else {
+            throw new NotImplementedException();
+          }
+          context.push(result);
+          break;
+        }
+        case NOT: {
+          YuckObject top = context.pop();
+          YuckObject result;
+          if (top instanceof YuckBoolean) {
+            result = new YuckBoolean(!((YuckBoolean) top).bool);
+          } else {
+            throw new NotImplementedException();
+          }
+          context.push(result);
+          break;
+        }
         default:
           System.err.printf("%s not supported.", instruction);
           throw new NotImplementedException();
