@@ -1,6 +1,7 @@
 package com.yuck.interpreter;
 
 import com.google.gson.GsonBuilder;
+import com.yuck.Yuck;
 import com.yuck.ycode.Opcode;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -51,6 +52,14 @@ public abstract class YuckObject {
   }
 
   public boolean isFilled() {
+    throw new NotImplementedException();
+  }
+
+  public YuckObject getField(String field) {
+    throw new NotImplementedException();
+  }
+
+  public YuckObject putField(String field, YuckObject object) {
     throw new NotImplementedException();
   }
 }

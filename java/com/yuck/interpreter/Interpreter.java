@@ -194,6 +194,17 @@ public class Interpreter {
           base.tableStore(key, val);
           break;
         }
+        case GET_FIELD: {
+          YuckObject base = context.pop();
+          context.push(base.getField((String) function.constants.inverse().get(instruction.getArgument())));
+          break;
+        }
+        case PUT_FIELD: {
+          YuckObject val = context.pop();
+          YuckObject base = context.pop();
+          base.putField((String) function.constants.inverse().get(instruction.getArgument()), val);
+          break;
+        }
         default:
           System.err.printf("%s not supported.", instruction);
           throw new NotImplementedException();
