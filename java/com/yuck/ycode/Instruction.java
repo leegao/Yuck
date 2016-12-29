@@ -38,6 +38,7 @@ public class Instruction {
       case NOT:
       case NEG:
       case POW:
+      case NEW:
         Preconditions.checkArgument(data.equals(0));
         return new Instruction(opcode, 0, context);
       case LOAD_CONST:
@@ -50,7 +51,6 @@ public class Instruction {
       case STORE_UP:
         Preconditions.checkArgument(data instanceof String);
         return new Instruction(opcode, context.upvalue((String) data), context);
-      case NEW:
       case GET_FIELD:
       case PUT_FIELD:
         Preconditions.checkArgument(data instanceof String);

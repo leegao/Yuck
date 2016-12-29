@@ -1,11 +1,12 @@
 package com.yuck.ast;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import com.yuck.grammar.Token;
-import com.yuck.ycode.Opcode;
 import com.yuck.compilation.YCodeCompilationContext;
+import com.yuck.grammar.Token;
+import com.yuck.ycode.Instruction;
+import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeFunction;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
 
@@ -21,7 +22,14 @@ public class NewExpression extends Expression {
 
   @Override
   public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
-    function.emit(Opcode.NEW, Joiner.on('.').join(name.names))
+    if (name.names.size() != 1) {
+      throw new NotImplementedException();
+    }
+
+    String id = name.names.get(0);
+    String variable = context.lookup(id).orElse(id);
+    function.emit(Instruction.variable(function, variable), variable)
+        .emit(Opcode.NEW)
         .emit(Opcode.DUP)
         .emit(Opcode.GET_FIELD, "init");
     arguments.forEach(expression -> expression.compile(function, context));
