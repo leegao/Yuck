@@ -19,6 +19,7 @@ public class YCodeFunction {
   public transient final List<Integer> labelPositions = new ArrayList<>();
   public final BiMap<Instruction, Integer> instructionPositions = HashBiMap.create();
   public final BiMap<YCodeFunction, Integer> functions = HashBiMap.create();
+  public final BiMap<YCodeClass, Integer> classes = HashBiMap.create();
   public final String name;
 
   public YCodeFunction(List<String> arguments, String name) {
@@ -143,7 +144,12 @@ public class YCodeFunction {
       function.write(buffer);
     }
     // Classes
-    buffer.writeShort(0);
+    buffer.writeShort(classes.size());
+    for (int i = 0; i < classes.size(); i++) {
+      Preconditions.checkArgument(classes.inverse().containsKey(i));
+      YCodeClass clazz = classes.inverse().get(i);
+      clazz.write(buffer);
+    }
     return buffer;
   }
 
@@ -183,7 +189,10 @@ public class YCodeFunction {
       function.functions.put(YCodeFunction.read(buffer), i);
     }
     // Classes
-    Preconditions.checkArgument(buffer.readShort() == 0);
+    int numClasses = buffer.readShort();
+    for (int i = 0; i < numClasses; i++) {
+      function.classes.put(YCodeClass.read(buffer), i);
+    }
     return function;
   }
 
@@ -203,5 +212,12 @@ public class YCodeFunction {
       name = prefix + "$" + n++;
     }
     return name;
+  }
+
+  public int clazz(YCodeClass yClass) {
+    Preconditions.checkArgument(!classes.containsKey(yClass));
+    int n = classes.size();
+    classes.put(yClass, n);
+    return n;
   }
 }

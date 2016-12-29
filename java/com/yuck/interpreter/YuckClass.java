@@ -1,7 +1,7 @@
 package com.yuck.interpreter;
 
 public class YuckClass extends YuckObject {
-  protected YuckClass(InterpreterContext context) {
+  public YuckClass(InterpreterContext context) {
     super(context);
   }
 

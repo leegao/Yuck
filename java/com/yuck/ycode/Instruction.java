@@ -70,6 +70,10 @@ public class Instruction {
         Preconditions.checkArgument(data instanceof YCodeFunction);
         int f = context.function((YCodeFunction) data);
         return new Instruction(opcode, f, context);
+      case CLASS:
+        Preconditions.checkArgument(data instanceof YCodeClass);
+        int c = context.clazz((YCodeClass) data);
+        return new Instruction(opcode, c, context);
       case TABLE:
         mult = 2;
       case CALL:

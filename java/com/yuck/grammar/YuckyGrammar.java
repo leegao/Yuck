@@ -359,7 +359,9 @@ public class YuckyGrammar extends GrammarBase<Token> {
       } else {
         Function<Token, VariableDeclaration> varDecl = (Function<Token, VariableDeclaration>) production.get(0);
         Token semicolon = (Token) production.get(1);
-        variableDeclarations.add(varDecl.apply(semicolon));
+        VariableDeclaration variableDeclaration = varDecl.apply(semicolon);
+        Preconditions.checkArgument(!variableDeclaration.init.isPresent());
+        variableDeclarations.add(variableDeclaration);
       }
     }
     return new ClassStatement(clazz, name, variableDeclarations, methodDeclarations, close);
