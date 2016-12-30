@@ -2,6 +2,7 @@ package com.yuck.ycode;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableList;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -12,11 +13,18 @@ import java.util.stream.Collectors;
 
 public class YCodeClass {
   public final String name;
+  public final List<String> extensions;
   public List<String> fields = new ArrayList<>();
   public BiMap<String, Integer> methods = HashBiMap.create();
 
   public YCodeClass(String name) {
     this.name = name;
+    extensions = ImmutableList.of();
+  }
+
+  public YCodeClass(String name, List<String> extensions) {
+    this.name = name;
+    this.extensions = extensions;
   }
 
   public void addField(String id) {
@@ -39,6 +47,10 @@ public class YCodeClass {
       Utils.writeString(buffer, key);
       buffer.writeShort(methods.get(key));
     }
+    buffer.writeShort(extensions.size());
+    for (String extension : extensions) {
+      Utils.writeString(buffer, extension);
+    }
     return buffer;
   }
 
@@ -52,6 +64,10 @@ public class YCodeClass {
     int numMethods = buffer.readShort();
     for (int i = 0; i < numMethods; i++) {
       clazz.methods.put(Utils.readString(buffer), (int) buffer.readShort());
+    }
+    int numExtensions = buffer.readShort();
+    for (int i = 0; i < numExtensions; i++) {
+      clazz.extensions.add(Utils.readString(buffer));
     }
     return clazz;
   }
