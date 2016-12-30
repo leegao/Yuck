@@ -121,6 +121,11 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return leaf -> new IndexExpression(leaf, expression, right);
   }
 
+  @Rule("level10' -> instanceof id")
+  public Function<Expression, Expression> level10_inst(Token instOf, Token id) {
+    return leaf -> new InstanceOfExpression(leaf, id);
+  }
+
   @Rule("level10 -> $E.leaf $level10'*")
   public Expression level10(Expression leaf, List<Function<Expression, Expression>> arguments) {
     for (Function<Expression, Expression> appliable : arguments) {

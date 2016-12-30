@@ -43,8 +43,8 @@ FloatLiteral = DecIntegerLiteral [.] [0-9]+
 
 /* keywords */
 <YYINITIAL> {
-  "break"              { return symbol(yytext()); }
-  "class"              { return symbol(yytext()); }
+  "break"                        { return symbol(yytext()); }
+  "class"                        { return symbol(yytext()); }
   "="                            { return symbol(yytext()); }
   "=="                           { return symbol(yytext()); }
   "!="                           { return symbol(yytext()); }
@@ -53,51 +53,52 @@ FloatLiteral = DecIntegerLiteral [.] [0-9]+
   ">"                            { return symbol(yytext()); }
   ">="                           { return symbol(yytext()); }
   "("                            { return symbol("%("); }
-  ")"                       { return symbol("%)"); }
-  "["                       { return symbol(yytext()); }
-  "]"                       { return symbol(yytext()); }
-  "{"                       { return symbol(yytext()); }
-  "}"                       { return symbol(yytext()); }
-  "."                       { return symbol(yytext()); }
-  ".."                       { return symbol(yytext()); }
-  ","                       { return symbol(yytext()); }
-  "+"                       { return symbol("add"); }
-  "-"                       { return symbol(yytext()); }
-  "**"                       { return symbol("pow"); }
-  "*"                       { return symbol("mul"); }
-  "/"                       { return symbol(yytext()); }
-  "|"                       { return symbol(yytext()); }
-  "&"                       { return symbol(yytext()); }
-  "^"                       { return symbol(yytext()); }
-  "?"                       { return symbol(yytext()); }
-  ":"                       { return symbol("%:"); }
-  "::"                       { return symbol("cons"); }
-  "+="                       { return symbol(yytext()); }
-  "-="                       { return symbol(yytext()); }
-  ";"                        { return symbol(yytext()); }
-  "@"                        { return symbol(yytext()); }
-  "to"                       { return symbol(yytext()); }
-  "and"                             { return symbol(yytext()); }
-  "or"                             { return symbol(yytext()); }
-  "not"                             { return symbol(yytext()); }
+  ")"                            { return symbol("%)"); }
+  "["                            { return symbol(yytext()); }
+  "]"                            { return symbol(yytext()); }
+  "{"                            { return symbol(yytext()); }
+  "}"                            { return symbol(yytext()); }
+  "."                            { return symbol(yytext()); }
+  ".."                           { return symbol(yytext()); }
+  ","                            { return symbol(yytext()); }
+  "+"                            { return symbol("add"); }
+  "-"                            { return symbol(yytext()); }
+  "**"                           { return symbol("pow"); }
+  "*"                            { return symbol("mul"); }
+  "/"                            { return symbol(yytext()); }
+  "|"                            { return symbol(yytext()); }
+  "&"                            { return symbol(yytext()); }
+  "^"                            { return symbol(yytext()); }
+  "?"                            { return symbol(yytext()); }
+  ":"                            { return symbol("%:"); }
+  "::"                           { return symbol("cons"); }
+  "+="                           { return symbol(yytext()); }
+  "-="                           { return symbol(yytext()); }
+  ";"                            { return symbol(yytext()); }
+  "@"                            { return symbol(yytext()); }
+  "to"                           { return symbol(yytext()); }
+  "and"                          { return symbol(yytext()); }
+  "or"                           { return symbol(yytext()); }
+  "not"                          { return symbol(yytext()); }
   "function"                     { return symbol(yytext()); }
-  "var"                             { return symbol(yytext()); }
+  "var"                          { return symbol(yytext()); }
   "true"                         { return symbol(yytext()); }
-  "false"                         { return symbol(yytext()); }
-  "if"                             { return symbol(yytext()); }
-  "for"                             { return symbol(yytext()); }
-  "elseif"                         { return symbol(yytext()); }
+  "false"                        { return symbol(yytext()); }
+  "if"                           { return symbol(yytext()); }
+  "for"                          { return symbol(yytext()); }
+  "elseif"                       { return symbol(yytext()); }
   "else"                         { return symbol(yytext()); }
-  "while"                         { return symbol(yytext()); }
-  "return"                         { return symbol(yytext()); }
-  "in"                             { return symbol(yytext()); }
-  "nil"                             { return symbol(yytext()); }
-  "match"                         { return symbol(yytext()); }
+  "while"                        { return symbol(yytext()); }
+  "return"                       { return symbol(yytext()); }
+  "in"                           { return symbol(yytext()); }
+  "nil"                          { return symbol(yytext()); }
+  "match"                        { return symbol(yytext()); }
   "with"                         { return symbol(yytext()); }
   "new"                          { return symbol(yytext()); }
-  "do"                             { return symbol(yytext()); }
+  "do"                           { return symbol(yytext()); }
   "this"                         { return symbol(yytext()); }
   "extends"                      { return symbol(yytext()); }
+  "instanceof"                   { return symbol(yytext()); }
 }
 
 <YYINITIAL> {
@@ -106,7 +107,7 @@ FloatLiteral = DecIntegerLiteral [.] [0-9]+
 
   /* literals */
   {DecIntegerLiteral}            { return symbol("num"); }
-  {FloatLiteral}            { return symbol("num"); }
+  {FloatLiteral}                 { return symbol("num"); }
   \"                             { string.setLength(0); yybegin(STRING); }
 
   /* comments */

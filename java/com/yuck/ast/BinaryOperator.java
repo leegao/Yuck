@@ -1,8 +1,7 @@
 package com.yuck.ast;
 
-import com.sun.org.apache.bcel.internal.generic.POP;
-import com.yuck.ycode.Opcode;
 import com.yuck.compilation.YCodeCompilationContext;
+import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeFunction;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
