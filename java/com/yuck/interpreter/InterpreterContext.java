@@ -20,7 +20,7 @@ public class InterpreterContext {
   }
 
   public InterpreterContext(@Nullable InterpreterContext previous, @Nullable YuckInstance currentInstance) {
-    this.previous = Optional.of(previous);
+    this.previous = Optional.ofNullable(previous);
     this.currentInstance = Optional.ofNullable(currentInstance);
   }
 
@@ -53,7 +53,7 @@ public class InterpreterContext {
     if (localNames.containsKey(name)) {
       return locals.get(localNames.get(name));
     }
-    Preconditions.checkArgument(previous.isPresent());
+    Preconditions.checkArgument(previous.isPresent(), "Cannot find the variable " + name);
     return previous.get().lookup(name);
   }
 
@@ -61,7 +61,7 @@ public class InterpreterContext {
     if (currentInstance.isPresent()) {
       return currentInstance.get();
     }
-    Preconditions.checkArgument(previous.isPresent());
+    Preconditions.checkArgument(previous.isPresent(), "Not inside an instance.");
     return previous.get().lookupThis();
   }
 
@@ -70,7 +70,7 @@ public class InterpreterContext {
       locals.put(localNames.get(name), val);
       return;
     }
-    Preconditions.checkArgument(previous.isPresent());
+    Preconditions.checkArgument(previous.isPresent(), "Cannot find the variable " + name);
     previous.get().storeup(name, val);
   }
 }
