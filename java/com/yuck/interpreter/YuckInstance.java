@@ -1,7 +1,5 @@
 package com.yuck.interpreter;
 
-import com.google.common.base.Preconditions;
-import com.yuck.ycode.YCodeClass;
 import com.yuck.ycode.YCodeFunction;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -9,10 +7,10 @@ import java.util.*;
 
 public class YuckInstance extends YuckObject {
   public final YuckClass clazz;
-  public transient final YCodeFunction outer;
+  public final YCodeFunction outer;
   public final Map<String, YuckObject> fields = new HashMap<>();
   public transient final InterpreterContext instanceContext;
-  public transient final List<YuckInstance> supers = new ArrayList<>();
+  public final List<YuckInstance> supers = new ArrayList<>();
 
   public YuckInstance(YuckClass clazz, YCodeFunction outer, InterpreterContext context) {
     super(context);
@@ -25,8 +23,8 @@ public class YuckInstance extends YuckObject {
     for (Map.Entry<String, Integer> method : clazz.yClass.methods.entrySet()) {
       fields.put(method.getKey(), new YuckFunction(outer.functions.inverse().get(method.getValue()), instanceContext));
     }
-    for (YCodeClass superClass : clazz.yClass.supers(clazz.function)) {
-      supers.add(new YuckInstance(new YuckClass(superClass, context, clazz.function), clazz.function, context));
+    for (YuckClass superClass : clazz.extensions) {
+      supers.add(new YuckInstance(superClass, superClass.function, superClass.context));
     }
   }
 

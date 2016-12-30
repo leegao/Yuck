@@ -9,18 +9,20 @@ class Foo {
   }
 }
 
-function meh() {
+function meh(n) {
   class Bar extends Foo {
     function init() {
       this(Foo).init();
     }
 
     function bar() {
-      return 5;
+      this.z = this.z + n;
+      return true;
     }
   }
   return new Bar();
 }
 
-var z = meh();
+var z = meh(3);
+z.bar();
 return z.foo();

@@ -11,15 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class YCodeFunction {
-  public final BiMap<String, Integer> locals = HashBiMap.create();
-  public final BiMap<String, Integer> upvalues = HashBiMap.create();
-  public final BiMap<Object, Integer> constants = HashBiMap.create();
+  public transient final BiMap<String, Integer> locals = HashBiMap.create();
+  public transient final BiMap<String, Integer> upvalues = HashBiMap.create();
+  public transient final BiMap<Object, Integer> constants = HashBiMap.create();
   public transient final BiMap<String, Integer> labels = HashBiMap.create();
-  public final List<Instruction> instructions = new ArrayList<>();
+  public transient final List<Instruction> instructions = new ArrayList<>();
   public transient final List<Integer> labelPositions = new ArrayList<>();
-  public final BiMap<Instruction, Integer> instructionPositions = HashBiMap.create();
-  public final BiMap<YCodeFunction, Integer> functions = HashBiMap.create();
-  public final BiMap<YCodeClass, Integer> classes = HashBiMap.create();
+  public transient final BiMap<Instruction, Integer> instructionPositions = HashBiMap.create();
+  public transient final BiMap<YCodeFunction, Integer> functions = HashBiMap.create();
+  public transient final BiMap<YCodeClass, Integer> classes = HashBiMap.create();
   public final String name;
 
   public YCodeFunction(List<String> arguments, String name) {

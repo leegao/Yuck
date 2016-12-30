@@ -14,9 +14,9 @@ public class YCodeClass {
   public final String name;
   public final List<String> extensions;
   public List<String> fields = new ArrayList<>();
-  public BiMap<String, Integer> methods = HashBiMap.create();
-  public BiMap<String, Integer> localExtension = HashBiMap.create();
-  public BiMap<String, Integer> upvalueExtension = HashBiMap.create();
+  public transient BiMap<String, Integer> methods = HashBiMap.create();
+  public transient BiMap<String, Integer> localExtension = HashBiMap.create();
+  public transient BiMap<String, Integer> upvalueExtension = HashBiMap.create();
 
   public YCodeClass(String name) {
     this.name = name;
@@ -91,19 +91,5 @@ public class YCodeClass {
       clazz.upvalueExtension.put(Utils.readString(buffer), (int) buffer.readShort());
     }
     return clazz;
-  }
-
-
-  public List<YCodeClass> supers(YCodeFunction function) {
-    List<YCodeClass> extending = new ArrayList<>();
-    for (String extension : extensions) {
-      for (YCodeClass clazz : function.classes.keySet()) {
-        if (clazz.name.equals(extension)) {
-          extending.add(clazz);
-          break;
-        }
-      }
-    }
-    return extending;
   }
 }
