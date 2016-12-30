@@ -237,6 +237,14 @@ public class Interpreter {
           }
           break;
         }
+        case INSTANCEOF: {
+          String name = (String) function.constants.inverse().get(instruction.getArgument());
+          YuckObject yuckObject = context.pop();
+          Preconditions.checkArgument(yuckObject instanceof YuckInstance);
+          YuckInstance instance = (YuckInstance) yuckObject;
+          context.push(new YuckBoolean(instance.getSuper(name).isPresent(), context));
+          break;
+        }
         default:
           System.err.printf("%s not supported.", instruction);
           throw new NotImplementedException();

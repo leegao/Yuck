@@ -6,15 +6,17 @@ import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeFunction;
 
 public class InstanceOfExpression extends Expression {
+  public final Expression left;
   public final String name;
 
   public InstanceOfExpression(Expression left, Token name) {
     super(left.getStartLine(), left.getStartColumn(), name.endLine, name.endColumn);
+    this.left = left;
     this.name = name.text;
   }
 
   @Override
   public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
-    return function.emit(Opcode.INSTANCEOF, function.constant(name));
+    return left.compile(function, context).emit(Opcode.INSTANCEOF, name);
   }
 }
