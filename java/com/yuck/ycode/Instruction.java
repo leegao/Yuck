@@ -148,6 +148,7 @@ public class Instruction {
       case NOT:
       case NEG:
       case POW:
+      case NEW:
         return opcode.toString();
       case LOAD_CONST:
         return String.format("%s(%s)", opcode.toString(), context.constants.inverse().get(argument));
@@ -157,7 +158,6 @@ public class Instruction {
       case LOAD_UP:
       case STORE_UP:
         return String.format("%s(%s)", opcode.toString(), context.upvalues.inverse().get(argument));
-      case NEW:
       case GET_FIELD:
       case PUT_FIELD:
         return String.format("%s(%s)", opcode.toString(), context.constants.inverse().get(argument));
@@ -168,12 +168,14 @@ public class Instruction {
         return opcode.toString();
       case CLOSURE:
         return String.format("%s(%s)", opcode, context.functions.inverse().get(argument).name);
+      case CLASS:
+        return String.format("%s(%s)", opcode, context.classes.inverse().get(argument).name);
       case TABLE:
       case CALL:
       case LIST:
         return String.format("%s(%s)", opcode, argument);
       default:
-        throw new IllegalStateException();
+        throw new IllegalStateException(String.format("Opcode %s is not supported.", opcode));
     }
   }
 }

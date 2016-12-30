@@ -45,6 +45,9 @@ public class ClassStatement extends Statement {
         yClass.addField(field.id);
       }
     }
+    if (!yClass.methods.containsKey("init")) {
+      throw new IllegalStateException("A class must have a constructor function init(...).");
+    }
     function.emit(Opcode.CLASS, yClass);
     function.emit(Opcode.STORE_LOCAL, name);
     return function;

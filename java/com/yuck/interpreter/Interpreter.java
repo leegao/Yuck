@@ -2,6 +2,7 @@ package com.yuck.interpreter;
 
 import com.google.common.base.Preconditions;
 import com.yuck.ycode.Instruction;
+import com.yuck.ycode.YCodeClass;
 import com.yuck.ycode.YCodeFunction;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -98,6 +99,7 @@ public class Interpreter {
             InterpreterContext result = interpret(closure.function, nextContext);
             context.push(result.pop());
           } else {
+            System.err.println(instruction + " : " + callable);
             throw new NotImplementedException();
           }
           break;
@@ -203,6 +205,19 @@ public class Interpreter {
           YuckObject val = context.pop();
           YuckObject base = context.pop();
           base.putField((String) function.constants.inverse().get(instruction.getArgument()), val);
+          break;
+        }
+        case CLASS: {
+          YCodeClass yClass = function.classes.inverse().get(instruction.getArgument());
+          YuckClass yuckClass = new YuckClass(yClass, context);
+          context.push(yuckClass);
+          break;
+        }
+        case NEW: {
+          YuckObject clazz = context.pop();
+          Preconditions.checkArgument(clazz instanceof YuckClass);
+          YuckInstance instance = new YuckInstance((YuckClass) clazz, function, context);
+          context.push(instance);
           break;
         }
         default:

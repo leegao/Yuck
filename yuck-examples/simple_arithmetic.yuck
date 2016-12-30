@@ -4,13 +4,16 @@ function f() {
   return x;
 }
 
-var y = 1 to f();
-var z = [3, x, [y]];
-return [1, 2, true][2];
+class Foo {
+  var z;
+  function init(z) {
+    this.z = z;
+  }
 
-if (1 < f(3)) {
-  x = 5;
-  return 1 + f() ** x;
-} else {
-  return 5;
+  function foo() {
+    return 3;
+  }
 }
+
+var z = new Foo();
+return z.foo() * 2;
