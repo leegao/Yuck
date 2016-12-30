@@ -1,7 +1,7 @@
 class Foo {
   var z;
-  function init(z) {
-    this.z = z;
+  function init() {
+    this.z = 3;
   }
 
   function foo() {
@@ -9,5 +9,16 @@ class Foo {
   }
 }
 
-var z = new Foo("ABC");
-return z.foo() == z.z;
+class Bar extends Foo {
+  function init() {
+    this(Foo).init();
+    this.z = 5;
+  }
+
+  function bar() {
+    return 5;
+  }
+}
+W
+var z = new Bar("ABC");
+return z.foo();

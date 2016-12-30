@@ -209,7 +209,7 @@ public class Interpreter {
         }
         case CLASS: {
           YCodeClass yClass = function.classes.inverse().get(instruction.getArgument());
-          YuckClass yuckClass = new YuckClass(yClass, context);
+          YuckClass yuckClass = new YuckClass(yClass, context, function);
           context.push(yuckClass);
           break;
         }

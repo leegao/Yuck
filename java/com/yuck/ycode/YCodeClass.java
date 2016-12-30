@@ -19,7 +19,7 @@ public class YCodeClass {
 
   public YCodeClass(String name) {
     this.name = name;
-    extensions = ImmutableList.of();
+    extensions = new ArrayList<>();
   }
 
   public YCodeClass(String name, List<String> extensions) {
@@ -70,5 +70,19 @@ public class YCodeClass {
       clazz.extensions.add(Utils.readString(buffer));
     }
     return clazz;
+  }
+
+
+  public List<YCodeClass> supers(YCodeFunction function) {
+    List<YCodeClass> extending = new ArrayList<>();
+    for (String extension : extensions) {
+      for (YCodeClass clazz : function.classes.keySet()) {
+        if (clazz.name.equals(extension)) {
+          extending.add(clazz);
+          break;
+        }
+      }
+    }
+    return extending;
   }
 }
