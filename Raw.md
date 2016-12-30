@@ -7,10 +7,10 @@
 
 #### Roadmap
 
-- [ ] Specification of the `yuck` language.
+- [x] Specification of the `yuck` language.
 - [x] Turning text into trees.
-- [ ] Turning trees into "ycode" programs.
-- [ ] Interpreting "ycode" directly.
+- [x] Turning trees into "ycode" programs.
+- [x] Interpreting "ycode" directly.
 - [ ] A few linters and static analyzers.
 - [ ] Simple peep-hole optimizations.
 - [ ] Gradually typing yucky code.
