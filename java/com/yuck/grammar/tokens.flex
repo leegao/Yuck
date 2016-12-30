@@ -95,6 +95,7 @@ FloatLiteral = DecIntegerLiteral [.] [0-9]+
   "with"                         { return symbol(yytext()); }
   "new"                          { return symbol(yytext()); }
   "do"                             { return symbol(yytext()); }
+  "this"                         { return symbol(yytext()); }
 }
 
 <YYINITIAL> {

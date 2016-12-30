@@ -253,6 +253,11 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return new Literal(nil);
   }
 
+  @Rule("E.leaf -> this")
+  public Expression expLeafThis(Token thisToken) {
+    return new This(thisToken);
+  }
+
   @Rule("statement -> $E (= $E : Assignment)?;")
   public Statement statement(Expression expr, Optional<Expression> assignment, Token semi) {
     if (assignment.isPresent()) {
