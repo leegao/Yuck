@@ -354,8 +354,8 @@ public class YuckyGrammar extends GrammarBase<Token> {
   }
 
   @SuppressWarnings("unchecked")
-  @Rule("statement -> class id { ($var.decl ; | $func.decl)* }")
-  public Statement statement(Token clazz, Token name, Token open, List<List<?>> declarations, Token close) {
+  @Rule("statement -> class id (extends id : Second)* { ($var.decl ; | $func.decl)* }")
+  public Statement statement(Token clazz, Token name, List<Token> extensions, Token open, List<List<?>> declarations, Token close) {
     List<VariableDeclaration> variableDeclarations = new ArrayList<>();
     List<FunctionDeclaration> methodDeclarations = new ArrayList<>();
     for (List<?> production : declarations) {
@@ -369,7 +369,7 @@ public class YuckyGrammar extends GrammarBase<Token> {
         variableDeclarations.add(variableDeclaration);
       }
     }
-    return new ClassStatement(clazz, name, variableDeclarations, methodDeclarations, close);
+    return new ClassStatement(clazz, name, extensions, variableDeclarations, methodDeclarations, close);
   }
 
   @Rule("statement -> ;")

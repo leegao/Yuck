@@ -6,30 +6,34 @@ import com.yuck.grammar.Token;
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeClass;
 import com.yuck.ycode.YCodeFunction;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ClassStatement extends Statement {
   public final String name;
+  public final List<String> extensions;
   public final ImmutableList<VariableDeclaration> fieldDeclarations;
   public final ImmutableList<FunctionDeclaration> methodDeclarations;
 
   public ClassStatement(
       Token clazz,
       Token name,
+      List<Token> extensions,
       List<VariableDeclaration> fieldDeclarations,
       List<FunctionDeclaration> methodDeclarations,
       Token close) {
     super(clazz.startLine, clazz.startColumn, close.endLine, close.endColumn);
     this.name = name.text;
+    this.extensions = ImmutableList.copyOf(
+        extensions.stream().map(token -> token.text).collect(Collectors.toList()));
     this.fieldDeclarations = ImmutableList.copyOf(fieldDeclarations);
     this.methodDeclarations = ImmutableList.copyOf(methodDeclarations);
   }
 
   @Override
   public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
-    YCodeClass yClass = new YCodeClass(name);
+    YCodeClass yClass = new YCodeClass(name, extensions);
     try (YCodeCompilationContext.Scope scope = context.push()) {
       for (FunctionDeclaration method : methodDeclarations) {
         yClass.addField(method.id);
