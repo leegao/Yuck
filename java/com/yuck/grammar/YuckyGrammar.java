@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.yuck.parsing.Grammar.E;
 import static com.yuck.parsing.Grammar.V;
 
 import org.kohsuke.args4j.Argument;
@@ -253,9 +254,22 @@ public class YuckyGrammar extends GrammarBase<Token> {
     return new Literal(nil);
   }
 
-  @Rule("E.leaf -> this")
-  public Expression expLeafThis(Token thisToken) {
-    return new This(thisToken);
+  @Rule("E.leaf -> this ( %( id %) : Second )?")
+  public Expression expLeafThis(Token thisToken, Optional<Token> parameter) {
+    if (!parameter.isPresent()) {
+      return new This(thisToken);
+    }
+    return new Super(thisToken, parameter.get());
+  }
+
+  @Resolve(variable = "E.leaf@($E.leaf@(%(.id.%))@group)@maybe", term = "%(")
+  public List<Atom> resolveThis(
+      List<Token> rest,
+      Set<List<Atom>> candidates) {
+    for (List<Atom> production : candidates) {
+      if (!production.get(0).equals(E())) return production;
+    }
+    throw new IllegalStateException();
   }
 
   @Rule("statement -> $E (= $E : Assignment)?;")

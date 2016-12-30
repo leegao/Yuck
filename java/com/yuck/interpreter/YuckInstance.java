@@ -75,4 +75,17 @@ public class YuckInstance extends YuckObject {
     }
     throw new NotImplementedException();
   }
+
+  public Optional<YuckInstance> getSuper(String name) {
+    if (this.clazz.yClass.name.equals(name)) {
+      return Optional.of(this);
+    }
+    for (YuckInstance superInstance : supers) {
+      Optional<YuckInstance> instance = superInstance.getSuper(name);
+      if (instance.isPresent()) {
+        return instance;
+      }
+    }
+    return Optional.empty();
+  }
 }

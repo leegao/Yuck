@@ -8,6 +8,7 @@ import com.yuck.ycode.YCodeClass;
 import com.yuck.ycode.YCodeFunction;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ClassStatement extends Statement {
@@ -47,6 +48,16 @@ public class ClassStatement extends Statement {
       }
       for (VariableDeclaration field : fieldDeclarations) {
         yClass.addField(field.id);
+      }
+      for (String extension : extensions) {
+        Optional<String> variable = context.lookup(extension);
+        if (variable.isPresent()) {
+          int local = function.locals.get(variable.get());
+          yClass.localExtension.put(extension, local);
+        } else {
+          int up = function.upvalue(extension);
+          yClass.upvalueExtension.put(extension, up);
+        }
       }
     }
     if (!yClass.methods.containsKey("init")) {

@@ -9,16 +9,18 @@ class Foo {
   }
 }
 
-class Bar extends Foo {
-  function init() {
-    this(Foo).init();
-    this.z = 5;
-  }
+function meh() {
+  class Bar extends Foo {
+    function init() {
+      this(Foo).init();
+    }
 
-  function bar() {
-    return 5;
+    function bar() {
+      return 5;
+    }
   }
+  return new Bar();
 }
-W
-var z = new Bar("ABC");
+
+var z = meh();
 return z.foo();

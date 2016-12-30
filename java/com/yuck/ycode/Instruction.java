@@ -42,6 +42,7 @@ public class Instruction {
       case THIS:
         Preconditions.checkArgument(data.equals(0));
         return new Instruction(opcode, 0, context);
+      case SUPER:
       case LOAD_CONST:
         return new Instruction(opcode, context.constant(data), context);
       case LOAD_LOCAL:
@@ -152,6 +153,7 @@ public class Instruction {
       case NEW:
       case THIS:
         return opcode.toString();
+      case SUPER:
       case LOAD_CONST:
         return String.format("%s(%s)", opcode.toString(), context.constants.inverse().get(argument));
       case LOAD_LOCAL:

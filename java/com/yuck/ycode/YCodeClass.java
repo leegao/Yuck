@@ -2,7 +2,6 @@ package com.yuck.ycode;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableList;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -16,6 +15,8 @@ public class YCodeClass {
   public final List<String> extensions;
   public List<String> fields = new ArrayList<>();
   public BiMap<String, Integer> methods = HashBiMap.create();
+  public BiMap<String, Integer> localExtension = HashBiMap.create();
+  public BiMap<String, Integer> upvalueExtension = HashBiMap.create();
 
   public YCodeClass(String name) {
     this.name = name;
@@ -51,6 +52,18 @@ public class YCodeClass {
     for (String extension : extensions) {
       Utils.writeString(buffer, extension);
     }
+    buffer.writeShort(localExtension.size());
+    keys = localExtension.keySet().stream().sorted().collect(Collectors.toList());
+    for (String key : keys) {
+      Utils.writeString(buffer, key);
+      buffer.writeShort(localExtension.get(key));
+    }
+    buffer.writeShort(upvalueExtension.size());
+    keys = upvalueExtension.keySet().stream().sorted().collect(Collectors.toList());
+    for (String key : keys) {
+      Utils.writeString(buffer, key);
+      buffer.writeShort(upvalueExtension.get(key));
+    }
     return buffer;
   }
 
@@ -68,6 +81,14 @@ public class YCodeClass {
     int numExtensions = buffer.readShort();
     for (int i = 0; i < numExtensions; i++) {
       clazz.extensions.add(Utils.readString(buffer));
+    }
+    int numLocals = buffer.readShort();
+    for (int i = 0; i < numLocals; i++) {
+      clazz.localExtension.put(Utils.readString(buffer), (int) buffer.readShort());
+    }
+    int numUpvalues = buffer.readShort();
+    for (int i = 0; i < numUpvalues; i++) {
+      clazz.upvalueExtension.put(Utils.readString(buffer), (int) buffer.readShort());
     }
     return clazz;
   }

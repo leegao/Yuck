@@ -147,7 +147,7 @@ public class Grammar {
     return new Variable(v);
   }
 
-  static Epsilon E() {
+  public static Epsilon E() {
     return new Epsilon();
   }
 }

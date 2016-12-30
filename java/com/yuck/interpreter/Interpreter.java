@@ -8,6 +8,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Interpreter {
   public static final boolean DEBUG = false;
@@ -223,6 +224,17 @@ public class Interpreter {
         case THIS: {
           YuckInstance instance = context.lookupThis();
           context.push(instance);
+          break;
+        }
+        case SUPER: {
+          YuckInstance instance = context.lookupThis();
+          String name = (String) function.constants.inverse().get(instruction.getArgument());
+          Optional<YuckInstance> superInstance = instance.getSuper(name);
+          if (superInstance.isPresent()) {
+            context.push(superInstance.get());
+          } else {
+            throw new IllegalStateException("No super class of " + name);
+          }
           break;
         }
         default:
