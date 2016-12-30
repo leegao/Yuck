@@ -39,6 +39,7 @@ public class Instruction {
       case NEG:
       case POW:
       case NEW:
+      case THIS:
         Preconditions.checkArgument(data.equals(0));
         return new Instruction(opcode, 0, context);
       case LOAD_CONST:
@@ -149,6 +150,7 @@ public class Instruction {
       case NEG:
       case POW:
       case NEW:
+      case THIS:
         return opcode.toString();
       case LOAD_CONST:
         return String.format("%s(%s)", opcode.toString(), context.constants.inverse().get(argument));

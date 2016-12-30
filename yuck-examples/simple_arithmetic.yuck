@@ -1,9 +1,3 @@
-var x = 3;
-function f() {
-  var x = 7;
-  return x;
-}
-
 class Foo {
   var z;
   function init(z) {
@@ -11,9 +5,9 @@ class Foo {
   }
 
   function foo() {
-    return 3;
+    return this.z;
   }
 }
 
-var z = new Foo();
-return z.foo() * 2;
+var z = new Foo("ABC");
+return z.foo() == z.z;

@@ -18,7 +18,7 @@ public class YuckFunction extends YuckObject {
     return Objects.hash(function);
   }
 
-  public final YCodeFunction function;
+  public transient final YCodeFunction function;
 
   @Override
   public YuckObjectKind getKind() {

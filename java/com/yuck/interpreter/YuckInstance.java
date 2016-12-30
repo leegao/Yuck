@@ -9,19 +9,20 @@ import java.util.Objects;
 
 public class YuckInstance extends YuckObject {
   public final YuckClass clazz;
-  public final YCodeFunction outer;
+  public transient final YCodeFunction outer;
   public final Map<String, YuckObject> fields = new HashMap<>();
+  public transient final InterpreterContext instanceContext;
 
   public YuckInstance(YuckClass clazz, YCodeFunction outer, InterpreterContext context) {
     super(context);
+    instanceContext = new InterpreterContext(context, this);
     this.clazz = clazz;
     this.outer = outer;
     for (String field : clazz.yClass.fields) {
-      fields.put(field, new YuckNil(context));
+      fields.put(field, new YuckNil(instanceContext));
     }
     for (Map.Entry<String, Integer> method : clazz.yClass.methods.entrySet()) {
-      // TODO: Add a new context scope here
-      fields.put(method.getKey(), new YuckFunction(outer.functions.inverse().get(method.getValue()), context));
+      fields.put(method.getKey(), new YuckFunction(outer.functions.inverse().get(method.getValue()), instanceContext));
     }
   }
 
@@ -48,6 +49,7 @@ public class YuckInstance extends YuckObject {
 
   @Override
   public YuckObject putField(String field, YuckObject object) {
-    return super.putField(field, object);
+    Preconditions.checkArgument(clazz.yClass.fields.contains(field));
+    return fields.put(field, object);
   }
 }

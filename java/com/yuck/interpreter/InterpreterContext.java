@@ -1,6 +1,7 @@
 package com.yuck.interpreter;
 
 import com.google.common.base.Preconditions;
+import com.sun.istack.internal.Nullable;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -10,14 +11,17 @@ public class InterpreterContext {
   protected final LinkedList<YuckObject> stack = new LinkedList<>();
   protected final HashMap<Integer, YuckObject> locals = new HashMap<>();
   protected final HashMap<String, Integer> localNames = new HashMap<>();
+  protected final Optional<YuckInstance> currentInstance;
   protected final Optional<InterpreterContext> previous;
 
   public InterpreterContext() {
     previous = Optional.empty();
+    currentInstance = Optional.empty();
   }
 
-  public InterpreterContext(InterpreterContext previous) {
+  public InterpreterContext(@Nullable InterpreterContext previous, @Nullable YuckInstance currentInstance) {
     this.previous = Optional.of(previous);
+    this.currentInstance = Optional.ofNullable(currentInstance);
   }
 
   public void push(YuckObject yuckObject) {
@@ -38,8 +42,11 @@ public class InterpreterContext {
   }
 
   public YuckObject get(int local) {
-    Preconditions.checkArgument(locals.containsKey(local));
-    return locals.get(local);
+    if (locals.containsKey(local)) {
+      return locals.get(local);
+    } else {
+      return new YuckNil(this);
+    }
   }
 
   public YuckObject lookup(String name) {
@@ -48,6 +55,14 @@ public class InterpreterContext {
     }
     Preconditions.checkArgument(previous.isPresent());
     return previous.get().lookup(name);
+  }
+
+  public YuckInstance lookupThis() {
+    if (currentInstance.isPresent()) {
+      return currentInstance.get();
+    }
+    Preconditions.checkArgument(previous.isPresent());
+    return previous.get().lookupThis();
   }
 
   public void storeup(String name, YuckObject val) {

@@ -89,8 +89,8 @@ public class Interpreter {
           }
           YuckObject callable = context.pop();
           if (callable instanceof YuckFunction) {
-            InterpreterContext nextContext = new InterpreterContext(context);
             YuckFunction closure = (YuckFunction) callable;
+            InterpreterContext nextContext = new InterpreterContext(closure.context, null);
             int local = 0;
             for (YuckObject argument : arguments) {
               nextContext.add(local, closure.function.locals.inverse().get(local), argument);
@@ -217,6 +217,11 @@ public class Interpreter {
           YuckObject clazz = context.pop();
           Preconditions.checkArgument(clazz instanceof YuckClass);
           YuckInstance instance = new YuckInstance((YuckClass) clazz, function, context);
+          context.push(instance);
+          break;
+        }
+        case THIS: {
+          YuckInstance instance = context.lookupThis();
           context.push(instance);
           break;
         }

@@ -30,6 +30,21 @@ public class Yuckc {
     new Yuckc().driver(args);
   }
 
+  private void dumpHuman(YCodeFunction function, String level) {
+    System.out.printf("%sFunction %s\n", level, function.name);
+    {
+      int i = 0;
+      for (Instruction instruction : function.instructions) {
+        System.out.printf("%s%d:\t%s\n", level, i++, instruction);
+      }
+    }
+    System.out.println();
+
+    for (int i = 0; i < function.functions.size(); i++) {
+      dumpHuman(function.functions.inverse().get(i), level + "  ");
+    }
+  }
+
   private void driver(String[] args) throws IOException {
     CmdLineParser parser = new CmdLineParser(this);
     try {
@@ -51,10 +66,7 @@ public class Yuckc {
           new ArrayList<>());
       YCodeFunction function = context.compile();
       if (human) {
-        int i = 0;
-        for (Instruction instruction : function.instructions) {
-          System.out.printf("%d:\t%s\n", i++, instruction);
-        }
+        dumpHuman(function, "");
       } else {
         if (output == null) {
           output = new File(yuckFile.replaceFirst("\\.yuck$", ".yc"));
