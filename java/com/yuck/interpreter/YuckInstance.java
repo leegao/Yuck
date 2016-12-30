@@ -1,5 +1,7 @@
 package com.yuck.interpreter;
 
+import com.yuck.Yuck;
+import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeFunction;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -35,12 +37,41 @@ public class YuckInstance extends YuckObject {
 
   @Override
   public boolean equals(Object o) {
+    if (o instanceof YuckObject) {
+      Optional<YuckObject> result = invoke("equals", (YuckObject) o);
+      if (result.isPresent()) return result.get().isFilled();
+    }
     return this == o;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clazz);
+    Optional<YuckObject> result = invoke("hash");
+    if (result.isPresent()) {
+      YuckObject yuckObject = result.get();
+      if (yuckObject instanceof YuckInteger) {
+        return ((YuckInteger) yuckObject).number;
+      }
+    }
+    return clazz.hashCode();
+  }
+
+  public Optional<YuckObject> invoke(String name, YuckObject... arguments) {
+    Optional<YuckInstance> field = hasField(name);
+    if (field.isPresent()) {
+      YuckInstance base = field.get();
+      YuckObject method = base.getField(name);
+      if (method instanceof YuckFunction) {
+        InterpreterContext newContext = new InterpreterContext(instanceContext, this);
+        for (int i = 0; i < arguments.length; i++) {
+          String parameter = ((YuckFunction) method).function.locals.inverse().get(i);
+          newContext.add(i, parameter != null ? parameter : "param@" + i, arguments[i]);
+        }
+        InterpreterContext result = Interpreter.interpret(((YuckFunction) method).function, newContext);
+        return Optional.of(result.pop());
+      }
+    }
+    return Optional.empty();
   }
 
   public Optional<YuckInstance> hasField(String field) {
@@ -85,5 +116,37 @@ public class YuckInstance extends YuckObject {
       }
     }
     return Optional.empty();
+  }
+
+  @Override
+  public String toString() {
+    Optional<YuckObject> result = invoke("toString");
+    if (result.isPresent()) {
+      YuckObject yuckObject = result.get();
+      if (yuckObject instanceof YuckString) {
+        return ((YuckString) yuckObject).string;
+      }
+    }
+    return super.toString();
+  }
+
+  @Override
+  public YuckObject tableLoad(YuckObject key) {
+    return super.tableLoad(key);
+  }
+
+  @Override
+  public void tableStore(YuckObject key, YuckObject val) {
+    super.tableStore(key, val);
+  }
+
+  @Override
+  public YuckObject binary(Opcode opcode, YuckObject other) {
+    return super.binary(opcode, other);
+  }
+
+  @Override
+  public boolean isFilled() {
+    return super.isFilled();
   }
 }

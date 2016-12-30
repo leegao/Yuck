@@ -1,23 +1,31 @@
 class Foo {
   var z;
-  function init() {
-    this.z = 3;
+  function init(n) {
+    this.z = n;
   }
 
   function foo() {
     return this.z;
+  }
+
+  function equals(other) {
+    return this.z == other.z;
   }
 }
 
 function meh(n) {
   class Bar extends Foo {
     function init() {
-      this(Foo).init();
+      this(Foo).init(n);
     }
 
     function bar() {
       this.z = this.z + n;
       return true;
+    }
+
+    function toString() {
+      return "meh";
     }
   }
   return new Bar();
@@ -25,4 +33,4 @@ function meh(n) {
 
 var z = meh(3);
 z.bar();
-return z.foo();
+return z;

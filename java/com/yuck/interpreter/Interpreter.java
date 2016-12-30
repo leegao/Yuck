@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class Interpreter {
   public static final boolean DEBUG = false;
-  public InterpreterContext interpret(YCodeFunction function, InterpreterContext context) {
+  public static InterpreterContext interpret(YCodeFunction function, InterpreterContext context) {
     int pc = 0;
     if (DEBUG) {
       function.instructions.forEach(System.err::println);

@@ -8,6 +8,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class YCodeClass {
@@ -91,5 +92,10 @@ public class YCodeClass {
       clazz.upvalueExtension.put(Utils.readString(buffer), (int) buffer.readShort());
     }
     return clazz;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name);
   }
 }
