@@ -1,6 +1,5 @@
 package com.yuck.interpreter;
 
-import com.yuck.Yuck;
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeFunction;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -147,6 +146,13 @@ public class YuckInstance extends YuckObject {
 
   @Override
   public boolean isFilled() {
-    return super.isFilled();
+    Optional<YuckObject> result = invoke("toBoolean");
+    if (result.isPresent()) {
+      YuckObject yuckObject = result.get();
+      if (yuckObject instanceof YuckBoolean) {
+        return ((YuckBoolean) yuckObject).bool;
+      }
+    }
+    return true;
   }
 }
