@@ -33,4 +33,4 @@ function meh(n) {
 
 var z = meh(3);
 z.bar();
-return z;
+return z instanceof Foo;
