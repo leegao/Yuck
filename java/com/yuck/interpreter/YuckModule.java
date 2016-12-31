@@ -2,8 +2,11 @@ package com.yuck.interpreter;
 
 import com.google.common.base.Preconditions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class YuckModule extends YuckObject{
   public final Map<String, YuckObject> map;
@@ -11,6 +14,20 @@ public class YuckModule extends YuckObject{
   protected YuckModule(Map<String, YuckObject> map, InterpreterContext context) {
     super(context);
     this.map = map;
+  }
+
+  protected YuckModule(InterpreterContext context) {
+    super(context);
+    this.map = new HashMap<>();
+  }
+
+
+  public static List<YuckObject> getArguments(InterpreterContext context) {
+    List<YuckObject> arguments = new ArrayList<>();
+    for (int i = 0; i < context.locals.size(); i++) {
+      arguments.add(context.locals.get(i));
+    }
+    return arguments;
   }
 
   public static YuckModule from(InterpreterContext result, InterpreterContext context) {
@@ -34,6 +51,17 @@ public class YuckModule extends YuckObject{
   @Override
   public int hashCode() {
     return 0;
+  }
+
+  protected void register(String name, Function<InterpreterContext, YuckObject> function, InterpreterContext context) {
+    map.put(name, new NativeFunction(function, context));
+  }
+
+  protected static void registerLocal(
+      String name,
+      Function<InterpreterContext, YuckObject> function,
+      InterpreterContext context) {
+    context.add(context.locals.size(), name, new NativeFunction(function, context));
   }
 
   @Override

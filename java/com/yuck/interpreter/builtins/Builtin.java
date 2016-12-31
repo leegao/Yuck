@@ -8,15 +8,20 @@ import com.yuck.interpreter.*;
 import com.yuck.ycode.YCodeFunction;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class Builtin {
+public class Builtin extends YuckModule implements NativeModule {
+  public Builtin(InterpreterContext context) {
+    super(context);
+  }
+
+  public Map<String, Function<InterpreterContext, NativeModule>> builtinModules = new HashMap<>();
+
   public static YuckObject print(InterpreterContext context) {
     List<YuckObject> arguments = getArguments(context);
     String joint = Joiner.on(" ").join(arguments);
@@ -24,7 +29,7 @@ public class Builtin {
     return new YuckNil(context);
   }
 
-  public static YuckObject require(InterpreterContext context) {
+  public YuckObject require(InterpreterContext context) {
     Preconditions.checkArgument(context.locals.size() > 0);
     Preconditions.checkArgument(context.get(0) instanceof YuckString);
     String pkg = ((YuckString) context.get(0)).string;
@@ -45,7 +50,13 @@ public class Builtin {
       } else {
         return value;
       }
+    } else if (builtinModules.containsKey(pkg)) {
+      NativeModule nativeModule = builtinModules.get(pkg).apply(context);
+      nativeModule.registerAll();
+      Preconditions.checkArgument(nativeModule instanceof YuckObject);
+      return (YuckObject) nativeModule;
     }
+
     throw new IllegalStateException();
   }
 
@@ -81,27 +92,13 @@ public class Builtin {
     }
   }
 
-  public static void register(
-      String name,
-      Function<InterpreterContext, YuckObject> function,
-      InterpreterContext context) {
-    context.add(context.locals.size(), name, new NativeFunction(function, context));
-  }
-
-  public static List<YuckObject> getArguments(InterpreterContext context) {
-    List<YuckObject> arguments = new ArrayList<>();
-    for (int i = 0; i < context.locals.size(); i++) {
-      arguments.add(context.locals.get(i));
-    }
-    return arguments;
-  }
-
-  public static void registerAll(InterpreterContext context) {
-    register("print", Builtin::print, context);
-    register("require", Builtin::require, context);
-    register("error", Builtin::error, context);
-    register("assert", Builtin::assert_, context);
-    register("tostring", Builtin::tostring, context);
-    register("tonumber", Builtin::tonumber, context);
+  public void registerAll() {
+    registerLocal("print", Builtin::print, context);
+    registerLocal("require", this::require, context);
+    registerLocal("error", Builtin::error, context);
+    registerLocal("assert", Builtin::assert_, context);
+    registerLocal("tostring", Builtin::tostring, context);
+    registerLocal("tonumber", Builtin::tonumber, context);
+    builtinModules.put("math", MathModule::new);
   }
 }

@@ -60,7 +60,7 @@ public class Yuck {
     try (DataInputStream reader = new DataInputStream(new FileInputStream(ycode))) {
       YCodeFunction function = YCodeFunction.read(reader);
       InterpreterContext top = new InterpreterContext();
-      Builtin.registerAll(top);
+      new Builtin(top).registerAll();
       InterpreterContext context = Interpreter.interpret(function, new InterpreterContext(top, null));
       YuckObject result = context.pop();
       if (!(result instanceof YuckNil)) {
