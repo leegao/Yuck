@@ -54,4 +54,10 @@ public class YuckList extends YuckObject {
   public boolean isFilled() {
     return list.size() != 0;
   }
+
+
+  @Override
+  public String toString() {
+    return Objects.toString(list);
+  }
 }

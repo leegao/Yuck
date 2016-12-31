@@ -24,4 +24,9 @@ public class YuckNil extends YuckObject {
   public boolean isFilled() {
     return false;
   }
+
+  @Override
+  public String toString() {
+    return "nil";
+  }
 }

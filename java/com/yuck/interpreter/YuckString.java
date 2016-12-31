@@ -32,4 +32,10 @@ public class YuckString extends YuckObject {
   public boolean isFilled() {
     return string.length() != 0;
   }
+
+
+  @Override
+  public String toString() {
+    return string;
+  }
 }

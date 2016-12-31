@@ -108,4 +108,9 @@ public class YuckInteger extends YuckObject {
   public boolean isFilled() {
     return number != 0;
   }
+
+  @Override
+  public String toString() {
+    return Objects.toString(number);
+  }
 }

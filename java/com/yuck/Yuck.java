@@ -5,6 +5,8 @@ import com.yuck.compilation.YCodeCompilationContext;
 import com.yuck.grammar.YuckyGrammar;
 import com.yuck.interpreter.Interpreter;
 import com.yuck.interpreter.InterpreterContext;
+import com.yuck.interpreter.builtins.Builtin;
+import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeFunction;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -43,7 +45,7 @@ public class Yuck {
             statements,
             String.format("@(%s)", name),
             new ArrayList<>());
-        YCodeFunction function = context.compile();
+        YCodeFunction function = context.compile().emit(Opcode.NIL).emit(Opcode.RETURN);
         File output = new File(ycode.replaceFirst("\\.yuck$", ".yc"));
         try (DataOutputStream writer = new DataOutputStream(new FileOutputStream(output))) {
           function.write(writer);
@@ -55,8 +57,9 @@ public class Yuck {
 
     try (DataInputStream reader = new DataInputStream(new FileInputStream(ycode))) {
       YCodeFunction function = YCodeFunction.read(reader);
-      Interpreter interpreter = new Interpreter();
-      InterpreterContext context = interpreter.interpret(function, new InterpreterContext());
+      InterpreterContext top = new InterpreterContext();
+      Builtin.registerAll(top);
+      InterpreterContext context = Interpreter.interpret(function, new InterpreterContext(top, null));
       System.out.println(context.pop());
     }
   }

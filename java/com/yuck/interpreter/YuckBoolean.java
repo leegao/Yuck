@@ -32,4 +32,9 @@ public class YuckBoolean extends YuckObject {
   public boolean isFilled() {
     return bool;
   }
+
+  @Override
+  public String toString() {
+    return Objects.toString(bool);
+  }
 }

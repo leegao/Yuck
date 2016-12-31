@@ -89,9 +89,10 @@ public class Interpreter {
             arguments.add(0, context.pop());
           }
           YuckObject callable = context.pop();
+          InterpreterContext nextContext = new InterpreterContext(callable.context, null);
+
           if (callable instanceof YuckFunction) {
             YuckFunction closure = (YuckFunction) callable;
-            InterpreterContext nextContext = new InterpreterContext(closure.context, null);
             int local = 0;
             for (YuckObject argument : arguments) {
               nextContext.add(local, closure.function.locals.inverse().get(local), argument);
@@ -99,6 +100,14 @@ public class Interpreter {
             }
             InterpreterContext result = interpret(closure.function, nextContext);
             context.push(result.pop());
+          } else if (callable instanceof NativeFunction) {
+            NativeFunction closure = (NativeFunction) callable;
+            int local = 0;
+            for (YuckObject argument : arguments) {
+              nextContext.add(local, "arg" + local, argument);
+              local++;
+            }
+            context.push(closure.function.apply(nextContext));
           } else {
             System.err.println(instruction + " : " + callable);
             throw new NotImplementedException();

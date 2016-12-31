@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public class InterpreterContext {
   protected final LinkedList<YuckObject> stack = new LinkedList<>();
-  protected final HashMap<Integer, YuckObject> locals = new HashMap<>();
+  public final HashMap<Integer, YuckObject> locals = new HashMap<>();
   protected final HashMap<String, Integer> localNames = new HashMap<>();
   protected final Optional<YuckInstance> currentInstance;
   protected final Optional<InterpreterContext> previous;

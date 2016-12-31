@@ -43,4 +43,9 @@ public class YuckTable extends YuckObject {
   public boolean isFilled() {
     return yuckObjectMap.size() != 0;
   }
+
+  @Override
+  public String toString() {
+    return Objects.toString(yuckObjectMap);
+  }
 }
