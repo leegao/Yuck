@@ -1,3 +1,5 @@
+var hello = require("yuck-examples.hello_world");
+
 class Foo {
   var z;
   function init(n) {
@@ -34,3 +36,4 @@ function meh(n) {
 var z = meh(3);
 z.bar();
 print(z instanceof Bar);
+hello.hello();

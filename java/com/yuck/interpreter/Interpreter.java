@@ -1,17 +1,52 @@
 package com.yuck.interpreter;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.yuck.ycode.Instruction;
 import com.yuck.ycode.YCodeClass;
 import com.yuck.ycode.YCodeFunction;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class Interpreter {
   public static final boolean DEBUG = false;
+  public static final List<Path> YUCK_PATHS = new ArrayList<>();
+
+  public static void addPath(Path path) {
+    YUCK_PATHS.add(path);
+  }
+
+  static {
+    // Add the current working directory
+    addPath(Paths.get(".").toAbsolutePath());
+    // Add the environment
+    String yuck_paths = System.getenv("YUCK_PATHS");
+    if (yuck_paths != null) {
+      for (String string : Splitter.on(":").omitEmptyStrings().trimResults().split(yuck_paths)) {
+        Path path = Paths.get(string).toAbsolutePath();
+        addPath(path);
+      }
+    }
+  }
+
+  public static Optional<File> lookupPackage(String pkg) {
+    String file = pkg.replace('.', '/') + ".yuck";
+    for (Path path : YUCK_PATHS) {
+      Path resolve = path.resolve(file);
+      if (Files.exists(resolve)) {
+        return Optional.of(resolve.toFile());
+      }
+    }
+    return Optional.empty();
+  }
+
   public static InterpreterContext interpret(YCodeFunction function, InterpreterContext context) {
     int pc = 0;
     if (DEBUG) {

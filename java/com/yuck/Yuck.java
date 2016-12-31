@@ -5,6 +5,8 @@ import com.yuck.compilation.YCodeCompilationContext;
 import com.yuck.grammar.YuckyGrammar;
 import com.yuck.interpreter.Interpreter;
 import com.yuck.interpreter.InterpreterContext;
+import com.yuck.interpreter.YuckNil;
+import com.yuck.interpreter.YuckObject;
 import com.yuck.interpreter.builtins.Builtin;
 import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeFunction;
@@ -60,7 +62,10 @@ public class Yuck {
       InterpreterContext top = new InterpreterContext();
       Builtin.registerAll(top);
       InterpreterContext context = Interpreter.interpret(function, new InterpreterContext(top, null));
-      System.out.println(context.pop());
+      YuckObject result = context.pop();
+      if (!(result instanceof YuckNil)) {
+        System.out.println(result);
+      }
     }
   }
 }

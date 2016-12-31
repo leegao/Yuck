@@ -4,6 +4,7 @@ import com.yuck.ast.Statement;
 import com.yuck.compilation.YCodeCompilationContext;
 import com.yuck.grammar.YuckyGrammar;
 import com.yuck.ycode.Instruction;
+import com.yuck.ycode.Opcode;
 import com.yuck.ycode.YCodeFunction;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -30,7 +31,7 @@ public class Yuckc {
     new Yuckc().driver(args);
   }
 
-  private void dumpHuman(YCodeFunction function, String level) {
+  private static void dumpHuman(YCodeFunction function, String level) {
     System.out.printf("%sFunction %s\n", level, function.name);
     {
       int i = 0;
@@ -56,6 +57,10 @@ public class Yuckc {
       return;
     }
 
+    yuckc(yuckFile, output, human);
+  }
+
+  public static YCodeFunction yuckc(String yuckFile, File output, boolean human) throws IOException {
     try (FileReader reader = new FileReader(yuckFile)) {
       YuckyGrammar grammar = new YuckyGrammar();
       List<Statement> statements = grammar.parseYuckCode(reader);
@@ -64,14 +69,17 @@ public class Yuckc {
           statements,
           String.format("@(%s)", name),
           new ArrayList<>());
-      YCodeFunction function = context.compile();
+      YCodeFunction function = context.compile().emit(Opcode.NIL).emit(Opcode.RETURN);
       if (human) {
         dumpHuman(function, "");
       } else {
         if (output == null) {
           output = new File(yuckFile.replaceFirst("\\.yuck$", ".yc"));
           if (output.toString().equals(yuckFile)) {
-            throw new IllegalStateException(String.format("%s does not end in a .yuck extension. Please specify a --output file.", yuckFile));
+            throw new IllegalStateException(
+                String.format(
+                    "%s does not end in a .yuck extension. Please specify a --output file.",
+                    yuckFile));
           }
         }
         try (DataOutputStream writer = new DataOutputStream(new FileOutputStream(output))) {
@@ -79,6 +87,7 @@ public class Yuckc {
           writer.flush();
         }
       }
+      return function;
     }
   }
 }
