@@ -3,6 +3,7 @@ package com.yuck.interpreter;
 import com.yuck.interpreter.builtins.NativeModule;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.util.List;
 import java.util.Objects;
 
 public class YuckString extends YuckModule implements NativeModule {
@@ -42,9 +43,34 @@ public class YuckString extends YuckModule implements NativeModule {
     return string;
   }
 
+  private YuckObject find(InterpreterContext context) {
+    List<YuckObject> arguments = getArguments(context);
+    if (arguments.size() == 1) {
+      return wrap(string.indexOf(unwrap(arguments.get(0))));
+    } else {
+      return wrap(string.indexOf(this.<String>unwrap(arguments.get(0)), unwrap(arguments.get(1))));
+    }
+  }
+
+  private YuckObject substring(InterpreterContext context) {
+    List<YuckObject> arguments = getArguments(context);
+    if (arguments.size() == 1) {
+      return wrap(string.substring(unwrap(arguments.get(0))));
+    } else {
+      return wrap(string.substring(unwrap(arguments.get(0)), unwrap(arguments.get(1))));
+    }
+  }
+
   public void registerAll() {
     register("length", c -> wrap(string.length()), context);
     register("replace", c -> wrap(string.replace(unwrap(c.get(0)), unwrap(c.get(1)))), context);
+    register("charAt", c -> wrap(String.valueOf(string.charAt(unwrap(c.get(0))))), context);
+    register("contains", c -> wrap(string.contains(unwrap(c.get(0)))), context);
+    register("startsWith", c -> wrap(string.startsWith(unwrap(c.get(0)))), context);
+    register("endsWith", c -> wrap(string.endsWith(unwrap(c.get(0)))), context);
+    register("find", this::find, context);
+    register("trim", c -> wrap(string.trim()), context);
+    register("substring", this::substring, context);
   }
 
   private YuckObject wrap(Object object) {
