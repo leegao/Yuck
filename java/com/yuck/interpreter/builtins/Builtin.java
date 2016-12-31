@@ -65,6 +65,22 @@ public class Builtin {
     throw new IllegalStateException("Assertion failed.");
   }
 
+  public static YuckObject tostring(InterpreterContext context) {
+    Preconditions.checkArgument(context.locals.size() > 0);
+    return new YuckString(context.get(0).toString(), context);
+  }
+
+  public static YuckObject tonumber(InterpreterContext context) {
+    Preconditions.checkArgument(context.locals.size() > 0);
+    Preconditions.checkArgument(context.get(0) instanceof YuckString);
+    String string = ((YuckString) context.get(0)).string;
+    try {
+      return new YuckInteger(Integer.valueOf(string), context);
+    } catch (NumberFormatException e) {
+      return new YuckFloat(Float.valueOf(string), context);
+    }
+  }
+
   public static void register(
       String name,
       Function<InterpreterContext, YuckObject> function,
@@ -85,5 +101,7 @@ public class Builtin {
     register("require", Builtin::require, context);
     register("error", Builtin::error, context);
     register("assert", Builtin::assert_, context);
+    register("tostring", Builtin::tostring, context);
+    register("tonumber", Builtin::tonumber, context);
   }
 }

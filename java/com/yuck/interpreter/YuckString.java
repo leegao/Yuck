@@ -5,7 +5,7 @@ import java.util.Objects;
 public class YuckString extends YuckObject {
   public final String string;
 
-  protected YuckString(String string, InterpreterContext context) {
+  public YuckString(String string, InterpreterContext context) {
     super(context);
     this.string = string;
   }

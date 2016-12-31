@@ -28,7 +28,7 @@ public class ForStatement extends Statement {
     String fallthrough = function.flx("iter");
 
     try (YCodeCompilationContext.Scope scope = context.push()) {
-      expr.compile(function, context); // TOS is list
+      expr.compile(function, context).emit(Opcode.GET_FIELD, "iterator").emit(Opcode.CALL, 1); // TOS is list
       function.emit(Opcode.STORE_LOCAL, iter);
       // While loop
       function.emit(Opcode.NOP, label);
