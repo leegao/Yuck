@@ -71,6 +71,13 @@ public class YuckString extends YuckModule implements NativeModule {
     register("find", this::find, context);
     register("trim", c -> wrap(string.trim()), context);
     register("substring", this::substring, context);
+    register("format", c -> wrap(String.format(string, getArguments(c).toArray())), context);
+    register(
+        "repeat",
+        c -> wrap(new String(new char[this.<Integer>unwrap(c.get(1))]).replace("\0", unwrap(c.get(0)))),
+        context);
+    register("lower", c -> wrap(string.toLowerCase()), context);
+    register("upper", c -> wrap(string.toUpperCase()), context);
   }
 
   private YuckObject wrap(Object object) {
