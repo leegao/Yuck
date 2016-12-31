@@ -1,8 +1,8 @@
 package com.yuck.interpreter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import com.google.common.collect.Lists;
+
+import java.util.*;
 
 public class YuckList extends YuckObject {
   public YuckList(InterpreterContext context) {
@@ -59,5 +59,26 @@ public class YuckList extends YuckObject {
   @Override
   public String toString() {
     return Objects.toString(list);
+  }
+
+  public YuckObject iterator(InterpreterContext context) {
+    List<YuckObject> copy = Lists.newArrayList(list);
+    Iterator<YuckObject> iterator = copy.iterator();
+    Map<String, YuckObject> map = new HashMap<>();
+    map.put(
+        "hasNext", new NativeFunction(c -> new YuckBoolean(iterator.hasNext(), c), context)
+    );
+    map.put(
+        "next", new NativeFunction(c -> iterator.next(), context)
+    );
+    return new YuckModule(map, context);
+  }
+
+  @Override
+  public YuckObject getField(String field) {
+    if (field.equals("@iterator")) {
+      return new NativeFunction(this::iterator, context);
+    }
+    return super.getField(field);
   }
 }

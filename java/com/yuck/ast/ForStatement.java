@@ -23,17 +23,16 @@ public class ForStatement extends Statement {
   @Override
   public YCodeFunction compile(YCodeFunction function, YCodeCompilationContext context) {
     // for i in list {...} -> var it = list.iterator(); while (it.has_next()) { var i = it.next(); ... }
-    String iter = function.fvs("iter");
-    String label = function.flx("iter");
-    String fallthrough = function.flx("iter");
-
     try (YCodeCompilationContext.Scope scope = context.push()) {
-      expr.compile(function, context).emit(Opcode.GET_FIELD, "iterator").emit(Opcode.CALL, 1); // TOS is list
+      expr.compile(function, context).emit(Opcode.GET_FIELD, "@iterator").emit(Opcode.CALL, 1); // TOS is list
+      String iter = function.fvs("iter");
+      String label = function.flx("iter");
+      String fallthrough = function.flx("fallthrough");
       function.emit(Opcode.STORE_LOCAL, iter);
       // While loop
       function.emit(Opcode.NOP, label);
       function.emit(Opcode.LOAD_LOCAL, iter);
-      function.emit(Opcode.GET_FIELD, "has_next");
+      function.emit(Opcode.GET_FIELD, "hasNext");
       function.emit(Opcode.CALL, 1);
       function.emit(Opcode.JUMPZ, fallthrough);
       // var i = it.next();

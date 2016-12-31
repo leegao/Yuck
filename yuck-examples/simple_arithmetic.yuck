@@ -37,3 +37,7 @@ var z = meh(3);
 z.bar();
 print(z instanceof Bar);
 hello.hello();
+
+for i in 1 to 5 {
+  print(i);
+}
