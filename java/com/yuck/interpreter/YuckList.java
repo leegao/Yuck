@@ -1,5 +1,6 @@
 package com.yuck.interpreter;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import java.util.*;
@@ -74,10 +75,18 @@ public class YuckList extends YuckObject {
     return new YuckModule(map, context);
   }
 
+  public YuckObject add(InterpreterContext context) {
+    Preconditions.checkArgument(context.locals.size() > 0);
+    list.add(context.get(0));
+    return this;
+  }
+
   @Override
   public YuckObject getField(String field) {
     if (field.equals("@iterator")) {
       return new NativeFunction(this::iterator, context);
+    } else if (field.equals("append")) {
+      return new NativeFunction(this::add, context);
     }
     return super.getField(field);
   }
