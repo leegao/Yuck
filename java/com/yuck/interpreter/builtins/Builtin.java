@@ -49,6 +49,22 @@ public class Builtin {
     throw new IllegalStateException();
   }
 
+  public static YuckObject error(InterpreterContext context) {
+    throw new IllegalStateException(context.get(0).toString());
+  }
+
+  public static YuckObject assert_(InterpreterContext context) {
+    List<YuckObject> arguments = getArguments(context);
+    Preconditions.checkArgument(arguments.size() > 0, "Assert takes at least one argument.");
+    if (arguments.get(0).isFilled()) {
+      return arguments.get(0);
+    }
+    if (arguments.size() > 1) {
+      throw new IllegalStateException("Assertion failed: " + arguments.get(1).toString());
+    }
+    throw new IllegalStateException("Assertion failed.");
+  }
+
   public static void register(
       String name,
       Function<InterpreterContext, YuckObject> function,
@@ -67,5 +83,7 @@ public class Builtin {
   public static void registerAll(InterpreterContext context) {
     register("print", Builtin::print, context);
     register("require", Builtin::require, context);
+    register("error", Builtin::error, context);
+    register("assert", Builtin::assert_, context);
   }
 }
